@@ -2,10 +2,10 @@
 permalink:      /:year-:month-:day/:title
 
 # Setup
-title:          Tale
+title:          MyBlog
 paginate:       5
 baseurl:        ""
-url:            "https://wangkunSE.github.io/tale"
+url:            "https://wangkunSE.github.io/_post"
 
 # Assets
 sass:
