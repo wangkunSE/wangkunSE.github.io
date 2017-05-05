@@ -5,7 +5,7 @@ permalink:      /:year-:month-:day/:title
 title:          MyBlog
 paginate:       5
 baseurl:        ""
-url:            "https://wangkunSE.github.io/_post"
+url:            "https://wangkunSE.github.io/"
 
 # Assets
 sass:
