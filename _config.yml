@@ -26,3 +26,5 @@ version:        3.4.1
 # Gems
 gems:
   - jekyll-paginate
+
+favicon: /favicon.ico
