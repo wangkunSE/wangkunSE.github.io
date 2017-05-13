@@ -4,7 +4,7 @@ permalink:      /:year-:month-:day/:title
 # Setup
 title:          WK's Blog
 paginate:       5
-baseurl:        ""
+baseurl:        "https://github.com/wangkunSE/wangkunSE.github.io"
 url:            "https://wangkunSE.github.io"
 
 # Assets
