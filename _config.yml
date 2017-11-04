@@ -4,7 +4,7 @@ bio:            'an easy-going man ;-)'
 description:    "This is the place for me to record my life and study."
 picture:        'assets/img/profile.png'
 locale:         en_US
-url:            https://wangkunse.github.io/
+url:            https://wangkunse.github.io
 
 
 # Jekyll
