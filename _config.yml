@@ -18,14 +18,16 @@ markdown:       kramdown
 
 # About
 author:
-  name:         Donny Wang
-  email:        wkzuilovess@gmail.com
+  name:         Chester How
+  url:          http://chester.how
+  email:        chesterhow@gmail.com
 
 # Custom vars
 version:        3.4.1
+github:
+  repo:         https://github.com/chesterhow/tale
 
 # Gems
 gems:
   - jekyll-paginate
-
 favicon: /favicon.ico
