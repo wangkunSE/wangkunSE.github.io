@@ -23,7 +23,8 @@ public class d_ReorderingDemo {
     private static class ReaderThread extends Thread {
 
         private static final AtomicInteger threadId = new AtomicInteger(0);
-        private static final ThreadLocal<Integer> threadLocal = ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式
+        private static final ThreadLocal<Integer> threadLocal =
+          ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式
 
         public long getId() {
             return threadLocal.get();
@@ -110,7 +111,7 @@ public T get() {
     }
 ```
 
-> 可以发现ThreadLocal真正起作用的其实是其中的ThreadLocalMap，所以当ThreadLocal被声明为static时，相关线程都可以访问同一份ThreadLocal对象，但是其中的值是和其线程绑定的，因此不会产生干扰。但是当ThreadLocal不被声明为static时，其实更好理解，它就是一个局部的只能存一个值key为当前线程的map变量，也就不存在其它线程访问的问题了。
+> 可以发现ThreadLocal真正起作用的其实是其中的ThreadLocalMap，所以当ThreadLocal被声明为static时，相关线程都可以访问同一份ThreadLocal对象，但是其中的值是和其线程绑定的，因此不会产生干扰。但是当ThreadLocal不被声明为static时，其实更好理解，它就是一个局部的只能存一个值key为当前线程的map变量，也就不存在其它线程访问的问题了。**ThreadLocal< T > 类似于包含了Map< Thread,T >对象，其中保存了特定于该线程的值，但其实现并非如此。这些特定于线程的值保存在Thread对象中，当线程终止后，这些值会作为垃圾回收。** 
 
 **下面代码和最初的演示代码逻辑相同，但是输出结果不同，大家可以想想为什么。**
 
@@ -120,7 +121,8 @@ public class d_ReorderingDemo {
     private static class ReaderThread extends Thread {
 
         private AtomicInteger threadId = new AtomicInteger(0);
-        private ThreadLocal<Integer> threadLocal = ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式
+        private ThreadLocal<Integer> threadLocal =
+        ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式
 
         public long getId() {
             return threadLocal.get();
