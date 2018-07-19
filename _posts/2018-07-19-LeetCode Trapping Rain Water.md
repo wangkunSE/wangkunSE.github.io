@@ -8,7 +8,7 @@
 
 > 结合下图看
 >
-> ![img](rainwatertrap.png)
+> ![img](../images/leetcode/rainwatertrap.png)
 >
 > ```java
 > Input: [0,1,0,2,1,0,1,3,2,1,2,1]
@@ -34,12 +34,9 @@ class Solution {
     }
 
     private int getTheTotalWater(int[] height,int start,int end,int index){
-        if (start >= end - 1) {
-            return 0;
-        }
-        int containsLeft = 0;
-        int containsRight = 0;
-        if(start < end){
+        if (start < end - 1) {
+            int containsLeft = 0;
+            int containsRight = 0;
             //find current max value index
             int max = findTheMax(height,start,end,index);
             //find left second max value index
@@ -49,11 +46,13 @@ class Solution {
             //left water capcity
             containsLeft = getTheWater(height,left,max,height[left]);
             if(right < end){
-                //right water capcity
+               //right water capcity
                 containsRight = getTheWater(height,max,right+1,height[right]);
             }
             //find outward
-            return getTheTotalWater(height,start,left+1,left)+getTheTotalWater(height,right,end,right)+containsLeft+containsRight;
+            return getTheTotalWater(height,start,left+1,left)
+                +getTheTotalWater(height,right,end,right)
+                +containsLeft+containsRight;
         }
         return 0;
     }
