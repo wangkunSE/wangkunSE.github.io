@@ -1,0 +1,103 @@
+## 解决CORS问题实践
+
+### 简介
+
+> 跨域资源共享([CORS](https://developer.mozilla.org/en-US/docs/Glossary/CORS)) 是一种机制，它使用额外的 [HTTP](https://developer.mozilla.org/en-US/docs/Glossary/HTTP) 头来告诉浏览器  让运行在一个 origin (domain) 上的Web应用被准许访问来自不同源服务器上的指定的资源。当一个资源从与该资源本身所在的服务器**不同的域、协议或端口**请求一个资源时，资源会发起一个**跨域 HTTP 请求**。
+
+**简单来说CORS就是浏览器为了保证网站的安全的一种机制。**
+
+[更多介绍：阮一峰的文章](http://www.ruanyifeng.com/blog/2016/04/cors.html)
+
+### 实践
+
+本文使用springboot + jquery试验一下CORS的解决方案。
+
+#### 环境
+
+![环境](../images/cors/环境.png)
+
+首先需要两个工程，因为是本机测试，所以两个端口要不一样，而且为了还原跨域的情景，所以将domain1，domain2一起绑定到本地IP。
+
+#### 步骤
+
+以上环境搭建完成后就开始实践了。这里是使用domain1跨域请求domain2的接口。
+
+页面代码如下：
+
+```html
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+
+<head>
+    <title>Hello World</title>
+    <script src="jquery-3.3.1.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#btn1").click(function () {
+                $.get("http://domain2:8081/domain2", function (data, status) {
+                    alert("data: " + data + "\n status: " + status);
+                });
+            });
+        });
+    </script>
+</head>
+
+<body>
+<h1> Hello World! </h1><br/>
+
+<input id="btn1" type="button" value="CROS-Test">
+
+</body>
+</html>
+```
+
+启动工程后点击button就会报如下错误:
+
+![CORS拦截](../images/cors/CORS拦截.png)
+
+这就说明请求已经被拦截了，要想请求到domain2的接口，需要domain2对跨域进行授权。
+
+我这里使用一个拦截器对domain1域的请求发放权限：
+
+```java
+public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+
+        String referer = request.getHeader("referer");
+        if (StringUtils.isEmpty(referer)) { 
+            referer = request.getHeader("origin");
+        }
+
+        if (!StringUtils.isEmpty(referer)) {
+            URL refererUrl = new URL(referer);
+            StringBuilder originBuf = new StringBuilder(refererUrl.getProtocol()).append("://")
+                    .append(refererUrl.getHost());
+            if (refererUrl.getPort() > 0) {
+                originBuf.append(":").append(refererUrl.getPort());
+            }
+            String origin = originBuf.toString();
+            if ("http://domain1:8080".equals(origin)) {
+
+                response.addHeader("Access-Control-Allow-Origin", origin);
+                response.addHeader("Access-Control-Allow-Credentials", "true");
+                response.addHeader("Access-Control-Allow-Headers", "demo");
+            }
+        }
+
+        return true;
+
+    }
+```
+
+
+
+重新访问一下：
+
+![跨域成功](../images/cors/跨域成功.png)
+
+可以看到请求成功了。主要原理就是domain2允许了domain1的跨域请求，浏览器获取到授权标识，其实就在http请求头中，就会放行。
+
+
+
+[以上全部源码](https://github.com/wangkunSE/cors-demo)
+
