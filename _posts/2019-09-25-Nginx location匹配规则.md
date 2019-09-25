@@ -39,10 +39,8 @@
 >
 > 查了下nginx的error日志，发现有如下一句话
 >
-> ```txt
 > 2019/09/25 16:13:48 [error] 53456#57324: *74 CreateFile() "D:\develop\nginx-1.16.1/admin/admin" failed (2: The system cannot find the file specified), client: 127.0.0.1, server: localhost, request: "GET /admin HTTP/1.1", host: "localhost"
 > 
-> ```
 >
 > 可以看到nginx尝试到/admin/admin下寻找我们的文件，这说明location后的前缀会在寻找文件时起作用！！！所以需要把它失效掉。配置如下
 >
