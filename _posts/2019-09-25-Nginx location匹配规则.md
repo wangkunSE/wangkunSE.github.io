@@ -28,7 +28,7 @@
 >
 >  ```
 > location ^~ /admin {
-> 	  root  admin;
+> 	  root  /a/n/admin;
 > 	  index index.html;
 > 	}
 >  ```
@@ -46,12 +46,11 @@
 >
 > ```
 > location ^~ /admin {
-> 		  root  admin;
-> 		  rewrite /admin / last;
+> 		  root  /a/b;
 > 		  index index.html;
 > 		}
 > ```
 >
-> 使用rewrite将前缀失效，问题解决！
+> 将root定位到父级目录，问题解决！
 >
 > 
