@@ -48,7 +48,7 @@
 
 #### 3.3 数据更新同步
 
-![1571298412214](D:\githubrepository\wangkunSE.github.io\images\eureka\renewlease.png)
+![1571298412214](..\images\eureka\renewlease.png)
 
 > 更新数据以及状态使用的是续约接口，可以看到也是registry的一个叫renew的方法。
 
