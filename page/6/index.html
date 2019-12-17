@@ -136,6 +136,58 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/06/25/LeetCode%20Next%20Permutation/">
+        <p class="h4 index-header">LeetCode-Next Permutation</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Next Permutation题目：
+大意就是找出以当前数组从左至右为一个数字的下一个大的数字的数组组合，只能用常量的空间。若已经为最大数，则返回递增数组。
+
+例子：1,2,3 → 1,3,23,2,1 → 1,2,31,1,5 → 1,5,1
+思路：
+其实这个题我一开始想的思路是从后往前找第一个比前一个值大的数，该位置就称为index好了，要满足nums[index]&gt;nums[index-1]，交换就OK，但是仔细想了下不对，应该是找到那个位置，然后从后往前找出最小的那个比nums[index-1]大的值，交换后排序index-1后的数组就OK了。
+
+代码：class Solution {
+    public void nextPermutation(int[] nums) {
+            if(nums == null || nums.length &lt;= 1){
+                return;
+            }
+            int length = nums.length;
+          </div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-06-25&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
         <p class="h4 index-header">synchronized理解与实践</p>
         
@@ -565,43 +617,6 @@ make: *** [build] Error 2
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/%E6%96%87%E5%AD%A6">文学</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/10/23/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E8%AF%BB%E5%90%8E%E6%84%9F/">
-        <p class="h4 index-header">大话设计模式读后感</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">&emsp;&emsp;算来从读这本书开始应该有一个多月了，刚开始读得时候真的是感觉像开启了新世界的大门，感觉太厉害了，全书都是一个个的小故事，故事中包含一个设计模式，真的让人感觉面向对象是一种思维，一门哲学，全书读起来十分抓人，个人感觉《HeadFirst设计模式》还要好。因为平时还有其他工作所以读完这本书花了一个月的时间，包括写书中的示例代码。虽然读完了这本书，但是感觉就如囫囵吞枣，很多东西都没理解，印象非常深刻的模式寥寥可数，还需要在实际的学习工作中深入理解。每个模式都非常的厉害，它们的存在让我感觉到写代码不是简单的复制粘贴，而是一门艺术。
-&emsp;&emsp;看了设计模式之后感觉自己以前的代码真的是丑陋无比，简直就如建房子只会堆砖抹水泥一样。也终于体会到了一点儿工程师和码农的区别，体会到了一些什么才是真正的面向对象编程。并不是说用一门面向对象的语言就可以写出面向对象的代码。面向对象编程使代码耦合度的降低，因此软件的扩展性，复用性得到了极大的增强。
-&emsp;&emsp;之前写代码真的是对设计几乎都没有如何想，觉得功能实现了就行了嘛，在适当地抽取一下复用的代码就算是对自己代</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-10-23&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E4%B9%A6%E7%B1%8D">书籍</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">设计模式</a>&nbsp;
           
         
       </div>
