@@ -136,41 +136,45 @@
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/09/25/LengthFieldBasedFrameDecoder%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91/">
-        <p class="h4 index-header">LengthFieldBasedFrameDecoder官方文档翻译</p>
+      <a href="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/">
+        <p class="h4 index-header">SpringCloud系列（一）之Eureka</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">Netty的LengthFieldBasedFrameDecoder解码器官方文档翻译
-* A decoder that splits the received {@link ByteBuf}s dynamically by the
-* value of the length field in the message.  It is particularly useful when you
-* decode a binary message which has an integer header field that represents the
-* length of the message body or the whole message.
-* &lt;p&gt;
-* {@link LengthFieldBasedFrameDecoder} has many configuration parameters so
-* that it can decode any message with a length field, which is often seen in
-* propr</div>
+          <div class="index-text mb-1">
+前言：时间久了发现自己的记性真的越来越差了，很多当时记得非常清楚的东西，隔了很长时间发现有印象是有印象，但是模模糊糊，提起来可能驴唇不对马嘴。因此觉得有些东西还是要落实，要输出，这样自己的印象才会深刻，所以从现在开始学习的东西都尝试着总结，以便以后忘记时也能回来看看迅速得回忆起这些知识，温故而知新。
+
+1. Eureka简介
+Eureka是Netflix开发的服务发现框架，本身是一个基于REST的服务，主要用于定位运行在AWS域中的中间层服务，以达到负载均衡和中间层服务故障转移的目的。SpringCloud将它集成在其子项目spring-cloud-netflix中，以实现SpringCloud的服务发现功能。
+概括一下就是Eureka是一种注册中心
+
+2. Eureka架构
+
+
+
+
+可以看到整个架构中有三种角色Eureka Server 、Service Consumer 、Service Provider。分别对应了注册中心，服务消费者，服务提供者。服务提供者将自己的信息注册到注册中心，并且可以更新和取消该注册。注册中心间同步服务提供者的信息。服务消费者通过注册中心找到服务提供者</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-09-25&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-17&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/Java">Java</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/springCloud">springCloud</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/Java">Java</a>&nbsp;
-          
-            <a href="/tags/NIO">NIO</a>&nbsp;
+            <a href="/tags/springCloud">springCloud</a>&nbsp;
           
         
       </div>
@@ -181,35 +185,62 @@
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/">
-        <p class="h4 index-header">NIO学习总结</p>
+      <a href="/2019/10/17/LeetCode%2089%20Gray%20Code/">
+        <p class="h4 index-header">LeetCode-Gray Code</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">NIO 学习总结1.学习感悟&emsp;&emsp;Java NIO是自jdk1.4以来就有的一个包。里面提供了大量的与普通IO不同的API。主要的不同点就在于N，有两种解释，一种是new，一种是nonblocking。学习完了之后我觉得两种说法都对，因为这部分API和典型的IO思想上完全不一样，而不一样之处中很重要的一点就是nonblocking这个特性。
-&emsp;&emsp;整体的学习是从构建非阻塞型Socket通信开始的，之前是一直在学习Socket的知识，因为在项目中用到了而且对于自己来说是难点，所以特地学习了一下，收获也非常多，不过Socket部分另起一篇文章写。
-&emsp;&emsp;NIO之前就明白很重要，但是一开始看Java核心技术的介绍并没有看进去，以为很难，学完之后发现并不然，重要的是要找到一个好的资源。我对NIO的学习大部分都是通过一个外国小哥的博客，链接在这里（tutorials.jenkov.com）。文章是14年就发表在网站上的，感觉自己要跟上这个时代真的是要做很多努力。博客中技术十分全面，Java的各种核心包都有教程，虽是英文，但是并不难懂，且有图有</div>
+          <div class="index-text mb-1">LeetCode: Gray Code题目:
+灰码的含义是两个连续的数字在二进制上只有一位不同。给一个正整数n，返回一个灰码集合，该集合必须以0开始。
+
+例子：
+Input: 2
+Output: [0,1,3,2]
+Explanation:
+00 - 0
+01 - 1
+11 - 3
+10 - 2
+
+对于一个整数n，灰码的序列可能不是唯一的，如下.
+For example, [0,2,3,1] 也是一个合格的返回值.
+
+00 - 0
+10 - 2
+11 - 3
+01 - 1
+
+思路:
+这个题是在刷dfs系列题的时候遇到的，刚开始以为很简单，不就是每一位选1还是0的问题吗，但是事实不是这样。最后发现规律，每增加一位实际是增加了当前位和已有集合的倒序列的和。
+n = 1 .    0        1
+n = 2 .    00       01    |    11        10
+n = 3 .    000    001        011        010    |    110        111        101        100
+…
+
+class Solut</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-09-05&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-17&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/Java">Java</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/Java">Java</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           
-            <a href="/tags/NIO">NIO</a>&nbsp;
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -220,41 +251,55 @@
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/06/03/Linux%E4%B8%8B%E5%AE%89%E8%A3%85ORACLE10g%E7%9A%84%E9%83%A8%E5%88%86%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E6%80%BB%E7%BB%93/">
-        <p class="h4 index-header">Linux下安装ORACLE10g的部分注意事项总结</p>
+      <a href="/2019/10/16/LeetCode%2079%20Word%20Search/">
+        <p class="h4 index-header">LeetCode-Word Search</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">Linux下安装ORACLE10g的注意事项总结1. 配置网络*vi /etc/sysconfig/network-scripts/ifcfg-eth0 *
+          <div class="index-text mb-1">LeetCode: Word Search题目:
+给定一个二维字符数组和一个单词，找在字符数组中是否能够拼成当前单词。
 
-DEVICE=eth0TYPE=EthernetUUID=eecaa6f0-7a48-4807-8d64-c0b7d490f8b2ONBOOT=yesNM_CONTROLLED=yesBOOTPROTO=noneIPADDR=192.168.152.136NETMASK=255.255.255.0GATEWAY=192.168.152.2HWADDR=00:0C:29:A9:44:BCPREFIX=24DEFROUTE=yesIPV4_FAILURE_FATAL=yesIPV6INIT=noNAME=”System eth0”LAST_CONNECT=1495547591DNS1=192.168.152.2
+例子：
+board =
+[
+  [&#39;A&#39;,&#39;B&#39;,&#39;C&#39;,&#39;E&#39;],
+  [&#39;S&#39;,&#39;F&#39;,&#39;C&#39;,&#39;S&#39;],
+     [&#39;A&#39;,&#39;D&#39;,&#39;E&#39;,&#39;E&#39;]
+   ]
 
-下划线部分以自己的机子为准，若能ping通ip地址而ping不同域名，可以加上最后一行的DNS，地址为网关地址
-2. 安装必要软件
-libXp-1.0.0-8.1.el5.i386.rpmbinutils-2.17.50.</div>
+   Given word = &quot;ABCCED&quot;, return true.
+   Given word = &quot;SEE&quot;, return true.
+Given word = &quot;ABCB&quot;, return false.
+
+思路:
+这个题很明显是一个dfs的题，找到开始位置然后分别找上下左右看能否拼成当前单词就可以判断当前结果，需要注意的是找的过程中不能再使用已经使用过的字符。
+
+代码：DFS
+class Solution {
+  public bool</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-06-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-16&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/RDBMS">RDBMS</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
           
-            <a href="/categories/oracle">oracle</a>&nbsp;
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/linux">linux</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           
-            <a href="/tags/oracle">oracle</a>&nbsp;
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -265,52 +310,421 @@ libXp-1.0.0-8.1.el5.i386.rpmbinutils-2.17.50.</div>
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/">
-        <p class="h4 index-header">Java-虚拟机工作原理</p>
+      <a href="/2019/10/12/LeetCode%20622%20Maximum%20Width%20of%20Binary%20Tree/">
+        <p class="h4 index-header">LeetCode-Maximum Width of Binary Tree</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">引言java程序的工作流程 
+          <div class="index-text mb-1">LeetCode: Maximum Width of Binary Tree题目:
+给定一个二叉树，求这个树的最大宽度。该宽度为两个非空节点间包含空节点的总结点数。
 
-可以看到我们平常首先会写一个java文件，然后经过java的编译器编译成字节码文件，也就是.class文件，这个过程中我们的程序还没有加载到内存之中。下一步便是通过JRE的类加载器将我们磁盘上的类文件加载到系统分配给JVM的内存区域–运行时数据区(Runtime Data Areas)。然后执行引擎解释或者编译类文件，转化为特定的CPU机器码，CPU执行机器码，至此完成整个过程。
+例子：
+Example 1:
 
+Input: 
 
+           1
+         /   \
+        3     2
+       / \     \  
+      5   3     9 
 
-可以发现其中有几个概念， 类加载器， 运行时数据区 ，执行引擎 。这些也都是java虚拟机中的核心概念。下面一一来介绍这些概念。
-类加载器接下来就看一下   类加载器 为何物，又是怎么工作的。
+Output: 4
+Explanation: 最大宽度是第三层，总共有四个节点 4 (5,3,null,9).
+Example 2:
 
-层级结构
-类加载器被组织成一种层级结构关系，也就是父子关系。其中，Bootstrap是所有类加载器的父亲。如图所示:
+Input: 
 
+          1
+         /  
+        3    
+       / \       
+      5   3     
 
+Output: 2
+Explanation:最大宽度是第三层 总共有两个节点 2 (5,3).
 
-
-Bootstrap Class Loader:
-当运行java虚拟机时，这个类加载器被创建，它加载一些基本的JAVA API，包括Object这个类。需要注意的是，这个类加载器不是用java语言写的，使用C++写的，所以无法访问。
-
-
-Extension </div>
+思路:
+这个题也是最直观的感受就是在考察树的广度遍历，但是因为没有深入思考过，所以在怎么区分每一层上陷入了卡克状态。看了提示发现可以通过队列的大小来确定当前层有多少个节点。知道这个后这个题的核心问题是怎么算两个节点</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-05-08&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-12&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/Java">Java</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
           
-            <a href="/categories/Jvm">Jvm</a>&nbsp;
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/Java">Java</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/27/LeetCode%20Generate%20Parentheses/">
+        <p class="h4 index-header">LeetCode-Generate Parentheses</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Generate Parentheses题目:
+给定一个数字n，写一个函数返回所有n对小括号的组合。
+
+例子：
+For example, given n = 3, a solution set is:
+
+[
+  &quot;((()))&quot;,
+  &quot;(()())&quot;,
+  &quot;(())()&quot;,
+  &quot;()(())&quot;,
+  &quot;()()()&quot;
+]
+
+思路:
+这个题也是明显的回溯的题，就是看当前选择哪个括号，但是需要注意的是左括号数一定要小于等于右括号数，当两种括号都使用完了就是一种解。
+
+代码：class Solution {
+ public List&lt;String&gt; generateParenthesis(int n) {
+
+        if (n &lt;= 0) {
+            return new ArrayList&lt;&gt;();
+        }
+
+        List&lt;String&gt; result = new ArrayL</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-27&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/26/LeetCode%20Subset/">
+        <p class="h4 index-header">LeetCode-Subset</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Subset题目:
+给定一个不重复的整型列表，要求返回它所有的子集
+
+例子：
+Input: nums = [1,2,3]
+Output:
+[
+  [3],
+  [1],
+  [2],
+  [1,2,3],
+  [1,3],
+  [2,3],
+  [1,2],
+  []
+]
+
+思路:
+好久没做题了，一碰到这个题隐隐约约感觉会做，但是感觉非常卡顿。最后受到启发，其实整体就是单看每一个数字拿与不拿的问题，这里就有似曾相识的感觉了。
+
+代码：class Solution {
+    public List&lt;List&lt;Integer&gt;&gt; subsets(int[] nums) {
+        if (null == nums || nums.length &lt; 1) {
+            return new ArrayList&lt;&gt;();
+        }
+
+        List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();
+        Li</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-26&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/26/LeetCode%20Letter%20Case%20P/">
+        <p class="h4 index-header">LeetCode-Letter Case P</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Letter Case P题目:
+给定一个字符串S，将字符串中的每个字母不包含数字分别变成大写和小写的方式，返回一个可能出现的字符串集合。
+
+例子：
+Examples:
+Input: S = &quot;a1b2&quot;
+Output: [&quot;a1b2&quot;, &quot;a1B2&quot;, &quot;A1b2&quot;, &quot;A1B2&quot;]
+
+Input: S = &quot;3z4&quot;
+Output: [&quot;3z4&quot;, &quot;3Z4&quot;]
+
+Input: S = &quot;12345&quot;
+Output: [&quot;12345&quot;]
+
+思路:
+这个题是在Subset那个题之后做的，做起来就很随便了，思路和那个一样，就是判断出是不是字母，如果是字母先把当前的字母变成小写走一遍，然后把当前字母变成大写走一遍。
+
+代码：class Solution {
+public List&lt;String&gt; letterCasePermutation(String sou</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-26&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/25/Nginx%20location%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/">
+        <p class="h4 index-header">Nginx location匹配规则</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">语法规则
+location [=|~|~*|^~] /uri/ { … }
+
+
+
+
+模式
+含义
+
+
+
+location = /uri
+= 表示精确匹配，只有完全匹配上才能生效
+
+
+location ^~ /uri
+^~ 开头对URL路径进行前缀匹配，并且在正则之前。
+
+
+location ~ pattern
+开头表示区分大小写的正则匹配
+
+
+location ~* pattern
+开头表示不区分大小写的正则匹配
+
+
+location /uri
+不带任何修饰符，也表示前缀匹配，但是在正则匹配之后
+
+
+location /
+通用匹配，任何未匹配到其它location的请求都会匹配到，相当于switch中的default
+
+
+
+首先精确匹配 =
+其次前缀匹配 ^~
+其次是按文件中顺序的正则匹配
+然后匹配不带任何修饰的前缀匹配。
+最后是交给 / 通用匹配
+当有匹配成功时候，停止匹配，按当前匹配规则处理请求
+
+遇到的问题
+想要在非根目录下部署静态文件，但是一直显示404。 配置如下
+location ^~ /admin {
+      root  /a/n/admin;
+      index </div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-25&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nginx">nginx</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/24/%E8%87%AA%E5%B7%B1%E6%90%AD%E5%BB%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B9%B6%E5%85%8D%E5%AF%86/">
+        <p class="h4 index-header">Git配置SSH免密码登录</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">1.本地生成秘钥　　打开Git Bash
+ssh-keygen -t rsa -C &quot;xiaowang@qq.com&quot;2.服务器上创建用户
+adduser git
+passwd git #设置git的密码
+cd /
+mkdir project #创建项目文件夹
+cd project
+git init
+cd ../../
+chown git:git project #设置用户组
+
+3.Git服务器打开RSA认证
+在Git服务器上首先需要将/etc/ssh/sshd_config中将RSA认证打开：
+RSAAuthentication yesPubkeyAuthentication yesAuthorizedKeysFile  .ssh/authorized_keys在/home/git下创建.ssh目录，然后创建authorized_keys文件，把id_rsa.pub里面的内容复制到authorized_keys文件中
+
+4.修改权限重要,很重要,非常重要！！！！！！！！！！没有配置的话还是需要输入密码的！！！
+
+修改 .ssh 目录的权限为 700修改 .ssh/</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-24&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/git">git</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/07/14/%E5%BD%B7%E5%BE%A8/">
+        <p class="h4 index-header">彷徨</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">​        还没从差点儿没毕业的阴影中完全走出来就经历了入职与培训。入职前就十分的忐忑，不明白自己这个选择到底正不正确，总感觉自己处在一个很关键的三岔口，而且不知道自己选得这条路到底是怎么样的，这些天也莫名的烦躁，对各种事情都提不起兴趣。工作上来讲因为有一段实习经历，所做的项目给我一种感觉，就是这里的技术并不是很新，很多代码也写得很奇怪。不过现在想想可能有两方面原因，第一可能是因为自己熟悉的代码不多，可能存在以管窥豹的问题，第二就是因为刚开始时接触的代码真得写得太规范了，造成了自己以为那就是互联网中真实的代码情况。
+​        刚入职第二天就参加培训了，可能是因为之前HR一直在说要给我们留下一个印象深刻的培训，所以对这次培训还是挺期待，想看看到底怎么个不一样法。但是培训下来发现基本也就是将培训计划的任务交给了另一个公司，说实话有一些失望，所有环节也都中规中矩，要是没有先前的鼓吹的话其实倒也还可以。整个培训最大的收获就是认识了一同入职的小伙伴，当然年龄有大有小，学历也有高有低，不过可以看出整体的招人层次还是比较高的。还有一个收获就是体验了一下年轻人该有的生活，疯狂，张扬，狂欢</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-07-14&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E5%85%B6%E4%BB%96">其他</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E6%9D%82%E8%AE%B0">杂记</a>&nbsp;
           
         
       </div>
@@ -321,7 +735,7 @@ Extension </div>
 
   <nav aria-label="index posts navigation">
     <span class="pagination pg-blue justify-content-center mt-5" id="pagination">
-      <a class="extend prev" rel="prev" href="/"><i class="fas fa-angle-double-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span>
+      <a class="extend prev" rel="prev" href="/"><i class="fas fa-angle-double-left"></i></a><a class="page-number" href="/">1</a><span class="page-number current">2</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/3/"><i class="fas fa-angle-double-right"></i></a>
     </span>
   </nav>
   

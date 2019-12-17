@@ -136,47 +136,56 @@
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
-        <p class="h4 index-header">synchronized理解与实践</p>
+      <a href="/2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/">
+        <p class="h4 index-header">MySQL必知必会</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">
-作为Java使用者，对于synchronized肯定不陌生，它是多线程中重要的一个机制，能够保证多线程程序在共享数据时的正确性。但是最近遇到一个问题，久久没有想明白，查阅了很多博客和资料最终终于想明白了，决定写记录下来。
+          <div class="index-text mb-1">1.检索数据1.1 distinct
+##用于检索出单一的行值
+select distinct vend_id from products.
 
-如果想了解synchronized的机制以及原理可以参考：
-Java 之 synchronized 详解
-起因    private static void synchronizedDemo() {
-        Task task = new Task();
-        for (int i = 0; i &lt; 10; i++) {
-            new Thread(task).start();
-        }
-    }
+##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。
+select distinct vend_id,vend_name from products.
 
-    private static class Task implements Runnable {
-        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;
-        private Integer value = </div>
+mysql&gt; select * from test;
++----+------+-------+
+| id | name | photo |
++----+------+-------+
+|  1 | tony | photo |
+|  1 | tom  | photo |
+|  2 | tony | photo |
+|  2 | tom  | photo |
+|  2 | tom  | photo |
++----+------+-------+
+5 rows in set
+
+mysql&gt; select distinct id,name from test;
++----+------+
+| id | name |
++----+------+
+|  1 | t</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-02-02&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-03&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+            <a href="/categories/RDBMS">RDBMS</a>&nbsp;
           
-            <a href="/categories/Java">Java</a>&nbsp;
+            <a href="/categories/Mysql">Mysql</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/Thread">Thread</a>&nbsp;
+            <a href="/tags/Mysql">Mysql</a>&nbsp;
           
         
       </div>
@@ -187,26 +196,100 @@ Java 之 synchronized 详解
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/01/31/ThreadLocal%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
-        <p class="h4 index-header">ThreadLocal理解与实践</p>
+      <a href="/2019/11/26/SpringSecurity/">
+        <p class="h4 index-header">SpringSecurity</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">​        首先贴出源码的对于该类的注释，大意讲的是这个类提供了线程封闭的变量。所谓线程封闭指的是其他线程不可以访问这个变量，每一个线程对应该变量的一个副本。当ThreadLocal被声明成private static时，一般用来将一个属性与当前线程联系起来（比如当前的线程ID，用户ID）。
-/**
- * This class provides thread-local variables.  These variables differ from
- * their normal counterparts in that each thread that accesses one (via its
- * {@code get} or {@code set} method) has its own, independently initialized
- * copy of the variable.  {@code ThreadLocal} instances are typically private
- * static fields in classes that wish t</div>
+          <div class="index-text mb-1">Spring Security1. 校验流程
+
+
+
+
+
+入口在AbstractAuthenticationProcessingFilter，它的实现如下图所示，可以发现它的子类只有一个UsernamePasswordAuthenticationFilter，其中的attemptAuthencation方法就如下实现。
+
+
+
+
+
+
+从上图可以看到尝试授权前先创造了一个Token，而username就被作为了principal也就是主体，password被作为了 credentials也就是认证证书。然后通过authenticationManager进行认证操作。Token的实现类图如下图所示。
+
+
+而AuthenticationManager的类图如下，可以发现默认实现类为ProviderManager。
+
+
+其中ProviderManager的授权方法如下图所示。
+
+
+可以看到主要就是通过AuthenticationProvider来进行实际的授权工作，找到第一个可用的AuthenticationProvider来进行授权。
+
+
+其中默认的Provider为AbstractUserDe</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-01-31&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-11-26&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/Spring">Spring</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Spring">Spring</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/11/14/Java%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%97%A5%E6%9C%9F%E7%9A%84%E9%97%B4%E9%9A%94%E5%A4%A9%E6%95%B0/">
+        <p class="h4 index-header">Java 计算两个日期的间隔天数</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">Java 计算两个日期的间隔天数
+两个日期的间隔天数应用场景很多，自己一开始写得是使用两个日期的毫秒数之差再除以一天的毫秒数算出天数，但是这种方法获得的值会出现不准确的问题。发现通过Calender考虑是否跨年来实现。
+
+package com.youdao.adapmathserver.util;
+
+import java.time.LocalDate;
+import java.util.Calendar;
+
+/**
+ * @author soul
+ * @version 2019/11/14
+ */
+public class DateUtil {
+
+     public static int differentDays(Date startDate, Date endDate) {
+        Calendar startCalender = Calendar.getInstance();
+        startCalender.setTime(startDate);
+
+        Calendar endCalender = Calendar.getInstance</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-11-14&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -230,79 +313,61 @@ Java 之 synchronized 详解
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/01/02/2017%E6%80%BB%E7%BB%93/">
-        <p class="h4 index-header">2017总结</p>
+      <a href="/2019/11/04/shell%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/">
+        <p class="h4 index-header">Shell 编程学习</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">&emsp;&emsp;时光匆匆，一转眼一年又过去了。很多事情都像是昨天刚刚发生的一样，越长大就越感觉到时间流逝之快远远超过预料。从前老师给布置任务让做年终个人总结，但当时从来都是敷衍，现在才感觉到这不失为一种记录时间的方法，所以就用这篇流水账记录一下我的2017。
-学业&emsp;&emsp;今年到头来虽然也感觉自己不会的知识很多，但是比起一年前的自己还是很有进步的。当然也有更多不足之处，需要在新的一年里努力加油的。
-&emsp;&emsp;细算一下进步体现在以下几个方面。首先是专业知识的理解加深，包括对整个计算机的理解，对工作语言Java本身的理解，对所应用到的一些知识的理解也都进了一步，不过这都是在结合别人建议之后进行加深的，这也是以后的方向，毕竟一个剑客也要对自己的剑了如指掌，才能在交战中取得胜利，才能够格参透更高深的剑意。其次是专业知识的广度也有所增长，了解到了很多新的专业方向，但是了解都很泛，明年一定要选其中的几个深入理解，只有看得招数多了，才能悟出自己的招数，就似独孤九剑，所谓无招胜有招不过就是临敌经验，以及对抓重点能力的锻炼。再次是对专业知识外的书籍的阅读，知晓了王阳明</div>
+          <div class="index-text mb-1">
+因为大部分的工作都是重复的，使用脚本会极大地提升自身工作效率。实际工作中有很长时间在使用shell做一些操作，平时也会写一些脚本简化自己的操作，但是基本都是命令的罗列，也就是顺序式编程，很低级。因此决定系统地学习一下shell编程更加提升自我效率。
+
+运行shell脚本的两种方式
+#! 是一个约定的标记，它告诉系统这个脚本需要什么解释器来执行，即使用哪一种 Shell。
+
+作为可执行程序
+
+chmod +x ./test.sh  #使脚本具有执行权限
+./test.sh  #执行脚本
+./的意思是在当前目录寻找test.sh文件，如果不加的话就回去PATH中找，通常都是找不到的。
+
+
+作为解释器参数
+
+/bin/sh test.sh
+/bin/php test.php
+这种方式运行的脚本，不需要在第一行指定解释器信息(#!/bin/bash)，写了也没用。
+
+
+
+
+Shell 变量定义变量 =
+变量定义要满足如下规则：
+
+命名只能使用英文字母，数字和下划线，首个字符不能以数字开头。
+中间不能有空格，可以使用下划线（_）。
+不能使用标点符号。
+不能使用bash里的关键字（可用help命</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-01-02&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E5%85%B6%E4%BB%96">其他</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E6%97%A5%E5%B8%B8">日常</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/">
-        <p class="h4 index-header">Maven的filtering和profile标签使用</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">使用Maven 将项目分版前言
-每个项目通常都会用不同的配置文件对应不同的版本，例如开发版和上线版本的配置通常会是不同的。此时就会产生一个问题，当项目需要从开发版切换到上线版时，总是会避免不了更改很多配置项，或者切换配置文件，但是不管哪一种都不方便配置。使用Maven就可以很方便的帮助我们应对这种问题，本文就简单介绍一下使用方法。
-
-resources属性
-这个属性就是指定构建项目时需要将哪些配置文件打包，其本身包含很多子标签，这里就不一一介绍了，只介绍相关的。其中include就是指定需要包含在最终项目中的资源。
-
- &lt;resources&gt;
-            &lt;resource&gt;
-                &lt;directory&gt;src/main/java&lt;/directory&gt;
-                &lt;includes&gt;
-                    &lt;include&gt;**/*.xml&lt;/include&gt;
-                &lt;/includes&gt</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-12-02&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-11-04&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
             <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/linux">linux</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/Maven">Maven</a>&nbsp;
+            <a href="/tags/linux">linux</a>&nbsp;
           
         
       </div>
@@ -313,103 +378,60 @@ resources属性
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/11/20/%E5%AE%9E%E4%B9%A0%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/">
-        <p class="h4 index-header">实习面试记录</p>
+      <a href="/2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/">
+        <p class="h4 index-header">G1垃圾回收器部分原理</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">spring相关
-1.springmvc 工作流程
-2.springmvc mapping种类
-3.spirng 工作原理
-4.Aop 概念以及spring aop实现的方式
-5.spring 启动过程
+          <div class="index-text mb-1">简介
+G1 GC，全称Garbage-First Garbage Collector，通过-XX:+UseG1GC参数来启用。G1的目标是在实现高吞吐量的同时，尽可能的满足垃圾收集暂停时间的需求。
 
-集合框架
-1.hashmap原理
-2.concurrentHashMap和hashtable，hashmap的区别
+参数及意义
 
-多线程
-1.原子类
-2.wait和sleep的区别
-3.某线程获得锁后能否反复进入被synchronized加锁的代码或方法
-4.countdownLaunch的实现原理
-5.多线程的学习方法：没有困难制造困难。
 
-jvm相关
-1.jvm编译时做了哪些优化（我说我挺懂jvm的，直接给我抛出了这个问题，当时就感觉自己嘴怎么这么贱。。）
-2.堆内存如何分配的（当时答得不好，他提示说新生代和老年代是不一样的，面试完才想起来这不就是垃圾回收算法的知识嘛。。还是不熟，死记课本不行啊。。）
+参数
+含义
 
-数据结构
-1.B树，B*树，能否根据所给数组形成B树（当时都忘了B树是啥样的了，只记得可以做索引。。平时一定要来回翻看，不然就会感觉到书到用时方恨少了。。）
-2.红黑树原理，作用
-3.堆排序</div>
+
+
+-XX:G1HeapRegionSize=n
+设置Region大小，并非最终值
+
+
+-XX:MaxGCPauseMillis
+设置G1收集过程目标时间，默认值200ms，不是硬性条件
+
+
+-XX:G1NewSizePercent
+新生代最小值，默认值5%
+
+
+-XX:G1MaxNewSizePercent
+新生代最大值，默认值60%
+
+
+-XX:ParallelGCThreads
+STW期间，并行GC线程数
+
+
+-XX:ConcGCThreads=n
+并发标记阶段，并行执行的线程数
+
+
+-XX:InitiatingHeapOccupancyPercent
+设置触发标记周期的 Java 堆占用率阈值。默认值是45%。这里的java堆占比指的是non_young_capacity_bytes，包括old+humongous
+
+
+G1 中的重要概念Region
+</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-20&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/">
-        <p class="h4 index-header">Java实现二叉树的三种非递归遍历</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">Java 实现二叉树的三种非递归遍历1.思路
-其实思路就是递归的思路，无非就是加入了栈这个数据结构。
-具体来看代码吧，个人觉得还算简洁。
-
-2.实现首先是结点数据结构的设置：/**
- * @author WK
- */
-public class SearchBinaryTree {
-
-    //存放的结点标志
-    public String tag = &quot;&quot;;
-    //是否被便利的标志
-    public boolean flag = false;
-    //左孩子
-    public SearchBinaryTree leftChild = null;
-    //右孩子
-    public SearchBinaryTree rightChild = null;
-  //省略了getter，setter以及构造函数
-}
-- 前序遍历/**
-     *
-     * @param T 传入的树的根结点
-     */
-    public static void priorOrderNonRecursive(SearchBinaryTree T) </div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-11&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-28&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
@@ -417,6 +439,61 @@ public class SearchBinaryTree {
             <a href="/categories/Java">Java</a>&nbsp;
           
             <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/Jvm">Jvm</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Jvm">Jvm</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/10/23/LeetCode%20211%20Add%20and%20Search%20Word%20-%20Data%20structure%20design/">
+        <p class="h4 index-header">LeetCode-Add and Search Word - Data structure design</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Add and Search Word - Data structure design题目:
+设计一个数据结构实现下面两个操作：
+void addWord(word)
+bool search(word)
+search(word)方法可以查找出添加的单词，并且单词中的（’.’）字符代表任意存在的字母。
+
+例子：
+addWord(&quot;bad&quot;)
+addWord(&quot;dad&quot;)
+  addWord(&quot;mad&quot;)
+  search(&quot;pad&quot;) -&gt; false
+  search(&quot;bad&quot;) -&gt; true
+  search(&quot;.ad&quot;) -&gt; true
+search(&quot;b..&quot;) -&gt; true
+
+思路:
+这个题是一个设计数据结构的题，和trieNode那个题是类似的，需要一个这样的结构来根据字母树来查找单词。但是这里多了一个任意字符’.’，刚开始我改变了存储结构，按层来存储，这样看来就像一个单链表，但是这样其实</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-23&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
@@ -424,6 +501,8 @@ public class SearchBinaryTree {
           
             <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
         
       </div>
     </div>
@@ -433,56 +512,50 @@ public class SearchBinaryTree {
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/">
-        <p class="h4 index-header">Vmare克隆虚拟机</p>
+      <a href="/2019/10/23/LeetCode%20208%20Implement%20Trie%20(Prefix%20Tree)/">
+        <p class="h4 index-header">LeetCode-Implement Trie (Prefix Tree)</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">克隆虚拟机​    VMware虚拟机安装系统虽然方便，但是搭集群时如果每个结点都重新安装的话也是很耗时的。幸好VMware有个克隆功能，用起来非常方便，非常爽。下面就给出简单的克隆教程。前提是你已经有一个安装好系统且配置好环境的虚拟机。
+          <div class="index-text mb-1">LeetCode: Implement Trie (Prefix Tree)题目:
+实现一个tire的数据结构实现下面的操作：
+ public void insert(String word) ;
+ public boolean search(String word) ;
+ public boolean startsWith(String prefix) ;
+search(word)方法可以查找出添加的单词，startsWith方法可以查找有没有以prefix为前缀的单词。
 
+例子：
+Trie trie = new Trie();
 
-这里我就用图上的nginx虚拟机做演示，我安装的是centos7。
-1、右键nginx虚拟机–》快照–》拍摄快照
-
-2、点击拍摄快照，快照拍摄成功。名称可自填
-
-3、再右键nginx虚拟机–》管理–》克隆
-
-4、下一步5、选择现有快照–》下一步
-
-6、选择创建完整克隆–》下一步
-
-7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。
-
-8、至此我们完成了克隆虚拟机的任务
-
-9、配置网络
-
-​    什么都没设置网络居然是好的，但是回头看原虚拟机，发现原虚拟机访问不了网络了，果然有问题。
-
-
-①、删除/etc/sysconfig/network-scripts/ifcfg-ens33 的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。
-
-②、进入/etc/</div>
+trie.insert(&quot;apple&quot;);
+trie.search(&quot;apple&quot;);   // returns true
+trie.search(&quot;app&quot;);     // returns false
+trie.startsWith(&quot;app&quot;); // returns true
+trie.insert(&quot;app&quot;);   
+trie.search(&q</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-04&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-23&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
             <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/vmare">vmare</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -493,43 +566,51 @@ public class SearchBinaryTree {
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/">
-        <p class="h4 index-header">编译安装nginx的坑</p>
+      <a href="/2019/10/22/LeetCode%20212%20Word%20Search%20II/">
+        <p class="h4 index-header">LeetCode-Word Search II</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">编译安装nginx的坑报错信息make -f objs/Makefile
-make[1]: Entering directory `/data/source/nginx&#39;
-cd /usr/local/ufo/lib/pcre \
-&amp;&amp; if [ -f Makefile ]; then make distclean; fi \
-&amp;&amp; CC=&quot;gcc&quot; CFLAGS=&quot;-O2 -fomit-frame-pointer -pipe &quot; \
-./configure --disable-shared
-/bin/sh: ./configure: No such file or directory
-make[1]: *** [/usr/local/services/lib/pcre/Makefile] Error 127
-make[1]: Leaving directory `/data/source/nginx-0.7.61&#39;
-make: *** [build] Error 2
+          <div class="index-text mb-1">LeetCode: Word Search II题目:
+给定一个二维字符数组和一个单词集合，找出所有在数组中的单词集合。每一个单词的字符必须在相邻的单元格中。
 
-分析
-一开始一点儿头绪都没有，</div>
+例子：
+Input: 
+board = [
+  [&#39;o&#39;,&#39;a&#39;,&#39;a&#39;,&#39;n&#39;],
+  [&#39;e&#39;,&#39;t&#39;,&#39;a&#39;,&#39;e&#39;],
+  [&#39;i&#39;,&#39;h&#39;,&#39;k&#39;,&#39;r&#39;],
+  [&#39;i&#39;,&#39;f&#39;,&#39;l&#39;,&#39;v&#39;]
+]
+words = [&quot;oath&quot;,&quot;pea&quot;,&quot;eat&quot;,&quot;rain&quot;]
+
+Output: [&quot;eat&quot;,&quot;oath&quot;]
+
+思路:
+这个题本身已经不陌生了，一看就是要使用dfs的解法。但是肯定没有这么简单，因为这是一道hard的题，所以肯定对时间复杂</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-22&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
             <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/nginx">nginx</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -540,33 +621,48 @@ make: *** [build] Error 2
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/10/28/%E6%88%91%E4%BB%AC%E4%BB%A8%E8%AF%BB%E5%90%8E%E6%84%9F/">
-        <p class="h4 index-header">我们仨读后感</p>
+      <a href="/2019/10/18/LeetCode%2093%20Restore%20IP%20Addresses/">
+        <p class="h4 index-header">LeetCode-Restore IP Addresses</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">&emsp;&emsp;自从读完《围城》，似乎对读书就爱了起来。其实《围城》中多处的引经据典我都看不懂，但是依然觉得这本书写得是真好。因为从前那么不爱读书的我竟能不知不觉的看下去，直到看完才惊觉已然看完了。因此当然就对钱老产生了极大的兴趣，为什么作者这么厉害，看围城前对钱老的了解只是《寂静的钱钟书》那篇文章。后来慢慢了解到钱老经历之丰富，学识之渊博。真的是敬仰二字都不足以表达出我的感受。
-&emsp;&emsp;读完《我们仨》才明白为什么围城中的序所写的钱老写书时给杨先生看，两人边看边笑。因为《围城》就是钱老回国后自己的故事啊，不同的是钱老有货真价实的学历与知识储备而且有他爱的圆圆。所以其实我很好奇《我们仨》中没写到的故事，就是钱老怎么和杨先生在一起，又有没有唐晓芙这个人呢？哈哈，就这两本书而言都给我同一种感觉，那就是读着不累，故事又很抓人，然而又不缺乏深度。我想这就是高级知识分子笔下的文章吧。
-&emsp;&emsp;《我们仨》真的是一个非常温馨的故事，一家人不论什么时候总是彼此牵挂，在一起便无限欢喜，一家人在一起平平淡淡但又充满趣味。其中很有感触的一幕就是，钱老躺在船的床上，杨先生</div>
+          <div class="index-text mb-1">LeetCode: Restore IP Addresses题目:
+给定一个由数字组成的字符串，求出改数字组成的串可以转化的所有合法ip集合。
+
+例子：
+Input: &quot;25525511135&quot;
+Output: [&quot;255.255.11.135&quot;, &quot;255.255.111.35&quot;]
+
+思路:
+首先合法的ip由四个数字组成并由3个（.） 进行分割，并且每个数字都大于0小于255。这个题也是一个典型的递归求解的问题，点的总数是确定的，只有3个，那么问题就是在哪里打点。然后再看其实第一次打点的位置只有3个，因为在第四个位置打点时就一定会大于255。所以问题就转换成找出第一个点的位置，然后再找子串的第一个点的位置，打够三个点结束。需要注意的是当串以0开始时，只能截取0。
+
+class Solution {
+  public List&lt;String&gt; restoreIpAddresses(String s) {
+        if (null == s || s.length() &lt; 4) {
+          </div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-10-28&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-18&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/%E4%B9%A6%E7%B1%8D">书籍</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/%E6%96%87%E5%AD%A6">文学</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -577,33 +673,60 @@ make: *** [build] Error 2
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/10/23/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E8%AF%BB%E5%90%8E%E6%84%9F/">
-        <p class="h4 index-header">大话设计模式读后感</p>
+      <a href="/2019/10/18/LeetCode%2090%20Subsets%20II/">
+        <p class="h4 index-header">LeetCode-Subsets II</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">&emsp;&emsp;算来从读这本书开始应该有一个多月了，刚开始读得时候真的是感觉像开启了新世界的大门，感觉太厉害了，全书都是一个个的小故事，故事中包含一个设计模式，真的让人感觉面向对象是一种思维，一门哲学，全书读起来十分抓人，个人感觉《HeadFirst设计模式》还要好。因为平时还有其他工作所以读完这本书花了一个月的时间，包括写书中的示例代码。虽然读完了这本书，但是感觉就如囫囵吞枣，很多东西都没理解，印象非常深刻的模式寥寥可数，还需要在实际的学习工作中深入理解。每个模式都非常的厉害，它们的存在让我感觉到写代码不是简单的复制粘贴，而是一门艺术。
-&emsp;&emsp;看了设计模式之后感觉自己以前的代码真的是丑陋无比，简直就如建房子只会堆砖抹水泥一样。也终于体会到了一点儿工程师和码农的区别，体会到了一些什么才是真正的面向对象编程。并不是说用一门面向对象的语言就可以写出面向对象的代码。面向对象编程使代码耦合度的降低，因此软件的扩展性，复用性得到了极大的增强。
-&emsp;&emsp;之前写代码真的是对设计几乎都没有如何想，觉得功能实现了就行了嘛，在适当地抽取一下复用的代码就算是对自己代</div>
+          <div class="index-text mb-1">LeetCode: Subsets II题目:
+给定一个集合，找出该集合可能的所有子集，当前集合包含重复元素。
+
+例子：
+Input: [1,2,2]
+Output:
+[
+  [2],
+  [1],
+  [1,2,2],
+  [2,2],
+  [1,2],
+  []
+]
+
+思路:
+这个题和subsets的思路大致一样，就是当前的元素到底要不要，不同点在于是否如何把相同元素的不同组合去重。首先就是对所查找集合进行排序，排序完成后相同的元素就在相邻的位置了，然后在查找的过程中，如果相同的靠前元素还没使用，当前元素就不应该纳入。
+
+class Solution {
+  public List&lt;List&lt;Integer&gt;&gt; subsetsWithDup(int[] nums) {
+
+        if (null == nums || nums.length == 0) {
+            return new ArrayList&lt;&gt;();
+        }
+
+        List&lt;List&lt;Integer&gt;&gt; res</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-10-23&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-18&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/%E4%B9%A6%E7%B1%8D">书籍</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">设计模式</a>&nbsp;
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
@@ -614,7 +737,7 @@ make: *** [build] Error 2
 
   <nav aria-label="index posts navigation">
     <span class="pagination pg-blue justify-content-center mt-5" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fas fa-angle-double-right"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="page-number" href="/page/3/">3</a><span class="space">&hellip;</span><a class="page-number" href="/page/7/">7</a><a class="extend next" rel="next" href="/page/2/"><i class="fas fa-angle-double-right"></i></a>
     </span>
   </nav>
   

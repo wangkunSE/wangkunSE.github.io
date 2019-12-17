@@ -4,6 +4,1404 @@
   
   
   <entry>
+    <title>MySQL必知必会</title>
+    <link href="undefined2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/"/>
+    <url>2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/</url>
+    
+    <content type="html"><![CDATA[<h3 id="1-检索数据"><a href="#1-检索数据" class="headerlink" title="1.检索数据"></a>1.检索数据</h3><h4 id="1-1-distinct"><a href="#1-1-distinct" class="headerlink" title="1.1 distinct"></a>1.1 distinct</h4><blockquote><pre><code class="sql">##用于检索出单一的行值select distinct vend_id from products.##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。select distinct vend_id,vend_name from products.mysql&gt; select * from test;+----+------+-------+| id | name | photo |+----+------+-------+|  1 | tony | photo ||  1 | tom  | photo ||  2 | tony | photo ||  2 | tom  | photo ||  2 | tom  | photo |+----+------+-------+5 rows in setmysql&gt; select distinct id,name from test;+----+------+| id | name |+----+------+|  1 | tony ||  1 | tom  ||  2 | tony ||  2 | tom  |+----+------+4 rows in setmysql&gt; select distinct id,photo from test;+----+-------+| id | photo |+----+-------+|  1 | photo ||  2 | photo |+----+-------+2 rows in set</code></pre></blockquote><h4 id="1-2-多个字段倒序"><a href="#1-2-多个字段倒序" class="headerlink" title="1.2 多个字段倒序"></a>1.2 多个字段倒序</h4><blockquote><p>多个字段想使用倒序时，必须为每个字段单独使用倒序，否则不会生效。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>RDBMS</category>
+      
+      <category>Mysql</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Mysql</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SpringSecurity</title>
+    <link href="undefined2019/11/26/SpringSecurity/"/>
+    <url>2019/11/26/SpringSecurity/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Spring-Security"><a href="#Spring-Security" class="headerlink" title="Spring Security"></a>Spring Security</h2><h3 id="1-校验流程"><a href="#1-校验流程" class="headerlink" title="1. 校验流程"></a>1. 校验流程</h3><img src="/2019/11/26/SpringSecurity/process.png" srcset="/img/loading.gif" class=""><img src="/2019/11/26/SpringSecurity/securityContext.png" srcset="/img/loading.gif" class=""><p>入口在AbstractAuthenticationProcessingFilter，它的实现如下图所示，可以发现它的子类只有一个UsernamePasswordAuthenticationFilter，其中的attemptAuthencation方法就如下实现。</p><img src="/2019/11/26/SpringSecurity/abstractAuthenticationProcessingFilter.png" srcset="/img/loading.gif" class=""><img src="/2019/11/26/SpringSecurity/attemptAuthentication.png" srcset="/img/loading.gif" class=""><p>从上图可以看到尝试授权前先创造了一个Token，而username就被作为了principal也就是主体，password被作为了 credentials也就是认证证书。然后通过authenticationManager进行认证操作。Token的实现类图如下图所示。</p><img src="/2019/11/26/SpringSecurity/usernamePasswordToken.png" srcset="/img/loading.gif" class=""><p>而AuthenticationManager的类图如下，可以发现默认实现类为ProviderManager。</p><img src="/2019/11/26/SpringSecurity/authenticationManager.png" srcset="/img/loading.gif" class=""><p>其中ProviderManager的授权方法如下图所示。</p><img src="/2019/11/26/SpringSecurity/authentication.png" srcset="/img/loading.gif" class=""><p>可以看到主要就是通过AuthenticationProvider来进行实际的授权工作，找到第一个可用的AuthenticationProvider来进行授权。</p><img src="/2019/11/26/SpringSecurity/authenticationProvider.png" srcset="/img/loading.gif" class=""><p>其中默认的Provider为AbstractUserDetailsAuthenticationProvider，有一个子类实现了它为DaoAuthenticationProvider。但是主要的方法就在当前抽象类中。</p><img src="/2019/11/26/SpringSecurity/authenticate.png" srcset="/img/loading.gif" class=""><p>可以看到这里做了用户的缓存，根据Username来查询，如果没有查询到的话就会找retrieve方法获取。</p><img src="/2019/11/26/SpringSecurity/retrieveUser.png" srcset="/img/loading.gif" class=""><p>以上是获取用户的代码，可以发现是通过UserDetailsService().loadUserByUsername(username)实现的。至此就用到了我们自己实现的相关方法。</p><h3 id="2-架构和实现"><a href="#2-架构和实现" class="headerlink" title="2.  架构和实现"></a>2.  架构和实现</h3><h4 id="2-1-核心组件"><a href="#2-1-核心组件" class="headerlink" title="2.1 核心组件"></a>2.1 核心组件</h4><h5 id="2-1-1-SecurityContextHolder-SecurityContext-和-Authentication对象"><a href="#2-1-1-SecurityContextHolder-SecurityContext-和-Authentication对象" class="headerlink" title="2.1.1 SecurityContextHolder,SecurityContext 和 Authentication对象"></a>2.1.1 SecurityContextHolder,SecurityContext 和 Authentication对象</h5><blockquote><p>SecurityContextHolder是最基础的对象。它存放了当前应用上下文的细节信息。默认是通过ThreadLocal来实现的，当然实现方式可以通过配置进行更改。</p></blockquote><h5 id="获取当前用户信息"><a href="#获取当前用户信息" class="headerlink" title="获取当前用户信息"></a>获取当前用户信息</h5><blockquote><p>UserDetails是Spring Security的一个principal实现。可以在应用中的任何一个地方通过以下代码获取到用户的用户名称。</p><pre><code class="java">Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();if (principal instanceof UserDetails) {String username = ((UserDetails)principal).getUsername();} else {String username = principal.toString();}</code></pre></blockquote><h5 id="UserDetailsService"><a href="#UserDetailsService" class="headerlink" title="UserDetailsService"></a>UserDetailsService</h5><blockquote><pre><code class="java">/**UserDetailsService通过用户名称参数来获取用户具体的UserDetails信息。*/UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;</code></pre><p>UserDetailsService纯粹是用户数据的DAO层（坑啊，为啥叫Service）。它并不进行其他的授权鉴权操作。</p></blockquote><h5 id="GrantedAuthority"><a href="#GrantedAuthority" class="headerlink" title="GrantedAuthority"></a>GrantedAuthority</h5><blockquote><p>GrantedAuthority集合可以通过Authentication的getAuthorities()方法得到。它是一种应用级的粗粒度的权限管理。</p></blockquote><h5 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h5><blockquote><ul><li>SecurityContextHolder 提供了访问SecurityContext对象的方法。</li><li>SecurityContext 持有了Authentication对象和一些指定请求的安全信息。</li><li>Authentication 代表了Spring Security中的principal.</li><li>GrantedAuthority 一种对principal的粗粒度授权。</li><li>UserDetails 提供一个Authentication对象需要的必要安全信息，从应用的DAO或其他的源来构建。</li><li>UserDetailsService 用来通过一个基于String的用户名来创建一个UserDetails。</li></ul></blockquote><h5 id="2-1-2-Authentication"><a href="#2-1-2-Authentication" class="headerlink" title="2.1.2 Authentication"></a>2.1.2 Authentication</h5><blockquote><p>Spring Security 鉴权的四个步骤:</p><ol><li>用户名和密码组合进UsernamePasswordAuthenticationToken中</li><li>token传递进AuthenticationManager中进行校验</li><li>AuhtenticationManger返回一个完整的Authentication实例当成功授权</li><li>SecurityContextHolder.getContext().setAuthentication()方法构建了一个SecurityContext.</li></ol><pre><code class="java">import org.springframework.security.authentication.*;import org.springframework.security.core.*;import org.springframework.security.core.authority.SimpleGrantedAuthority;import org.springframework.security.core.context.SecurityContextHolder;public class AuthenticationExample {private static AuthenticationManager am = new SampleAuthenticationManager();public static void main(String[] args) throws Exception { BufferedReader in = new BufferedReader(new InputStreamReader(System.in)); while(true) { System.out.println(&quot;Please enter your username:&quot;); String name = in.readLine(); System.out.println(&quot;Please enter your password:&quot;); String password = in.readLine(); try {     Authentication request = new UsernamePasswordAuthenticationToken(name, password);     Authentication result = am.authenticate(request);     SecurityContextHolder.getContext().setAuthentication(result);     break; } catch(AuthenticationException e) {     System.out.println(&quot;Authentication failed: &quot; + e.getMessage()); } } System.out.println(&quot;Successfully authenticated. Security context contains: &quot; +         SecurityContextHolder.getContext().getAuthentication());}}class SampleAuthenticationManager implements AuthenticationManager {static final List&lt;GrantedAuthority&gt; AUTHORITIES = new ArrayList&lt;GrantedAuthority&gt;();static { AUTHORITIES.add(new SimpleGrantedAuthority(&quot;ROLE_USER&quot;));}public Authentication authenticate(Authentication auth) throws AuthenticationException { if (auth.getName().equals(auth.getCredentials())) { return new UsernamePasswordAuthenticationToken(auth.getName(),     auth.getCredentials(), AUTHORITIES); } throw new BadCredentialsException(&quot;Bad Credentials&quot;);}}</code></pre></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>Spring</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Spring</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Java 计算两个日期的间隔天数</title>
+    <link href="undefined2019/11/14/Java%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%97%A5%E6%9C%9F%E7%9A%84%E9%97%B4%E9%9A%94%E5%A4%A9%E6%95%B0/"/>
+    <url>2019/11/14/Java%E8%AE%A1%E7%AE%97%E4%B8%A4%E4%B8%AA%E6%97%A5%E6%9C%9F%E7%9A%84%E9%97%B4%E9%9A%94%E5%A4%A9%E6%95%B0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Java-计算两个日期的间隔天数"><a href="#Java-计算两个日期的间隔天数" class="headerlink" title="Java 计算两个日期的间隔天数"></a>Java 计算两个日期的间隔天数</h2><blockquote><p>两个日期的间隔天数应用场景很多，自己一开始写得是使用两个日期的毫秒数之差再除以一天的毫秒数算出天数，但是这种方法获得的值会出现不准确的问题。发现通过Calender考虑是否跨年来实现。</p></blockquote><pre><code class="java">package com.youdao.adapmathserver.util;import java.time.LocalDate;import java.util.Calendar;/** * @author soul * @version 2019/11/14 */public class DateUtil {     public static int differentDays(Date startDate, Date endDate) {        Calendar startCalender = Calendar.getInstance();        startCalender.setTime(startDate);        Calendar endCalender = Calendar.getInstance();        endCalender.setTime(endDate);        int startDay = startCalender.get(Calendar.DAY_OF_YEAR);        int endDay = endCalender.get(Calendar.DAY_OF_YEAR);        int startYear = startCalender.get(Calendar.YEAR);        int endYear = endCalender.get(Calendar.YEAR);        if (startYear != endYear) {            int timeDistance = 0;            for (int i = startYear; i &lt; endYear; i++) {                if (i % 4 == 0 &amp;&amp; i % 100 != 0 || i % 400 == 0) {                    timeDistance += 366;                } else {                    timeDistance += 365;                }            }            return timeDistance + (endDay - startDay);        } else {            return endDay - startDay;        }    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>Java</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Shell 编程学习</title>
+    <link href="undefined2019/11/04/shell%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/"/>
+    <url>2019/11/04/shell%E7%BC%96%E7%A8%8B%E5%AD%A6%E4%B9%A0/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>因为大部分的工作都是重复的，使用脚本会极大地提升自身工作效率。实际工作中有很长时间在使用shell做一些操作，平时也会写一些脚本简化自己的操作，但是基本都是命令的罗列，也就是顺序式编程，很低级。因此决定系统地学习一下shell编程更加提升自我效率。</p></blockquote><h4 id="运行shell脚本的两种方式"><a href="#运行shell脚本的两种方式" class="headerlink" title="运行shell脚本的两种方式"></a>运行shell脚本的两种方式</h4><blockquote><p><strong>#! 是一个约定的标记，它告诉系统这个脚本需要什么解释器来执行，即使用哪一种 Shell。</strong></p><ul><li><p><strong>作为可执行程序</strong></p><blockquote><pre><code class="shell">chmod +x ./test.sh  #使脚本具有执行权限./test.sh  #执行脚本</code></pre><p>./的意思是在当前目录寻找test.sh文件，如果不加的话就回去PATH中找，通常都是找不到的。</p></blockquote></li><li><p><strong>作为解释器参数</strong></p><blockquote><pre><code class="shell">/bin/sh test.sh/bin/php test.php</code></pre><p>这种方式运行的脚本，不需要在第一行指定解释器信息(#!/bin/bash)，写了也没用。</p></blockquote></li></ul></blockquote><h3 id="Shell-变量"><a href="#Shell-变量" class="headerlink" title="Shell 变量"></a>Shell 变量</h3><h4 id="定义变量"><a href="#定义变量" class="headerlink" title="定义变量 ="></a>定义变量 =</h4><blockquote><p>变量定义要满足如下规则：</p><ul><li>命名只能使用英文字母，数字和下划线，首个字符不能以数字开头。</li><li>中间不能有空格，可以使用下划线（_）。</li><li>不能使用标点符号。</li><li>不能使用bash里的关键字（可用help命令查看保留关键字）。</li></ul></blockquote><h4 id="使用变量"><a href="#使用变量" class="headerlink" title="使用变量   ${}"></a>使用变量   ${}</h4><blockquote><p>在变量名前加上<strong>$</strong>符号即可。特殊情况下需要在变量名外加上<strong>{}</strong></p><pre><code class="shell">for skill in Ada Coffe Action Java; do    echo &quot;I am good at ${skill}Script&quot;done</code></pre><p>这样做是为了识别变量边界。推荐做法~</p></blockquote><h4 id="只读变量-readonly"><a href="#只读变量-readonly" class="headerlink" title="只读变量  readonly"></a>只读变量  readonly</h4><blockquote><pre><code class="shell">#!/bin/bashmyUrl=&quot;http://www.google.com&quot;readonly myUrlmyUrl=&quot;http://www.github.com&quot;</code></pre><p>运行脚本得到如下结果：</p><pre><code class="shell">/bin/sh: NAME: This variable is read only.</code></pre></blockquote><h4 id="删除变量-unset"><a href="#删除变量-unset" class="headerlink" title="删除变量  unset"></a>删除变量  unset</h4><blockquote><p>变量被删除后不能再次使用，将读不到任何相关值，不能删除只读变量。</p></blockquote><h4 id="变量类型"><a href="#变量类型" class="headerlink" title="变量类型"></a>变量类型</h4><blockquote><ol><li><p><strong>局部变量</strong>:</p><p>局部变量在脚本或命令中定义，仅在当前shell实例中有效，其他shell启动的程序不能访问局部变量。</p></li><li><p><strong>环境变量</strong> (<strong>/etc/profile</strong>、<strong>.bash_profile</strong>、<strong>/etc/bashrc</strong>、<strong>/etc/profile.d</strong>)：</p><p>通常是放在以上文件中的变量，也可以使用export自己定义，但是只有写入文件的变量可以在当前shell断开后接着使用。</p></li><li><p><strong>shell变量</strong>：</p><p>shell变量是由shell程序设置的特殊变量。shell变量中有一部分是环境变量，有一部分是局部变量，这些变量保证了shell的正常运行。</p></li></ol></blockquote><h4 id="Shell-字符串"><a href="#Shell-字符串" class="headerlink" title="Shell 字符串"></a>Shell 字符串</h4><h5 id="单引号-‘’"><a href="#单引号-‘’" class="headerlink" title="单引号 ‘’"></a>单引号 ‘’</h5><blockquote><ul><li>单引号里的任何字符都会原样输出，单引号字符串中的变量是无效的</li><li>单引号字串中不能出现单独一个的单引号（对单引号使用转义符后也不行），但可成对出现，作为字符串拼接使用</li></ul></blockquote><h5 id="双引号””"><a href="#双引号””" class="headerlink" title="双引号””"></a>双引号””</h5><blockquote><ul><li>双引号里可以有变量</li><li>双引号里可以出现转义字符</li></ul></blockquote><h5 id="字符串相关函数"><a href="#字符串相关函数" class="headerlink" title="字符串相关函数"></a>字符串相关函数</h5><blockquote><ul><li><p><strong>获取字符串长度:</strong>    <strong>${#string}</strong></p></li><li><p><strong>提取子字符串:    ${string:1:4}</strong> 从哪个字符开始截，截几位</p><pre><code class="shell">string=&quot;runoob is a great site&quot;echo ${string:1:4} # 输出 unoo</code></pre></li><li><p>查找子字符串: </p><pre><code class="shell">string=&quot;runoob is a great site&quot;echo `expr index &quot;$string&quot; io`  # 输出 4</code></pre></li></ul></blockquote><h4 id="Shell-数组"><a href="#Shell-数组" class="headerlink" title="Shell 数组"></a>Shell 数组</h4><blockquote><p>bash仅支持一维数组。</p></blockquote><h5 id="定义数组"><a href="#定义数组" class="headerlink" title="定义数组"></a>定义数组</h5><blockquote><pre><code class="shell">array_name=(value0 value1 value2 value3)#或者array_name=(value0value1value2value3)#单独定义分量array_name[0]=value0array_name[1]=value1array_name[n]=valuen## 可以不使用连续的下标，而且下标的范围没有限制。</code></pre></blockquote><h5 id="读取数组"><a href="#读取数组" class="headerlink" title="读取数组"></a>读取数组</h5><blockquote><pre><code class="shell"># 一般格式 ${数组名[下标]}valuen=${array_name[n]}# 使用 @ 符号可以获取数组中的所有元素echo ${array_name[@]}# 获取数组的长度length=${#array_name[@]}#或者length=${#array_name[*]}#单个元素长度${#array_name[n]}</code></pre></blockquote><h5 id="注释"><a href="#注释" class="headerlink" title="注释"></a>注释</h5><blockquote><pre><code class="shell">:&lt;&lt;EOF注释内容...注释内容...注释内容...EOF# EOF可以用其他内容代替:&lt;&lt;!注释内容...注释内容...注释内容...!</code></pre></blockquote><h3 id="实践Demo"><a href="#实践Demo" class="headerlink" title="实践Demo"></a>实践Demo</h3><h5 id="向其他机器拷贝文件"><a href="#向其他机器拷贝文件" class="headerlink" title="向其他机器拷贝文件"></a>向其他机器拷贝文件</h5><blockquote><pre><code class="shell">#!/bin/bashecho &quot;ready to cp $@ to all nodes &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&quot;if [ $# -lt 1 ];then    echo &quot;need files!&quot;    exit -1fifor file in $@;do    if [ ! -f $file  ]; then        echo &quot;$file is not a file!&quot;        exit -1    fidonefor i in notestorage026 notestorage027 notestorage028 notestorage029 notestorage030;do    echo &quot;start handle files for $i&quot;    for file in $@;do            echo &quot;start scp $file to $i&quot;            scp $file $i:/disk1/cloudstorage/            echo &quot;scp $file to $i done&quot;    donedone</code></pre></blockquote><h5 id="启动其他机器的脚本"><a href="#启动其他机器的脚本" class="headerlink" title="启动其他机器的脚本"></a>启动其他机器的脚本</h5><blockquote><pre><code class="shell">#!/bin/bashfor i in notestorage026 notestorage027 notestorage028 notestorage029 notestorage030;do    echo &quot;start init $i&quot;    ssh -T $i &lt;&lt;&#39;ENDSSH&#39;      cd /disk1/cloudstorage    sh deploy-storeserver.sh    #cd /disk1/cloudstorage/ServerCommons    #sh my_deploy.shENDSSH    echo &quot;deploy $i done&quot;done</code></pre></blockquote><h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><blockquote><ol><li><a href="https://www.runoob.com/linux/linux-shell-variable.html" target="_blank" rel="noopener">https://www.runoob.com/linux/linux-shell-variable.html</a></li><li><a href="https://blog.csdn.net/Apollon_krj/article/details/70148022" target="_blank" rel="noopener">https://blog.csdn.net/Apollon_krj/article/details/70148022</a></li></ol></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>G1垃圾回收器部分原理</title>
+    <link href="undefined2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/"/>
+    <url>2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/</url>
+    
+    <content type="html"><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote><p>G1 GC，全称Garbage-First Garbage Collector，通过-XX:+UseG1GC参数来启用。G1的目标是在实现高吞吐量的同时，尽可能的满足垃圾收集暂停时间的需求。</p></blockquote><h4 id="参数及意义"><a href="#参数及意义" class="headerlink" title="参数及意义"></a>参数及意义</h4><table><thead><tr><th align="left">参数</th><th align="left">含义</th></tr></thead><tbody><tr><td align="left">-XX:G1HeapRegionSize=n</td><td align="left">设置Region大小，并非最终值</td></tr><tr><td align="left">-XX:MaxGCPauseMillis</td><td align="left">设置G1收集过程目标时间，默认值200ms，不是硬性条件</td></tr><tr><td align="left">-XX:G1NewSizePercent</td><td align="left">新生代最小值，默认值5%</td></tr><tr><td align="left">-XX:G1MaxNewSizePercent</td><td align="left">新生代最大值，默认值60%</td></tr><tr><td align="left">-XX:ParallelGCThreads</td><td align="left">STW期间，并行GC线程数</td></tr><tr><td align="left">-XX:ConcGCThreads=n</td><td align="left">并发标记阶段，并行执行的线程数</td></tr><tr><td align="left">-XX:InitiatingHeapOccupancyPercent</td><td align="left">设置触发标记周期的 Java 堆占用率阈值。默认值是45%。这里的java堆占比指的是non_young_capacity_bytes，包括old+humongous</td></tr></tbody></table><h3 id="G1-中的重要概念"><a href="#G1-中的重要概念" class="headerlink" title="G1 中的重要概念"></a>G1 中的重要概念</h3><h4 id="Region"><a href="#Region" class="headerlink" title="Region"></a>Region</h4><img src="/2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/classicjvmstructure.jpg" srcset="/img/loading.gif" class=""><blockquote><p>传统的GC收集器是将连续的内存空间划分为新生代，老年代和永久代（JDK 8去除了永久代，引入了元空间Metaspace），这种划分的特点是各代的存储地址（逻辑地址）是连续的。</p></blockquote><img src="/2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/g1collectorpart.png" srcset="/img/loading.gif" class=""><blockquote><p>而G1的各代存储地址是不连续的，每一代都使用了n个不连续的大小相同的Region，每个Region占有一块连续的虚拟内存地址。如上图所示。</p><p>在上图中，有一些<strong>Region</strong>被标记成了H，他代表Humongous，这些Region存储的是大对象（humongous object，H-obj），即大小大于等于region一半的对象。</p><p><strong>H-obj特征</strong>：</p><ul><li>直接分配到old gen</li><li>在global concurrent marking阶段的cleanup 和 full GC阶段回收</li><li>在分配H-obj前先检查是否超过 initiating heap occupancy percent（JVM参数，表明希望heap维持总heap的多大占比）和the marking threshold，如果超过就启动global concurrent marking，为的是提早回收，防止 evacuation failures 和 full GC</li></ul><p><strong>为了减少连续H-objs分配对GC的影响，需要把大对象变为普通的对象，建议增大Region size。</strong></p><p>一个Region的大小可以通过参数-XX:G1HeapRegionSize设定，取值范围从1M到32M，且是2的指数。相关的设置代码如下：</p><pre><code class="c++">// share/vm/gc_implementation/g1/heapRegion.cpp// Minimum region size; we won&#39;t go lower than that.// We might want to decrease this in the future, to deal with small// heaps a bit more efficiently.#define MIN_REGION_SIZE  (      1024 * 1024 )// Maximum region size; we don&#39;t go higher than that. There&#39;s a good// reason for having an upper bound. We don&#39;t want regions to get too// large, otherwise cleanup&#39;s effectiveness would decrease as there// will be fewer opportunities to find totally empty regions after// marking.#define MAX_REGION_SIZE  ( 32 * 1024 * 1024 )// The automatic region size calculation will try to have around this// many regions in the heap (based on the min heap size).#define TARGET_REGION_NUMBER          2048void HeapRegion::setup_heap_region_size(size_t initial_heap_size, size_t max_heap_size) {uintx region_size = G1HeapRegionSize;if (FLAG_IS_DEFAULT(G1HeapRegionSize)) { size_t average_heap_size = (initial_heap_size + max_heap_size) / 2; region_size = MAX2(average_heap_size / TARGET_REGION_NUMBER,                    (uintx) MIN_REGION_SIZE);}int region_size_log = log2_long((jlong) region_size);// Recalculate the region size to make sure it&#39;s a power of// 2. This means that region_size is the largest power of 2 that&#39;s// &lt;= what we&#39;ve calculated so far.region_size = ((uintx)1 &lt;&lt; region_size_log);// Now make sure that we don&#39;t go over or under our limits.if (region_size &lt; MIN_REGION_SIZE) { region_size = MIN_REGION_SIZE;} else if (region_size &gt; MAX_REGION_SIZE) { region_size = MAX_REGION_SIZE;}}</code></pre></blockquote><h4 id="SATB-Snapshot-At-The-Beginning"><a href="#SATB-Snapshot-At-The-Beginning" class="headerlink" title="SATB(Snapshot-At-The-Beginning)"></a>SATB(Snapshot-At-The-Beginning)</h4><blockquote><p>意思是GC开始时活着对象的一个快照。通过Root Tracing得到，作用是维持并发GC的正确性。</p></blockquote><img src="/2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/stab.png" srcset="/img/loading.gif" class=""><blockquote><p>由Taiichi Yuasa为增量式标记清除垃圾收集器开发的一个算法，主要应用于垃圾收集的并发标记阶段，解决了CMS垃圾收集器重新标记阶段长时间STW的潜在风险。</p><ol><li>假设第n轮并发标记开始，将该Region当前的top指针赋值给next TAMS，在并发标记标记期间，分配的对象都在[next TAMS, top]之间，SATB能够确保这部分的对象都会被标记，默认都是存活的。</li><li>当并发标记结束时，将next TAMS所在的地址赋值给previous TAMS，SATB给 [bottom, previous TAMS] 之间的对象创建一个快照Bitmap，所有垃圾对象能通过快照被识别出来</li><li>第n+1轮并发标记开始，过程和第n轮一样</li></ol></blockquote><p>在G1中主要使用pre-write barrier来存储存活对象。</p><blockquote><p>当然，很可能有对象在snapshot中是活的，但随着并发GC的进行它可能本来已经死了，但SATB还是会让它活过这次GC。</p></blockquote><h3 id="RSet"><a href="#RSet" class="headerlink" title="RSet"></a>RSet</h3><blockquote><p>全称是Remembered Set，是辅助GC过程的一种结构，典型的空间换时间工具，和Card Table有些类似。</p><p>还有一种数据结构也是辅助GC的：Collection Set（CSet），它记录了GC要收集的Region集合，集合里的Region可以是任意年代的。在GC的时候，对于old-&gt;young和old-&gt;old的跨代对象引用，只要扫描对应的CSet中的RSet即可。</p></blockquote><img src="/2019/10/28/G1%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8%E9%83%A8%E5%88%86%E5%8E%9F%E7%90%86/rset.jpg" srcset="/img/loading.gif" class=""><blockquote><p>上图中有三个Region，每个Region被分成了多个Card，在不同Region中的Card会相互引用，Region1中的Card中的对象引用了Region2中的Card中的对象，蓝色实线表示的就是points-out的关系，而在Region2的RSet中，记录了Region1的Card，即红色虚线表示的关系，这就是points-into。 而维系RSet中的引用关系靠post-write barrier和Concurrent refinement threads来维护</p></blockquote><h3 id="GC过程"><a href="#GC过程" class="headerlink" title="GC过程"></a>GC过程</h3><h4 id="GC模式"><a href="#GC模式" class="headerlink" title="GC模式"></a>GC模式</h4><blockquote><ul><li><strong>Young GC</strong>：</li></ul><p>选定所有年轻代里的Region。通过控制年轻代的region个数，即年轻代内存大小，来控制young GC的时间开销。</p><ul><li><strong>Mixed GC</strong>：</li></ul><p>选定所有年轻代里的Region，外加根据global concurrent marking统计得出收集收益高的若干老年代Region。在用户指定的开销目标范围内尽可能选择收益高的老年代Region。</p><p><strong>由上面的描述可知，Mixed GC不是full GC，它只能回收部分老年代的Region，如果mixed GC实在无法跟上程序分配内存的速度，导致老年代填满无法继续进行Mixed GC，就会使用serial old GC（full GC）来收集整个GC heap。所以我们可以知道，G1是不提供full GC的。</strong></p></blockquote><h4 id="global-concurrent-marking"><a href="#global-concurrent-marking" class="headerlink" title="global concurrent marking"></a>global concurrent marking</h4><blockquote><p>在G1 GC中，它主要是为Mixed GC提供标记服务的，并不是一次GC过程的一个必须环节。</p><ul><li><strong>初始标记（initial mark，STW）</strong>:它标记了从GC Root开始直接可达的对象。</li><li><strong>并发标记（Concurrent Marking）</strong>:这个阶段从GC Root开始对heap中的对象标记，标记线程与应用程序线程并行执行，并且收集各个Region的存活对象信息。</li><li><strong>最终标记（Remark，STW）</strong>:标记那些在并发标记阶段发生变化的对象，将被回收。</li><li><strong>清除垃圾（Cleanup）</strong>:清除空Region（没有存活对象的），加入到free list。</li></ul></blockquote><h4 id="MIX-GC"><a href="#MIX-GC" class="headerlink" title="MIX GC"></a>MIX GC</h4><blockquote><p>MixedGC的发生时机由一些参数控制着，另外控制着哪些老年代Region会被选入Cset。</p><ul><li>G1HeapWastePercent：垃圾大于这个占比就会发生mixed GC。</li><li>G1MixedGCLiveThresholdPercent：old generation region中的存活对象的占比，只有在此参数之下，才会被选入CSet。</li><li>G1MixedGCCountTarget：一次global concurrent marking之后，最多执行Mixed GC的次数。</li><li>G1OldCSetRegionThresholdPercent：一次Mixed GC中能被选入CSet的最多old generation region数量。</li></ul></blockquote><h3 id="GC日志"><a href="#GC日志" class="headerlink" title="GC日志"></a>GC日志</h3><h4 id="Young-GC日志"><a href="#Young-GC日志" class="headerlink" title="Young GC日志"></a>Young GC日志</h4><pre><code class="java">{Heap before GC invocations=12 (full 1): garbage-first heap   total 3145728K, used 336645K [0x0000000700000000, 0x00000007c0000000, 0x00000007c0000000)  region size 1024K, 172 young (176128K), 13 survivors (13312K) Metaspace       used 29944K, capacity 30196K, committed 30464K, reserved 1077248K  class space    used 3391K, capacity 3480K, committed 3584K, reserved 1048576K2014-11-14T17:57:23.654+0800: 27.884: [GC pause (G1 Evacuation Pause) (young)Desired survivor size 11534336 bytes, new threshold 15 (max 15)- age   1:    5011600 bytes,    5011600 total 27.884: [G1Ergonomics (CSet Construction) start choosing CSet, _pending_cards: 1461, predicted base time: 35.25 ms, remaining time: 64.75 ms, target pause time: 100.00 ms] 27.884: [G1Ergonomics (CSet Construction) add young regions to CSet, eden: 159 regions, survivors: 13 regions, predicted young region time: 44.09 ms] 27.884: [G1Ergonomics (CSet Construction) finish choosing CSet, eden: 159 regions, survivors: 13 regions, old: 0 regions, predicted pause time: 79.34 ms, target pause time: 100.00 ms], 0.0158389 secs]   [Parallel Time: 8.1 ms, GC Workers: 4]      [GC Worker Start (ms): Min: 27884.5, Avg: 27884.5, Max: 27884.5, Diff: 0.1]      [Ext Root Scanning (ms): Min: 0.4, Avg: 0.8, Max: 1.2, Diff: 0.8, Sum: 3.1]      [Update RS (ms): Min: 0.0, Avg: 0.3, Max: 0.6, Diff: 0.6, Sum: 1.4]         [Processed Buffers: Min: 0, Avg: 2.8, Max: 5, Diff: 5, Sum: 11]      [Scan RS (ms): Min: 0.0, Avg: 0.1, Max: 0.1, Diff: 0.1, Sum: 0.3]      [Code Root Scanning (ms): Min: 0.0, Avg: 0.1, Max: 0.2, Diff: 0.2, Sum: 0.6]      [Object Copy (ms): Min: 4.9, Avg: 5.1, Max: 5.2, Diff: 0.3, Sum: 20.4]      [Termination (ms): Min: 0.0, Avg: 0.0, Max: 0.0, Diff: 0.0, Sum: 0.0]      [GC Worker Other (ms): Min: 0.0, Avg: 0.4, Max: 1.3, Diff: 1.3, Sum: 1.4]      [GC Worker Total (ms): Min: 6.4, Avg: 6.8, Max: 7.8, Diff: 1.4, Sum: 27.2]      [GC Worker End (ms): Min: 27891.0, Avg: 27891.3, Max: 27892.3, Diff: 1.3]   [Code Root Fixup: 0.5 ms]   [Code Root Migration: 1.3 ms]   [Code Root Purge: 0.0 ms]   [Clear CT: 0.2 ms]   [Other: 5.8 ms]      [Choose CSet: 0.0 ms]      [Ref Proc: 5.0 ms]      [Ref Enq: 0.1 ms]      [Redirty Cards: 0.0 ms]      [Free CSet: 0.2 ms]   [Eden: 159.0M(159.0M)-&gt;0.0B(301.0M) Survivors: 13.0M-&gt;11.0M Heap: 328.8M(3072.0M)-&gt;167.3M(3072.0M)]Heap after GC invocations=13 (full 1): garbage-first heap   total 3145728K, used 171269K [0x0000000700000000, 0x00000007c0000000, 0x00000007c0000000)  region size 1024K, 11 young (11264K), 11 survivors (11264K) Metaspace       used 29944K, capacity 30196K, committed 30464K, reserved 1077248K  class space    used 3391K, capacity 3480K, committed 3584K, reserved 1048576K} [Times: user=0.05 sys=0.01, real=0.02 secs]</code></pre><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><blockquote><p><a href="https://tech.meituan.com/2016/09/23/g1.html" target="_blank" rel="noopener">https://tech.meituan.com/2016/09/23/g1.html</a></p><p><a href="https://www.infoq.com/articles/tuning-tips-G1-GC/" target="_blank" rel="noopener">https://www.infoq.com/articles/tuning-tips-G1-GC/</a></p><p><a href="https://www.infoq.com/articles/G1-One-Garbage-Collector-To-Rule-Them-All/" target="_blank" rel="noopener">https://www.infoq.com/articles/G1-One-Garbage-Collector-To-Rule-Them-All/</a></p><p><a href="https://zhuanlan.zhihu.com/p/52841787" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/52841787</a></p><p><a href="https://www.jianshu.com/p/9e70097807ba" target="_blank" rel="noopener">https://www.jianshu.com/p/9e70097807ba</a></p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>编程</category>
+      
+      <category>Jvm</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Jvm</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Add and Search Word - Data structure design</title>
+    <link href="undefined2019/10/23/LeetCode%20211%20Add%20and%20Search%20Word%20-%20Data%20structure%20design/"/>
+    <url>2019/10/23/LeetCode%20211%20Add%20and%20Search%20Word%20-%20Data%20structure%20design/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Add-and-Search-Word-Data-structure-design"><a href="#LeetCode-Add-and-Search-Word-Data-structure-design" class="headerlink" title="LeetCode: Add and Search Word - Data structure design"></a>LeetCode: <a href="https://leetcode.com/problems/add-and-search-word-data-structure-design/" target="_blank" rel="noopener">Add and Search Word - Data structure design</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>设计一个数据结构实现下面两个操作：</p><pre><code class="java">void addWord(word)bool search(word)</code></pre><p><strong>search(word)</strong>方法可以查找出添加的单词，并且单词中的（’.’）字符代表任意存在的字母。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">addWord(&quot;bad&quot;)addWord(&quot;dad&quot;)  addWord(&quot;mad&quot;)  search(&quot;pad&quot;) -&gt; false  search(&quot;bad&quot;) -&gt; true  search(&quot;.ad&quot;) -&gt; truesearch(&quot;b..&quot;) -&gt; true</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题是一个设计数据结构的题，和trieNode那个题是类似的，需要一个这样的结构来根据字母树来查找单词。但是这里多了一个任意字符’.’，刚开始我改变了存储结构，按层来存储，这样看来就像一个单链表，但是这样其实是有问题的，会把不存在的单词也能查出来。正确的应该是插入还是相同的，查找通过递归的方式进行查找。</p></blockquote><pre><code class="java"> class WordDictionary {        TrieNode root;        /**         * Initialize your data structure here.         */        public WordDictionary() {            root = new TrieNode();        }        /**         * Adds a word into the data structure.         */        public void addWord(String word) {            if (null == word) {                return;            }            char[] chars = word.toCharArray();            TrieNode p = root;            for (char aChar : chars) {                int index = aChar - &#39;a&#39;;                if (p.next[index] == null) {                    p.next[index] = new TrieNode();                }                p = p.next[index];            }            p.isWord = true;        }        /**         * Returns if the word is in the data structure. A word could contain the dot character &#39;.&#39; to represent any one letter.         */        public boolean search(String word) {            if (null == word) {                return false;            }            return matches(word.toCharArray(), root, 0);        }        private boolean matches(char[] chars, TrieNode root, int offset) {            if (chars.length == offset) {                return root.isWord;            }            char curChar = chars[offset];            if (&#39;.&#39; == curChar) {                for (int i = 0; i &lt; root.next.length; i++) {                    TrieNode trieNode = root.next[i];                    if (null != trieNode &amp;&amp; matches(chars, root.next[i], offset + 1)) {                        return true;                    }                }            } else {                return root.next[chars[offset] - &#39;a&#39;] != null &amp;&amp; matches(chars, root.next[chars[offset] - &#39;a&#39;], offset + 1);            }            return false;        }    }     class TrieNode {        boolean isWord;        TrieNode[] next;        public TrieNode() {            next = new TrieNode[27];            isWord = false;        }    }</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Implement Trie (Prefix Tree)</title>
+    <link href="undefined2019/10/23/LeetCode%20208%20Implement%20Trie%20(Prefix%20Tree)/"/>
+    <url>2019/10/23/LeetCode%20208%20Implement%20Trie%20(Prefix%20Tree)/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Implement-Trie-Prefix-Tree"><a href="#LeetCode-Implement-Trie-Prefix-Tree" class="headerlink" title="LeetCode: Implement Trie (Prefix Tree)"></a>LeetCode: <a href="https://leetcode.com/problems/implement-trie-prefix-tree/" target="_blank" rel="noopener">Implement Trie (Prefix Tree)</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>实现一个tire的数据结构实现下面的操作：</p><pre><code class="java"> public void insert(String word) ; public boolean search(String word) ; public boolean startsWith(String prefix) ;</code></pre><p><strong>search(word)</strong>方法可以查找出添加的单词，startsWith方法可以查找有没有以prefix为前缀的单词。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Trie trie = new Trie();trie.insert(&quot;apple&quot;);trie.search(&quot;apple&quot;);   // returns truetrie.search(&quot;app&quot;);     // returns falsetrie.startsWith(&quot;app&quot;); // returns truetrie.insert(&quot;app&quot;);   trie.search(&quot;app&quot;);     // returns true</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题是一个设计数据结构的题，关键点在于怎么能够查找单词前缀。最好的方法就是将字母分存，然后一层一层的去构建单词。实现如下。</p></blockquote><pre><code class="java"> class WordDictionary {        TrieNode root;        /**         * Initialize your data structure here.         */        public WordDictionary() {            root = new TrieNode();        }        /**         * Adds a word into the data structure.         */        public void addWord(String word) {            if (null == word) {                return;            }            char[] chars = word.toCharArray();            TrieNode p = root;            for (char aChar : chars) {                int index = aChar - &#39;a&#39;;                if (p.next[index] == null) {                    p.next[index] = new TrieNode();                }                p = p.next[index];            }            p.isWord = true;        }        /**         * Returns if the word is in the data structure. A word could contain the dot character &#39;.&#39; to represent any one letter.         */        public boolean search(String word) {            if (null == word) {                return false;            }            return matches(word.toCharArray(), root, 0);        }        private boolean matches(char[] chars, TrieNode root, int offset) {            if (chars.length == offset) {                return root.isWord;            }            char curChar = chars[offset];            if (&#39;.&#39; == curChar) {                for (int i = 0; i &lt; root.next.length; i++) {                    TrieNode trieNode = root.next[i];                    if (null != trieNode &amp;&amp; matches(chars, root.next[i], offset + 1)) {                        return true;                    }                }            } else {                return root.next[chars[offset] - &#39;a&#39;] != null &amp;&amp; matches(chars, root.next[chars[offset] - &#39;a&#39;], offset + 1);            }            return false;        }    }     class TrieNode {        boolean isWord;        TrieNode[] next;        public TrieNode() {            next = new TrieNode[27];            isWord = false;        }    }</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Word Search II</title>
+    <link href="undefined2019/10/22/LeetCode%20212%20Word%20Search%20II/"/>
+    <url>2019/10/22/LeetCode%20212%20Word%20Search%20II/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Word-Search-II"><a href="#LeetCode-Word-Search-II" class="headerlink" title="LeetCode: Word Search II"></a>LeetCode: <a href="https://leetcode.com/problems/word-search-ii/" target="_blank" rel="noopener">Word Search II</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个二维字符数组和一个单词集合，找出所有在数组中的单词集合。每一个单词的字符必须在相邻的单元格中。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Input: board = [  [&#39;o&#39;,&#39;a&#39;,&#39;a&#39;,&#39;n&#39;],  [&#39;e&#39;,&#39;t&#39;,&#39;a&#39;,&#39;e&#39;],  [&#39;i&#39;,&#39;h&#39;,&#39;k&#39;,&#39;r&#39;],  [&#39;i&#39;,&#39;f&#39;,&#39;l&#39;,&#39;v&#39;]]words = [&quot;oath&quot;,&quot;pea&quot;,&quot;eat&quot;,&quot;rain&quot;]Output: [&quot;eat&quot;,&quot;oath&quot;]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题本身已经不陌生了，一看就是要使用dfs的解法。但是肯定没有这么简单，因为这是一道hard的题，所以肯定对时间复杂度是有要求的，一个个单词的找肯定会超时，想来想去没有想到很好的办法，最后看了看别人的做法，了解到TireNode数据结构可以大大缩减查找的时间。具体结构与解法如下。</p></blockquote><pre><code class="java">class Solution {   public List&lt;String&gt; findWords(char[][] board, String[] words) {        if (null == board || null == words) {            return new ArrayList&lt;&gt;();        }        TireNode root = buildTireNodes(words);        List&lt;String&gt; result = new ArrayList&lt;&gt;();        for (int i = 0; i &lt; board.length; i++) {            for (int j = 0; j &lt; board[0].length; j++) {                findAllResults(result, i, j, root, board);            }        }        return result;    }    private void findAllResults(List&lt;String&gt; result, int row, int column, TireNode root, char[][] board) {        char curChar = board[row][column];        if (&#39;#&#39; == curChar || root.next[curChar - &#39;a&#39;] == null) {            return;        }        TireNode p = root.next[curChar - &#39;a&#39;];        if (null != p.word) {            result.add(p.word);            p.word = null;        }        board[row][column] = &#39;#&#39;;        if (row &gt; 0) {            findAllResults(result, row - 1, column, p, board);        }        if (column &gt; 0) {            findAllResults(result, row, column - 1, p, board);        }        if (row &lt; board.length - 1) {            findAllResults(result, row + 1, column, p, board);        }        if (column &lt; board[0].length - 1) {            findAllResults(result, row, column + 1, p, board);        }        board[row][column] = curChar;    }    private TireNode buildTireNodes(String[] words) {        TireNode root = new TireNode();        for (String word : words) {            TireNode p = root;            for (char curChar : word.toCharArray()) {                int index = curChar - &#39;a&#39;;                if (p.next[index] == null) {                    p.next[index] = new TireNode();                }                p = p.next[index];            }            p.word = word;        }        return root;    }    static class TireNode {        public TireNode[] next = new TireNode[26];        public String word;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Restore IP Addresses</title>
+    <link href="undefined2019/10/18/LeetCode%2093%20Restore%20IP%20Addresses/"/>
+    <url>2019/10/18/LeetCode%2093%20Restore%20IP%20Addresses/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Restore-IP-Addresses"><a href="#LeetCode-Restore-IP-Addresses" class="headerlink" title="LeetCode: Restore IP Addresses"></a>LeetCode: <a href="https://leetcode.com/problems/restore-ip-addresses/" target="_blank" rel="noopener">Restore IP Addresses</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个由数字组成的字符串，求出改数字组成的串可以转化的所有合法ip集合。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Input: &quot;25525511135&quot;Output: [&quot;255.255.11.135&quot;, &quot;255.255.111.35&quot;]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>首先合法的ip由四个数字组成并由3个（<strong>.</strong>） 进行分割，并且每个数字都大于0小于255。这个题也是一个典型的递归求解的问题，点的总数是确定的，只有3个，那么问题就是在哪里打点。然后再看其实第一次打点的位置只有3个，因为在第四个位置打点时就一定会大于255。所以问题就转换成找出第一个点的位置，然后再找子串的第一个点的位置，打够三个点结束。需要注意的是当串以0开始时，只能截取0。</p></blockquote><pre><code class="java">class Solution {  public List&lt;String&gt; restoreIpAddresses(String s) {        if (null == s || s.length() &lt; 4) {            return new ArrayList&lt;&gt;();        }        List&lt;String&gt; result = new ArrayList&lt;&gt;();        List&lt;String&gt; ipSplit = new ArrayList&lt;&gt;();        findAllIp(result, s, ipSplit);        return result;    }    private void findAllIp(List&lt;String&gt; result, String s, List&lt;String&gt; ipSplit) {        if (&quot;&quot;.equals(s) &amp;&amp; ipSplit.size() &lt; 4 || ipSplit.size() &gt; 4) {            return;        }        if (&quot;&quot;.equals(s)) {            ipSplit.size();            StringBuilder sb = new StringBuilder();            for (int i = 0; i &lt; ipSplit.size(); i++) {                sb.append(ipSplit.get(i));                if (i != 3) {                    sb.append(&quot;.&quot;);                }            }            result.add(sb.toString());            return;        }        if (s.startsWith(&quot;0&quot;)) {            ipSplit.add(s.substring(0, 1));            findAllIp(result, s.substring(1), ipSplit);            ipSplit.remove(ipSplit.size() - 1);        } else {            for (int i = 1; i &lt; 4; i++) {                if (i &lt;= s.length()) {                    String substring = s.substring(0, i);                    int strInt = Integer.parseInt(substring);                    if (strInt &gt; 255 || strInt &lt; 0) {                        return;                    }                    ipSplit.add(substring);                    findAllIp(result, s.substring(i), ipSplit);                    ipSplit.remove(ipSplit.size() - 1);                }            }        }    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Subsets II</title>
+    <link href="undefined2019/10/18/LeetCode%2090%20Subsets%20II/"/>
+    <url>2019/10/18/LeetCode%2090%20Subsets%20II/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Subsets-II"><a href="#LeetCode-Subsets-II" class="headerlink" title="LeetCode: Subsets II"></a>LeetCode: <a href="https://leetcode.com/problems/subsets-ii/" target="_blank" rel="noopener">Subsets II</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个集合，找出该集合可能的所有子集，当前集合包含重复元素。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Input: [1,2,2]Output:[  [2],  [1],  [1,2,2],  [2,2],  [1,2],  []]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题和subsets的思路大致一样，就是当前的元素到底要不要，不同点在于是否如何把相同元素的不同组合去重。首先就是对所查找集合进行排序，排序完成后相同的元素就在相邻的位置了，然后在查找的过程中，如果相同的靠前元素还没使用，当前元素就不应该纳入。</p></blockquote><pre><code class="java">class Solution {  public List&lt;List&lt;Integer&gt;&gt; subsetsWithDup(int[] nums) {        if (null == nums || nums.length == 0) {            return new ArrayList&lt;&gt;();        }        List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();        boolean[] used = new boolean[nums.length];        Arrays.sort(nums);        findAllSubsetsWithDup(result, new ArrayList&lt;Integer&gt;(), nums, used, 0);        return result;    }    private void findAllSubsetsWithDup(List&lt;List&lt;Integer&gt;&gt; result, List&lt;Integer&gt; tempSubset, int[] nums, boolean[] used, int start) {        if (start == nums.length) {            result.add(new ArrayList&lt;&gt;(tempSubset));            return;        }        if (!used[start] &amp;&amp; !(start &gt; 0 &amp;&amp; nums[start] == nums[start - 1] &amp;&amp; !used[start - 1])) {            used[start] = true;            tempSubset.add(nums[start]);            findAllSubsetsWithDup(result, tempSubset, nums, used, start + 1);            tempSubset.remove(tempSubset.size() - 1);            used[start] = false;        }        findAllSubsetsWithDup(result, tempSubset, nums, used, start + 1);    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>SpringCloud系列（一）之Eureka</title>
+    <link href="undefined2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/"/>
+    <url>2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/</url>
+    
+    <content type="html"><![CDATA[<blockquote><p>前言：时间久了发现自己的记性真的越来越差了，很多当时记得非常清楚的东西，隔了很长时间发现有印象是有印象，但是模模糊糊，提起来可能驴唇不对马嘴。因此觉得有些东西还是要落实，要输出，这样自己的印象才会深刻，所以从现在开始学习的东西都尝试着总结，以便以后忘记时也能回来看看迅速得回忆起这些知识，温故而知新。</p></blockquote><h3 id="1-Eureka简介"><a href="#1-Eureka简介" class="headerlink" title="1. Eureka简介"></a>1. Eureka简介</h3><blockquote><p>Eureka是Netflix开发的服务发现框架，本身是一个基于REST的服务，主要用于定位运行在AWS域中的中间层服务，以达到负载均衡和中间层服务故障转移的目的。SpringCloud将它集成在其子项目spring-cloud-netflix中，以实现SpringCloud的服务发现功能。</p><p><strong>概括一下就是Eureka是一种注册中心</strong></p></blockquote><h3 id="2-Eureka架构"><a href="#2-Eureka架构" class="headerlink" title="2. Eureka架构"></a>2. Eureka架构</h3><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/arch.jpg" srcset="/img/loading.gif" class=""><blockquote><p>可以看到整个架构中有三种角色<strong>Eureka Server 、Service Consumer 、Service Provider</strong>。分别对应了注册中心，服务消费者，服务提供者。服务提供者将自己的信息注册到注册中心，并且可以更新和取消该注册。注册中心间同步服务提供者的信息。服务消费者通过注册中心找到服务提供者然后发起远程调用。</p></blockquote><h3 id="3-Eureka工作流程"><a href="#3-Eureka工作流程" class="headerlink" title="3. Eureka工作流程"></a>3. Eureka工作流程</h3><h4 id="3-1-获取服务提供者信息"><a href="#3-1-获取服务提供者信息" class="headerlink" title="3.1 获取服务提供者信息"></a>3.1 获取服务提供者信息</h4><blockquote><p>每个服务在EurekaServer中是以<strong>InstanceInfo</strong>的形式存储在registry的map中的，map的具体key和value如下图所示。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/datastructure.png" srcset="/img/loading.gif" class=""><blockquote><p>客户端通过应用的名称获取相应的应用信息，然后发起远程调用。为了提高效率EurekaServer提供了二级缓存，具体的缓存如下图所示。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/cache.png" srcset="/img/loading.gif" class=""><blockquote><p>可以看到总共有两级缓存，一个是只读缓存，提供给客户端用的，另一个利用guava实现的读写缓存，并且每30S就会同步到只读缓存中。并且会有定时任务检查实例的过期时间从而剔除不需要的服务并且更新registry和读写缓存。缓存获取的逻辑就是客户端查找一个实例的信息，若只读缓存中没有当前信息的话从读写缓存中去查找，若读写缓存中也没有的话才回去registry中查找。</p></blockquote><h4 id="3-2-注册客户端信息"><a href="#3-2-注册客户端信息" class="headerlink" title="3.2 注册客户端信息"></a>3.2 注册客户端信息</h4><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/updateMetadata.png" srcset="/img/loading.gif" class=""><blockquote><p>如上图所示为注册信息入口，可以看到是一个http请求。从这个方法中找到下图方法为详细注册方法。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/register.png" srcset="/img/loading.gif" class=""><blockquote><p>可以看到显示到父类执行了注册信息，然后将信息同步注册到了其他的server中。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/registertopeer.png" srcset="/img/loading.gif" class=""><blockquote><p>看到最后就是将注册信息同步到其他server中。</p></blockquote><h4 id="3-3-数据更新同步"><a href="#3-3-数据更新同步" class="headerlink" title="3.3 数据更新同步"></a>3.3 数据更新同步</h4><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/renewlease.png" srcset="/img/loading.gif" class=""><blockquote><p>更新数据以及状态使用的是续约接口，可以看到也是registry的一个叫renew的方法。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/renew.png" srcset="/img/loading.gif" class=""><blockquote><p>如上图所示，更新也是先到父类执行更新方法，最后将更新信息同步到其他的server上，而更新时比对的就是当前的实例信息的修改时间和需要更改信息的修改时间，时间靠后的取胜。可以看到Eureka其实并不能实时保证server间数据是一致的。</p></blockquote><h3 id="4-注册中心"><a href="#4-注册中心" class="headerlink" title="4. 注册中心"></a>4. 注册中心</h3><blockquote><p>作为注册中心来讲，就是服务消费者找到服务提供者的一个通讯录，当一个服务消费者已经找到服务提供者时，即便通讯录消失了，也不应当使服务消费者找不到之前联系过的提供者。也就是说注册中心要做到系统的独立性，系统对注册中心的依赖应当非常小。第二就是注册中心不应当因为自己的原因保证不了自己在任何时刻都是可用的状态。而Eureka这两点全部都做到了，所以是一个合格的注册中心。</p></blockquote><img src="/2019/10/17/SpringCloud%E7%B3%BB%E5%88%97%EF%BC%88%E4%B8%80%EF%BC%89%E4%B9%8BEureka/zkvseureka.png" srcset="/img/loading.gif" class=""><blockquote><p>上图是Eureka和zk的对比，可以看出它与zk不同的部分正是它更适合做注册中心的关键。</p><p>但是遗憾的是Eureka的2.x及以上版本目前已经不提供开源了，不过目前spring cloud使用阿里的nacas作为注册中心。后面再对它进行分析。</p></blockquote><h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><blockquote><p><a href="https://blog.csdn.net/zhxdick/article/list/2" target="_blank" rel="noopener">https://blog.csdn.net/zhxdick/article/list/2</a></p><p><a href="https://www.infoq.cn/article/why-doesnot-alibaba-use-zookeeper" target="_blank" rel="noopener">https://www.infoq.cn/article/why-doesnot-alibaba-use-zookeeper</a></p><p><a href="https://medium.com/knerd/eureka-why-you-shouldnt-use-zookeeper-for-service-discovery-4932c5c7e764" target="_blank" rel="noopener">https://medium.com/knerd/eureka-why-you-shouldnt-use-zookeeper-for-service-discovery-4932c5c7e764</a></p><p><a href="https://github.com/apache/zookeeper" target="_blank" rel="noopener">https://github.com/apache/zookeeper</a></p><p><a href="https://github.com/Netflix/eureka" target="_blank" rel="noopener">https://github.com/Netflix/eureka</a></p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>springCloud</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>springCloud</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Gray Code</title>
+    <link href="undefined2019/10/17/LeetCode%2089%20Gray%20Code/"/>
+    <url>2019/10/17/LeetCode%2089%20Gray%20Code/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Gray-Code"><a href="#LeetCode-Gray-Code" class="headerlink" title="LeetCode: Gray Code"></a>LeetCode: <a href="https://leetcode.com/problems/gray-code/" target="_blank" rel="noopener">Gray Code</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>灰码的含义是两个连续的数字在二进制上只有一位不同。给一个正整数n，返回一个灰码集合，该集合必须以0开始。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Input: 2Output: [0,1,3,2]Explanation:00 - 001 - 111 - 310 - 2对于一个整数n，灰码的序列可能不是唯一的，如下.For example, [0,2,3,1] 也是一个合格的返回值.00 - 010 - 211 - 301 - 1</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题是在刷dfs系列题的时候遇到的，刚开始以为很简单，不就是每一位选1还是0的问题吗，但是事实不是这样。最后发现规律，每增加一位实际是增加了当前位和已有集合的倒序列的和。</p><p>n = 1 .    0        1</p><p>n = 2 .    00       01    |    11        10</p><p>n = 3 .    000    001        011        010    |    110        111        101        100</p><p>…</p></blockquote><pre><code class="java">class Solution {  public List&lt;Integer&gt; grayCode(int n) {        List&lt;Integer&gt; rs = new ArrayList&lt;Integer&gt;();        rs.add(0);        for (int i = 0; i &lt; n; i++) {            int size = rs.size();            for (int k = size - 1; k &gt;= 0; k--) {                int moveLeft = 1 &lt;&lt; i;                int curNum = rs.get(k) | moveLeft;                rs.add(curNum);            }        }        return rs;    };}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Word Search</title>
+    <link href="undefined2019/10/16/LeetCode%2079%20Word%20Search/"/>
+    <url>2019/10/16/LeetCode%2079%20Word%20Search/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Word-Search"><a href="#LeetCode-Word-Search" class="headerlink" title="LeetCode: Word Search"></a>LeetCode: <a href="https://leetcode.com/problems/word-search/" target="_blank" rel="noopener">Word Search</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个二维字符数组和一个单词，找在字符数组中是否能够拼成当前单词。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">board =[  [&#39;A&#39;,&#39;B&#39;,&#39;C&#39;,&#39;E&#39;],  [&#39;S&#39;,&#39;F&#39;,&#39;C&#39;,&#39;S&#39;],     [&#39;A&#39;,&#39;D&#39;,&#39;E&#39;,&#39;E&#39;]   ]   Given word = &quot;ABCCED&quot;, return true.   Given word = &quot;SEE&quot;, return true.Given word = &quot;ABCB&quot;, return false.</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题很明显是一个dfs的题，找到开始位置然后分别找上下左右看能否拼成当前单词就可以判断当前结果，需要注意的是找的过程中不能再使用已经使用过的字符。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><p><strong>DFS</strong></p><pre><code class="java">class Solution {  public boolean exist(char[][] board, String word) {        if (board == null || word == null) {            return false;        }        char[] chars = word.toCharArray();        boolean[][] used = new boolean[board.length][board[0].length];        for (int i = 0; i &lt; board.length; i++) {            for (int j = 0; j &lt; board[0].length; j++) {                if (chars[0] == board[i][j]) {                    boolean exist = findExist(i, j, chars, board, 0, used);                    if (exist) {                        return true;                    }                }            }        }        return false;    }    private boolean findExist(int row, int column, char[] chars, char[][] board, int offset, boolean[][] used) {        if (offset &gt;= chars.length) {            return true;        }        if (row &gt;= board.length || column &gt;= board[0].length || row &lt; 0 || column &lt; 0 || used[row][column]) {            return false;        }        if (chars[offset] != board[row][column]) {            return false;        }        used[row][column] = true;        boolean left = findExist(row, column - 1, chars, board, offset + 1, used);        boolean top = findExist(row + 1, column, chars, board, offset + 1, used);        boolean right = findExist(row, column + 1, chars, board, offset + 1, used);        boolean down = findExist(row - 1, column, chars, board, offset + 1, used);        used[row][column] = false;        return right || down || top || left;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Maximum Width of Binary Tree</title>
+    <link href="undefined2019/10/12/LeetCode%20622%20Maximum%20Width%20of%20Binary%20Tree/"/>
+    <url>2019/10/12/LeetCode%20622%20Maximum%20Width%20of%20Binary%20Tree/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Maximum-Width-of-Binary-Tree"><a href="#LeetCode-Maximum-Width-of-Binary-Tree" class="headerlink" title="LeetCode: Maximum Width of Binary Tree"></a>LeetCode: <a href="https://leetcode.com/problems/maximum-width-of-binary-tree/" target="_blank" rel="noopener">Maximum Width of Binary Tree</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个二叉树，求这个树的最大宽度。该宽度为两个非空节点间包含空节点的总结点数。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Example 1:Input:            1         /   \        3     2       / \     \        5   3     9 Output: 4Explanation: 最大宽度是第三层，总共有四个节点 4 (5,3,null,9).Example 2:Input:           1         /          3           / \             5   3     Output: 2Explanation:最大宽度是第三层 总共有两个节点 2 (5,3).</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题也是最直观的感受就是在考察树的广度遍历，但是因为没有深入思考过，所以在怎么区分每一层上陷入了卡克状态。看了提示发现可以通过队列的大小来确定当前层有多少个节点。知道这个后这个题的核心问题是怎么算两个节点间的距离，其实每棵满二叉树都可以写成一个数组的形式，所以这里其实就需要记录两个值，一个是每一层最左边节点的索引，另一个是每一层最右边节点索引，通过这两个节点索引的差值就能够计算出当前层的最大宽度。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><p><strong>DFS</strong></p><pre><code class="java">class Solution { public int widthOfBinaryTree(TreeNode root) {            if (root == null) {                return 0;            }            List&lt;Integer&gt; start = new LinkedList&lt;&gt;();            List&lt;Integer&gt; end = new LinkedList&lt;&gt;();            return findMaxWidthOfBinaryTree(root, 0, 1, start, end);        }        private int findMaxWidthOfBinaryTree(TreeNode root, int level, int order, List&lt;Integer&gt; start, List&lt;Integer&gt; end) {            if (root == null) {                return 0;            }            if (start.size() == level) {                start.add(order);                end.add(order);            } else {                end.set(level, order);            }            int cur = end.get(level) - start.get(level) + 1;            int left = findMaxWidthOfBinaryTree(root.left, level + 1, 2 * order, start, end);            int right = findMaxWidthOfBinaryTree(root.right, level + 1, 2 * order + 1, start, end);            return Math.max(cur, Math.max(left, right));        }}</code></pre><blockquote><p>同样的BFS也可以实现</p></blockquote><pre><code class="java">class Solution {private static final Map&lt;TreeNode, Integer&gt; nodeOrderMap = new HashMap&lt;&gt;();        public int widthOfBinaryTree(TreeNode root) {            if (root == null) {                return 0;            }            LinkedList&lt;TreeNode&gt; queue = new LinkedList&lt;&gt;();            nodeOrderMap.put(root, 1);            queue.offer(root);            int maxWidth = 0;            while (!queue.isEmpty()) {                int size = queue.size();                maxWidth = Math.max(nodeOrderMap.get(queue.peekLast()) - nodeOrderMap.get(queue.peekFirst()) + 1, maxWidth);                for (int i = 0; i &lt; size; i++) {                    TreeNode tempNode = queue.poll();                    if (tempNode.left != null) {                        queue.offer(tempNode.left);                        nodeOrderMap.put(tempNode.left, nodeOrderMap.get(tempNode) * 2);                    }                    if (tempNode.right != null) {                        queue.offer(tempNode.right);                        nodeOrderMap.put(tempNode.right, nodeOrderMap.get(tempNode) * 2 + 1);                    }                }            }            return maxWidth;        }    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Generate Parentheses</title>
+    <link href="undefined2019/09/27/LeetCode%20Generate%20Parentheses/"/>
+    <url>2019/09/27/LeetCode%20Generate%20Parentheses/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Generate-Parentheses"><a href="#LeetCode-Generate-Parentheses" class="headerlink" title="LeetCode: Generate Parentheses"></a>LeetCode: <a href="https://leetcode.com/problems/generate-parentheses/" target="_blank" rel="noopener">Generate Parentheses</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个数字n，写一个函数返回所有n对小括号的组合。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">For example, given n = 3, a solution set is:[  &quot;((()))&quot;,  &quot;(()())&quot;,  &quot;(())()&quot;,  &quot;()(())&quot;,  &quot;()()()&quot;]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题也是明显的回溯的题，就是看当前选择哪个括号，但是需要注意的是左括号数一定要小于等于右括号数，当两种括号都使用完了就是一种解。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><pre><code class="java">class Solution { public List&lt;String&gt; generateParenthesis(int n) {        if (n &lt;= 0) {            return new ArrayList&lt;&gt;();        }        List&lt;String&gt; result = new ArrayList&lt;&gt;();        int charLength = 2 * n;        fillParentheseResult(result, n, n, new char[charLength], 0);        return result;    }    private void fillParentheseResult(List&lt;String&gt; result, int left, int right, char[] temp, int offset) {        if (right == 0) {            result.add(new String(temp));            return;        }        if (left == right &amp;&amp; left &gt; 0) {            temp[offset] = &#39;(&#39;;            fillParentheseResult(result, left - 1, right, temp, offset + 1);        } else if (left &gt; 0 &amp;&amp; right &gt; 0 &amp;&amp; left &lt; right) {            temp[offset] = &#39;(&#39;;            fillParentheseResult(result, left - 1, right, temp, offset + 1);            temp[offset] = &#39;)&#39;;            fillParentheseResult(result, left, right - 1, temp, offset + 1);        } else if (left == 0 &amp;&amp; right &gt; 0) {            temp[offset] = &#39;)&#39;;            fillParentheseResult(result, left, right - 1, temp, offset + 1);        }    }}</code></pre><blockquote><p>会发现以上代码比较繁琐，因为条件判断。但是仔细想了下条件判断可以简化成如下样子</p></blockquote><pre><code class="java">class Solution { public List&lt;String&gt; generateParenthesis(int n) {        if (n &lt;= 0) {            return new ArrayList&lt;&gt;();        }        List&lt;String&gt; result = new ArrayList&lt;&gt;();        int charLength = 2 * n;        fillParentheseResult(result, n, n, new char[charLength], 0);        return result;    }    private void fillParentheseResult(List&lt;String&gt; result, int left, int right, char[] temp, int offset) {        if (right == 0) {            result.add(new String(temp));            return;        }        if (left &gt; 0) {            temp[offset] = &#39;(&#39;;            fillParentheseResult(result, left - 1, right, temp, offset + 1);        }        if (left &lt; right) {            temp[offset] = &#39;)&#39;;            fillParentheseResult(result, left, right - 1, temp, offset + 1);        }    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Subset</title>
+    <link href="undefined2019/09/26/LeetCode%20Subset/"/>
+    <url>2019/09/26/LeetCode%20Subset/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Subset"><a href="#LeetCode-Subset" class="headerlink" title="LeetCode: Subset"></a>LeetCode: <a href="https://leetcode.com/problems/subsets/" target="_blank" rel="noopener">Subset</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个不重复的整型列表，要求返回它所有的子集</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Input: nums = [1,2,3]Output:[  [3],  [1],  [2],  [1,2,3],  [1,3],  [2,3],  [1,2],  []]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>好久没做题了，一碰到这个题隐隐约约感觉会做，但是感觉非常卡顿。最后受到启发，其实整体就是单看每一个数字拿与不拿的问题，这里就有似曾相识的感觉了。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><pre><code class="java">class Solution {    public List&lt;List&lt;Integer&gt;&gt; subsets(int[] nums) {        if (null == nums || nums.length &lt; 1) {            return new ArrayList&lt;&gt;();        }        List&lt;List&lt;Integer&gt;&gt; result = new ArrayList&lt;&gt;();        List&lt;Integer&gt; localSet = new ArrayList&lt;&gt;();        result.add(new ArrayList&lt;&gt;());        fillResultForNums(result, nums, localSet, 0);        return result;    }    private void fillResultForNums(List&lt;List&lt;Integer&gt;&gt; result, int[] nums, List&lt;Integer&gt; localSet, int offset) {        if (offset &gt;= nums.length) {            return;        }        //pick        int val = nums[offset];        localSet.add(val);        fillResultForNums(result, nums, localSet, offset + 1);        result.add(new ArrayList&lt;&gt;(localSet));        //not pick        localSet.remove(localSet.size() - 1);        fillResultForNums(result, nums, localSet, offset + 1);    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Letter Case P</title>
+    <link href="undefined2019/09/26/LeetCode%20Letter%20Case%20P/"/>
+    <url>2019/09/26/LeetCode%20Letter%20Case%20P/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Letter-Case-P"><a href="#LeetCode-Letter-Case-P" class="headerlink" title="LeetCode: Letter Case P"></a>LeetCode: <a href="https://leetcode.com/problems/letter-case-permutation/" target="_blank" rel="noopener">Letter Case P</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给定一个字符串S，将字符串中的每个字母不包含数字分别变成大写和小写的方式，返回一个可能出现的字符串集合。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Examples:Input: S = &quot;a1b2&quot;Output: [&quot;a1b2&quot;, &quot;a1B2&quot;, &quot;A1b2&quot;, &quot;A1B2&quot;]Input: S = &quot;3z4&quot;Output: [&quot;3z4&quot;, &quot;3Z4&quot;]Input: S = &quot;12345&quot;Output: [&quot;12345&quot;]</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题是在Subset那个题之后做的，做起来就很随便了，思路和那个一样，就是判断出是不是字母，如果是字母先把当前的字母变成小写走一遍，然后把当前字母变成大写走一遍。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><pre><code class="java">class Solution {public List&lt;String&gt; letterCasePermutation(String source) {        if (Objects.isNull(source) || &quot;&quot;.equals(source)) {            return new ArrayList&lt;&gt;();        }        char[] chars = source.toCharArray();        List&lt;String&gt; result = new ArrayList&lt;&gt;();        fillResult(0, result, chars, new char[chars.length]);        return result;    }    private void fillResult(int offset, List&lt;String&gt; result, char[] chars, char[] target) {        if (offset &gt;= chars.length) {            result.add(new String(target));            return;        }        char aChar = chars[offset];        if ((&#39;a&#39; &lt;= aChar &amp;&amp; &#39;z&#39; &gt;= aChar)|| (&#39;A&#39; &lt;= aChar &amp;&amp; &#39;Z&#39; &gt;= aChar)) {            target[offset] = Character.toLowerCase(aChar);            fillResult(offset + 1, result, chars, target);            target[offset] = Character.toUpperCase(aChar);            fillResult(offset + 1, result, chars, target);        }else {            target[offset] = aChar;            fillResult(offset + 1, result, chars, target);        }    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Nginx location匹配规则</title>
+    <link href="undefined2019/09/25/Nginx%20location%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/"/>
+    <url>2019/09/25/Nginx%20location%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/</url>
+    
+    <content type="html"><![CDATA[<h4 id="语法规则"><a href="#语法规则" class="headerlink" title="语法规则"></a>语法规则</h4><blockquote><pre><code class="shell">location [=|~|~*|^~] /uri/ { … }</code></pre></blockquote><table><thead><tr><th>模式</th><th align="left">含义</th></tr></thead><tbody><tr><td>location = /uri</td><td align="left">= 表示精确匹配，只有完全匹配上才能生效</td></tr><tr><td>location ^~ /uri</td><td align="left">^~ 开头对URL路径进行前缀匹配，并且在正则之前。</td></tr><tr><td>location ~ pattern</td><td align="left">开头表示区分大小写的正则匹配</td></tr><tr><td>location ~* pattern</td><td align="left">开头表示不区分大小写的正则匹配</td></tr><tr><td>location /uri</td><td align="left">不带任何修饰符，也表示前缀匹配，但是在正则匹配之后</td></tr><tr><td>location /</td><td align="left">通用匹配，任何未匹配到其它location的请求都会匹配到，相当于switch中的default</td></tr></tbody></table><ul><li>首先精确匹配 <code>=</code></li><li>其次前缀匹配 <code>^~</code></li><li>其次是按文件中顺序的正则匹配</li><li>然后匹配不带任何修饰的前缀匹配。</li><li>最后是交给 <code>/</code> 通用匹配</li><li>当有匹配成功时候，停止匹配，按当前匹配规则处理请求</li></ul><h3 id="遇到的问题"><a href="#遇到的问题" class="headerlink" title="遇到的问题"></a>遇到的问题</h3><blockquote><p>想要在非根目录下部署静态文件，但是一直显示404。 配置如下</p><pre><code>location ^~ /admin {      root  /a/n/admin;      index index.html;    }</code></pre><p>意思就是将根目录指向nginx所在的admin下，而admin目录下有index.html文件。想要通过访问<a href="http://localhost/admin" target="_blank" rel="noopener">http://localhost/admin</a> 访问到index.html。但是这样写会一直报404。</p><p><strong>根源</strong></p><p>查了下nginx的error日志，发现有如下一句话</p><p>2019/09/25 16:13:48 [error] 53456#57324: *74 CreateFile() “D:\develop\nginx-1.16.1/admin/admin” failed (2: The system cannot find the file specified), client: 127.0.0.1, server: localhost, request: “GET /admin HTTP/1.1”, host: “localhost”</p><p>可以看到nginx尝试到/admin/admin下寻找我们的文件，这说明location后的前缀会在寻找文件时起作用！！！所以需要把它失效掉。配置如下</p><pre><code>location ^~ /admin {          root  /a/b;          index index.html;        }</code></pre><p>将root定位到父级目录，问题解决！</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>nginx</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Git配置SSH免密码登录</title>
+    <link href="undefined2019/09/24/%E8%87%AA%E5%B7%B1%E6%90%AD%E5%BB%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B9%B6%E5%85%8D%E5%AF%86/"/>
+    <url>2019/09/24/%E8%87%AA%E5%B7%B1%E6%90%AD%E5%BB%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B9%B6%E5%85%8D%E5%AF%86/</url>
+    
+    <content type="html"><![CDATA[<h4 id="1-本地生成秘钥"><a href="#1-本地生成秘钥" class="headerlink" title="1.本地生成秘钥"></a>1.本地生成秘钥</h4><p>　　打开Git Bash</p><pre><code>ssh-keygen -t rsa -C &quot;xiaowang@qq.com&quot;</code></pre><h4 id="2-服务器上创建用户"><a href="#2-服务器上创建用户" class="headerlink" title="2.服务器上创建用户"></a>2.服务器上创建用户</h4><blockquote><pre><code class="shell">adduser gitpasswd git #设置git的密码cd /mkdir project #创建项目文件夹cd projectgit initcd ../../chown git:git project #设置用户组</code></pre></blockquote><h4 id="3-Git服务器打开RSA认证"><a href="#3-Git服务器打开RSA认证" class="headerlink" title="3.Git服务器打开RSA认证"></a>3.Git服务器打开RSA认证</h4><blockquote><p>在Git服务器上首先需要将/etc/ssh/sshd_config中将RSA认证打开：</p><p>RSAAuthentication yes<br>PubkeyAuthentication yes<br>AuthorizedKeysFile  .ssh/authorized_keys<br>在/home/git下创建.ssh目录，然后创建authorized_keys文件，把id_rsa.pub里面的内容复制到authorized_keys文件中</p></blockquote><h4 id="4-修改权限"><a href="#4-修改权限" class="headerlink" title="4.修改权限"></a>4.修改权限</h4><p><strong>重要,很重要,非常重要！！！！！！！！！！没有配置的话还是需要输入密码的！！！</strong></p><blockquote><p>修改 .ssh 目录的权限为 700<br>修改 .ssh/authorized_keys 文件的权限为 600</p><pre><code class="shell">chmod 700 .sshcd .sshchmod 600 authorized_keys</code></pre></blockquote><h4 id="5-客户端clone仓库"><a href="#5-客户端clone仓库" class="headerlink" title="5.客户端clone仓库"></a>5.客户端clone仓库</h4><p>不需要输入密码即可</p><p>git clone <a href="mailto:git@115.136.72.96">git@115.136.72.96</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>git</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>彷徨</title>
+    <link href="undefined2019/07/14/%E5%BD%B7%E5%BE%A8/"/>
+    <url>2019/07/14/%E5%BD%B7%E5%BE%A8/</url>
+    
+    <content type="html"><![CDATA[<p>​        还没从差点儿没毕业的阴影中完全走出来就经历了入职与培训。入职前就十分的忐忑，不明白自己这个选择到底正不正确，总感觉自己处在一个很关键的三岔口，而且不知道自己选得这条路到底是怎么样的，这些天也莫名的烦躁，对各种事情都提不起兴趣。工作上来讲因为有一段实习经历，所做的项目给我一种感觉，就是这里的技术并不是很新，很多代码也写得很奇怪。不过现在想想可能有两方面原因，第一可能是因为自己熟悉的代码不多，可能存在以管窥豹的问题，第二就是因为刚开始时接触的代码真得写得太规范了，造成了自己以为那就是互联网中真实的代码情况。</p><p>​        刚入职第二天就参加培训了，可能是因为之前HR一直在说要给我们留下一个印象深刻的培训，所以对这次培训还是挺期待，想看看到底怎么个不一样法。但是培训下来发现基本也就是将培训计划的任务交给了另一个公司，说实话有一些失望，所有环节也都中规中矩，要是没有先前的鼓吹的话其实倒也还可以。整个培训最大的收获就是认识了一同入职的小伙伴，当然年龄有大有小，学历也有高有低，不过可以看出整体的招人层次还是比较高的。还有一个收获就是体验了一下年轻人该有的生活，疯狂，张扬，狂欢，倒也是一种不一样的体验。</p><p>​        这段时间倒也真的是挺忙的，有公司分配的新任务，且完全没有给上手时间的空档期，又有项目需要做。不过加油吧，努力永远不会白费。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>其他</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>杂记</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>解决CORS问题实践</title>
+    <link href="undefined2019/01/09/%E8%A7%A3%E5%86%B3CORS%E9%97%AE%E9%A2%98%E5%AE%9E%E8%B7%B5/"/>
+    <url>2019/01/09/%E8%A7%A3%E5%86%B3CORS%E9%97%AE%E9%A2%98%E5%AE%9E%E8%B7%B5/</url>
+    
+    <content type="html"><![CDATA[<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><blockquote><p>跨域资源共享(<a href="https://developer.mozilla.org/en-US/docs/Glossary/CORS" target="_blank" rel="noopener">CORS</a>) 是一种机制，它使用额外的 <a href="https://developer.mozilla.org/en-US/docs/Glossary/HTTP" target="_blank" rel="noopener">HTTP</a> 头来告诉浏览器  让运行在一个 origin (domain) 上的Web应用被准许访问来自不同源服务器上的指定的资源。当一个资源从与该资源本身所在的服务器<strong>不同的域、协议或端口</strong>请求一个资源时，资源会发起一个<strong>跨域 HTTP 请求</strong>。</p></blockquote><p><strong>简单来说CORS就是浏览器为了保证网站的安全的一种机制。</strong></p><p><a href="http://www.ruanyifeng.com/blog/2016/04/cors.html" target="_blank" rel="noopener">更多介绍：阮一峰的文章</a></p><h3 id="实践"><a href="#实践" class="headerlink" title="实践"></a>实践</h3><p>本文使用springboot + jquery试验一下CORS的解决方案。</p><h4 id="环境"><a href="#环境" class="headerlink" title="环境"></a>环境</h4><img src="/2019/01/09/%E8%A7%A3%E5%86%B3CORS%E9%97%AE%E9%A2%98%E5%AE%9E%E8%B7%B5/%E7%8E%AF%E5%A2%83.png" srcset="/img/loading.gif" class=""><p>首先需要两个工程，因为是本机测试，所以两个端口要不一样，而且为了还原跨域的情景，所以将domain1，domain2一起绑定到本地IP。</p><h4 id="步骤"><a href="#步骤" class="headerlink" title="步骤"></a>步骤</h4><p>以上环境搭建完成后就开始实践了。这里是使用domain1跨域请求domain2的接口。</p><p>页面代码如下：</p><pre><code class="html">&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.01 Transitional//EN&quot;        &quot;http://www.w3.org/TR/html4/loose.dtd&quot;&gt;&lt;html&gt;&lt;head&gt;    &lt;title&gt;Hello World&lt;/title&gt;    &lt;script src=&quot;jquery-3.3.1.min.js&quot;&gt;&lt;/script&gt;    &lt;script&gt;        $(document).ready(function () {            $(&quot;#btn1&quot;).click(function () {                $.get(&quot;http://domain2:8081/domain2&quot;, function (data, status) {                    alert(&quot;data: &quot; + data + &quot;\n status: &quot; + status);                });            });        });    &lt;/script&gt;&lt;/head&gt;&lt;body&gt;&lt;h1&gt; Hello World! &lt;/h1&gt;&lt;br/&gt;&lt;input id=&quot;btn1&quot; type=&quot;button&quot; value=&quot;CROS-Test&quot;&gt;&lt;/body&gt;&lt;/html&gt;</code></pre><p>启动工程后点击button就会报如下错误:</p><img src="/2019/01/09/%E8%A7%A3%E5%86%B3CORS%E9%97%AE%E9%A2%98%E5%AE%9E%E8%B7%B5/CORS%E6%8B%A6%E6%88%AA.png" srcset="/img/loading.gif" class=""><p>这就说明请求已经被拦截了，要想请求到domain2的接口，需要domain2对跨域进行授权。</p><p>我这里使用一个拦截器对domain1域的请求发放权限：</p><pre><code class="java">public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {        String referer = request.getHeader(&quot;referer&quot;);        if (StringUtils.isEmpty(referer)) {             referer = request.getHeader(&quot;origin&quot;);        }        if (!StringUtils.isEmpty(referer)) {            URL refererUrl = new URL(referer);            StringBuilder originBuf = new StringBuilder(refererUrl.getProtocol()).append(&quot;://&quot;)                    .append(refererUrl.getHost());            if (refererUrl.getPort() &gt; 0) {                originBuf.append(&quot;:&quot;).append(refererUrl.getPort());            }            String origin = originBuf.toString();            if (&quot;http://domain1:8080&quot;.equals(origin)) {                response.addHeader(&quot;Access-Control-Allow-Origin&quot;, origin);                response.addHeader(&quot;Access-Control-Allow-Credentials&quot;, &quot;true&quot;);                response.addHeader(&quot;Access-Control-Allow-Headers&quot;, &quot;demo&quot;);            }        }        return true;    }</code></pre><p>重新访问一下：</p><img src="/2019/01/09/%E8%A7%A3%E5%86%B3CORS%E9%97%AE%E9%A2%98%E5%AE%9E%E8%B7%B5/%E8%B7%A8%E5%9F%9F%E6%88%90%E5%8A%9F.png" srcset="/img/loading.gif" class=""><p>可以看到请求成功了。主要原理就是domain2允许了domain1的跨域请求，浏览器获取到授权标识，其实就在http请求头中，就会放行。</p><p><a href="https://github.com/wangkunSE/cors-demo" target="_blank" rel="noopener">以上全部源码</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>http</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>百度面试记录</title>
+    <link href="undefined2018/09/17/%E7%99%BE%E5%BA%A6%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/"/>
+    <url>2018/09/17/%E7%99%BE%E5%BA%A6%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/</url>
+    
+    <content type="html"><![CDATA[<h2 id="百度面试记录"><a href="#百度面试记录" class="headerlink" title="百度面试记录"></a>百度面试记录</h2><p>百度总共三面，之前对百度印象其实一般，但是经过面试之后感觉首先面试我的这三个面试官专业水平很高，而且待人十分和善，非常加分。</p><h3 id="一面："><a href="#一面：" class="headerlink" title="一面："></a>一面：</h3><ol><li>自我介绍</li><li>说下你对区块链的理解</li><li>说下区块链的适用场景</li><li>说下对比特币的看法</li><li>说下区块链的目前状况以及可能的发展方向</li><li>分布式系统和区块链的关系</li><li>说项目</li><li>ZK在项目中的作用，ZK的局限性</li><li>算法题，两个乱序数组，输出一个排序且去重的数组（看似简单，但是写了三页纸。。）</li><li>开放性题，36匹马，6个赛道，选出最快的三匹马最少需要几次比赛</li><li>手中有多少offer了</li></ol><blockquote><p>一面聊得很舒服，因为我自我介绍的时候说了我最近在了解区块链，所以这方面聊了很多东西。而且主要是面试官很和善，耳垂很大，很爱笑，给我的印象非常好，面完就很想一起工作</p></blockquote><h3 id="二面："><a href="#二面：" class="headerlink" title="二面："></a>二面：</h3><ol><li>区块链和传统数据库的区别，两个适用场景分别是什么</li><li>数据库是什么，都有哪些类型的</li><li>聊项目</li><li>ZK是什么</li><li>ZK采用的分布式一致性协议详解</li><li>其他的分布式一致性协议有了解吗</li><li>算法题，树的最大深度，尽可能说出你能想到的思路</li><li>算法题，一个经过移动的单调递增的数组，从中检索目标值。例子[15,16,17,1,2,3,4,5] 查找18</li><li>TCP和UDP的区别，TCP为什么可靠，TCP的拥塞控制</li><li>进程和线程的概念，区别，适用场景</li><li>一个开放性题关于数据架构，总共问了五层。问题一步接一步，反应时间很短。。还是很有挑战性的。</li></ol><blockquote><p>二面面试官自我介绍的时候说他是做数据库相关的，所以问了很多数据库相关的问题，二面面试官提的问题希望我能回答出他想要的标准答案，但是某些问题我没有get到他的点，感觉会比较严格一些，所以面完感觉要凉凉了。但是整体来讲二面面试官人也非常好，不管是从专业上来讲还是待人上。而且面试官给我提了一个很好的改进意见，就是说问题要说具体些，越具体说明越了解本质。</p></blockquote><h3 id="三面"><a href="#三面" class="headerlink" title="三面:"></a>三面:</h3><ol><li>自我介绍</li><li>挑选一个项目进行讲解</li><li>ZK在这个项目中的作用</li><li>你在这个项目中发挥的作用，团队的参与人数，职责</li><li>另一个项目，画状态扭转图，架构图，以及在项目中发挥的作用，这个项目的难点，怎么解决的</li><li>选一个项目难点进行介绍，为什么困难</li><li>一个开放性试题，有N个棋子，A,B两个人轮流从中拿1~M个，求M和N的关系在什么情况下A,B分别必胜</li><li>目前手中的offer</li><li>对所持有的offer的公司进行比较</li><li>喜欢什么样的公司文化</li></ol><blockquote><p>三面我本以为面试官要问大量的算法题，但是却以项目为主，分别详细介绍了两个项目。然后了解了一些其他情况，三面面试官对我的改进建议和二面面试官类似，有些地方说得还是不够具体。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>老虎面试</title>
+    <link href="undefined2018/09/05/%E8%80%81%E8%99%8E%E9%9D%A2%E8%AF%95/"/>
+    <url>2018/09/05/%E8%80%81%E8%99%8E%E9%9D%A2%E8%AF%95/</url>
+    
+    <content type="html"><![CDATA[<h2 id="老虎面试"><a href="#老虎面试" class="headerlink" title="老虎面试"></a>老虎面试</h2><h3 id="一面-电话"><a href="#一面-电话" class="headerlink" title="一面 (电话)"></a>一面 (电话)</h3><ol><li>值类型和引用类型区别</li><li>项目相关问题</li><li>ThradLocal原理</li><li>Mysql索引原理，联合索引什么时候有作用，最左匹配原则</li><li>数据库锁介绍</li></ol><h3 id="二面（现场）"><a href="#二面（现场）" class="headerlink" title="二面（现场）"></a>二面（现场）</h3><ol><li>Spring的Aop概念，相关的注解</li><li>Resource和AutoWire的区别</li><li>BlockingQueue怎么实现的，手写</li><li>可重入锁，公平锁不公平锁</li><li>场景题，高并发场景怎么保证服务高可用和数据的一致性</li><li>算法题，计算一个二叉树的最大层深</li></ol><h3 id="三面（现场）"><a href="#三面（现场）" class="headerlink" title="三面（现场）"></a>三面（现场）</h3><ol><li>TCP/IP协议模型和相关协议介绍</li><li>TCP是如何保证可靠的</li><li>数据库锁的分类方式及实现，以及场景</li><li>进程和线程的区别</li><li>图的遍历算法</li><li>算法题，手写DFS</li><li>算法题，一个二维数组，从起点到目标点的最短距离，中间有障碍物</li><li>有没有学习新的技术，为什么学</li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>有道面试记录</title>
+    <link href="undefined2018/08/29/%E6%9C%89%E9%81%93%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/"/>
+    <url>2018/08/29/%E6%9C%89%E9%81%93%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/</url>
+    
+    <content type="html"><![CDATA[<h2 id="有道面试记录"><a href="#有道面试记录" class="headerlink" title="有道面试记录"></a>有道面试记录</h2><h3 id="一面"><a href="#一面" class="headerlink" title="一面"></a>一面</h3><ol><li>自我介绍</li><li>ThreadLocal介绍一下，原理，一定安全吗</li><li>线程池</li><li>JVM垃圾回收的意义</li><li>数据库锁</li><li>MySQL的引擎，innodb的索引实现，MyIsSam和innodb的区别</li><li>violatile的作用</li><li>算法题，单链表判断有环</li></ol><h3 id="二面"><a href="#二面" class="headerlink" title="二面"></a>二面</h3><ol><li><p>RPC和http的应用场景</p></li><li><p>hbase的简单介绍</p></li><li><p>hbase的索引机制</p></li><li><p>JDK1.8的新特性</p></li><li><p>lambda简单介绍，好处</p></li><li><p>拥塞机制</p></li><li><p>分布式环境的数据一致性怎么保证</p></li><li><p>Zookeeper简介</p></li><li><p>ZK实现分布式锁</p></li><li><p>场景题：一个秒杀场景，100万的请求，2000库存，怎么保证数据库的请求最少</p></li><li><p>算法题：</p><blockquote><p> 题目：一个字符串其中字符都是相邻且重复出现的，只有一个字母出现了一次，找出这个字符，要求时间复杂度小于O(n)</p><p>举例：输入:aabbccdee   输出:6</p><p>思路：用二分查找，面试官大哥本来想考我一下，但是不小心自己说漏嘴了，笑得漏出了小虎牙</p></blockquote></li></ol><h3 id="三面"><a href="#三面" class="headerlink" title="三面"></a>三面</h3><ol><li><p>算法题：</p><blockquote><p>题目：找出一组线段集合中被一条垂线穿过的最多的线段数目。</p><p>举例：输入 : （1，2）（1，3）（2，4）（5，6） 输出：3</p></blockquote></li><li><p>设计一个权限管理系统，这个系统是仿造WIKI做的。</p></li></ol>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>菜鸟面试记录</title>
+    <link href="undefined2018/08/25/%E8%8F%9C%E9%B8%9F%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/"/>
+    <url>2018/08/25/%E8%8F%9C%E9%B8%9F%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/</url>
+    
+    <content type="html"><![CDATA[<h2 id="菜鸟面试记录"><a href="#菜鸟面试记录" class="headerlink" title="菜鸟面试记录"></a>菜鸟面试记录</h2><h3 id="一面"><a href="#一面" class="headerlink" title="一面"></a>一面</h3><ol><li>Java内存模型说一下（当时说错了，说的是JVM内存模型，但是面试官还是顺着往下问了）</li><li>Java怎么样算内存泄漏</li><li>垃圾回收算法</li><li>垃圾回收器</li><li>CMS的垃圾回收过程</li><li>mysql的索引</li><li>mysql的锁，行锁，表锁怎么加</li><li>CAS原理</li><li>如何解决CAS的ABA问题</li><li>Java中的锁机制</li><li>线程池，详细说明其中参数</li><li>Spring容器启动过程</li><li>记不清了。。</li></ol><h3 id="二面"><a href="#二面" class="headerlink" title="二面"></a>二面</h3><ol><li>项目的介绍</li><li>HashMap，HashTable的区别，哪个用的多</li><li>ConcurrentHashMap效率高的原因，分段锁是分多少段</li><li>Mysql索引</li><li>JDK源码是否了解</li><li>开源项目是否有了解</li><li>一个智力题，分布不均匀的香两根，每根燃烧完需要1小时，如何测出15分钟的时间</li></ol><h3 id="三面"><a href="#三面" class="headerlink" title="三面"></a>三面</h3><ol><li>hash表的概念，作用</li><li>Hashmap的两个默认参数作用，initCapcity,loadFactor</li><li>为什么initCapcity默认是2的倍数，如果初始化时是奇数会怎么样</li><li>LoadFactor的作用，为什么默认是0.75，设置成别的有什么影响</li><li>HashMap，Hashtable区别</li><li>Hashtable是加了对象锁保证线程安全，那么加了对象锁一定线程安全吗</li><li>Mysql的排它锁和共享锁的区别，什么场景需要用他们</li><li>垃圾回收的作用</li><li>简单问了一个项目，并且根据项目设计了一个衍生的场景题</li><li>Java的锁机制</li><li>Https一定安全吗，如果你是中间人会怎么进行攻击</li><li>OSI7层结构，哪几层可以去掉不要</li><li>进程和线程的区别</li><li>当一个单核机器运行一个计算任务时如何提高效率</li></ol><h3 id="HR面"><a href="#HR面" class="headerlink" title="HR面"></a>HR面</h3><ol><li>简单说一下本科和研究生都在做什么</li><li>本科一直打游戏那怎么确定现在可以有足够的自信</li><li>为什么选择杭州，北京不是很好吗</li><li>有女朋友吗</li><li>有什么问题</li></ol><p>整体上感觉技术面试还好，hr面试可能真的太诚实了，还是需要准备一下，所以可能挂掉了。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Https原理</title>
+    <link href="undefined2018/08/16/Https%E5%8E%9F%E7%90%86/"/>
+    <url>2018/08/16/Https%E5%8E%9F%E7%90%86/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Https-原理"><a href="#Https-原理" class="headerlink" title="Https 原理"></a>Https 原理</h2><p><a href="https://www.cnblogs.com/zhangshitong/p/6478721.html" target="_blank" rel="noopener">https://www.cnblogs.com/zhangshitong/p/6478721.html</a></p><p><a href="https://www.jianshu.com/p/55e402bcbc18" target="_blank" rel="noopener">https://www.jianshu.com/p/55e402bcbc18</a></p><h3 id="概括"><a href="#概括" class="headerlink" title="概括"></a>概括</h3><blockquote><p>https的通信主要是两段加密的过程，客户端和服务端的通信要保证安全则需要使用密钥对传输内容进行加密。因为非对称加密算法的效率低所以采取对称加密算法。</p></blockquote><h3 id="问题提出"><a href="#问题提出" class="headerlink" title="问题提出"></a>问题提出</h3><h4 id="1-那么就出现了第一个问题-数据密钥怎么给客户端？"><a href="#1-那么就出现了第一个问题-数据密钥怎么给客户端？" class="headerlink" title="1. 那么就出现了第一个问题:数据密钥怎么给客户端？"></a>1. 那么就出现了第一个问题:数据密钥怎么给客户端？</h4><p>肯定是要加密的，那么用什么方法，对称加密算法吗，那么问题就来了，解密数据密钥的密钥怎么传给客户端？再设计一层嘛？所以行不通。那么就用非对称加密，服务端用私钥加密数据密钥，而客户端用自己的服务端发给他的公钥进行解密拿出数据密钥。</p><h4 id="2-那么如果有个中间人是不是整个计划也就泡汤了？怎么防止这种情况-就是怎么保证我拿到的公钥是我想访问的服务器的公钥？"><a href="#2-那么如果有个中间人是不是整个计划也就泡汤了？怎么防止这种情况-就是怎么保证我拿到的公钥是我想访问的服务器的公钥？" class="headerlink" title="2. 那么如果有个中间人是不是整个计划也就泡汤了？怎么防止这种情况?就是怎么保证我拿到的公钥是我想访问的服务器的公钥？"></a>2. 那么如果有个中间人是不是整个计划也就泡汤了？怎么防止这种情况?就是怎么保证我拿到的公钥是我想访问的服务器的公钥？</h4><p>把公钥放到一个第三方权威机构，也就是CA中心。CA中心给服务器颁发权威证书，也就是CA中心把服务端需要获取数据密钥的公钥用自己的公钥加密后的东西(很绕。。)。CA中心的公钥就在操作系统或浏览器中可查。</p><h4 id="3-那么即便证书是合法的也不能证明我和服务器之间就没有中间人啊，因为其他机构也可以注册证书"><a href="#3-那么即便证书是合法的也不能证明我和服务器之间就没有中间人啊，因为其他机构也可以注册证书" class="headerlink" title="3. 那么即便证书是合法的也不能证明我和服务器之间就没有中间人啊，因为其他机构也可以注册证书?"></a>3. 那么即便证书是合法的也不能证明我和服务器之间就没有中间人啊，因为其他机构也可以注册证书?</h4><p>这个时候就有一个数字签名的概念，在证书中还有一个数字签名，这个签名就像指纹，唯一确定一个服务器，通过特定方法加密过的，一起放在证书中。客户端通过验证数字签名的方式确定这是需要交互的客户端发来的证书。这样就终于拿到服务端的数据密钥的加密公钥了。然后客户端生成一个随机密钥，通过这个公钥加密，服务端解密后达成协议，后面的通信都用这个密钥进行通信，以打成通信安全的目的。</p><h3 id="交互流程"><a href="#交互流程" class="headerlink" title="交互流程"></a>交互流程</h3><img src="/2018/08/16/Https%E5%8E%9F%E7%90%86/https%E9%80%9A%E4%BF%A1.png" srcset="/img/loading.gif" class=""><blockquote><ol><li>客户端通过发送client hello报文开始SSL通信.报文中包含客户端支持的SSL指定版本,加密组件列表(所使用的加密算法 密钥长度等)</li><li>服务器可进行SSL通信时,会议Server Hello报文作文回应.报文中含SSL版本 加密组件.服务器的加密组件内容是从接受客户端加密组件内筛选出来的.</li><li>之后服务器发送certificate报文.报文中包好公开密钥证书.</li><li>服务器发送server hello done报文通知客户端.最初阶段握手协商部分结束.</li><li>SSL第一次握手结束后,客户端以client key exchange报文作为回应.报文包含通信加密中使用的随机密码串.该报文已用步骤3中的公钥加密;</li><li>客户端继续发送change cipher spec报文.该报文会提示想服务器,在此报文之后的通讯会采用pre-master secret密钥加密</li><li>客户端发送finished报文 该报文包含连接至今前部报文的整体校验值.这次握手协商是否成功,要以服务器是否能够正确解密该报文作文判定标准.</li><li>服务器同样发送change cipher spec报文</li><li>服务器同样发送finished报文</li><li>C&amp;S finishe报文交换完毕之后,ssl连接就算建立完成.通信会受到SSL的保护.从此开始进行应用层的协议通信,即发送HTTP响应</li><li>应用层协议通信,即发送HTTP响应</li><li>最后客户端断开连接.断开连接时,发送close_notity报文.上图做了一些省略</li></ol></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>网络</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>http</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>equals()与hashCode()关联总结</title>
+    <link href="undefined2018/08/14/equals()%E4%B8%8EhashCode()%E5%85%B3%E8%81%94%E6%80%BB%E7%BB%93/"/>
+    <url>2018/08/14/equals()%E4%B8%8EhashCode()%E5%85%B3%E8%81%94%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h3 id="1-equals"><a href="#1-equals" class="headerlink" title="1. equals()"></a>1. equals()</h3><h4 id="1-1含义"><a href="#1-1含义" class="headerlink" title="1.1含义"></a>1.1含义</h4><blockquote><p>默认代表两个对象的引用是否相等，等同于 ==。但是一般的覆盖行为是为了使两个对象逻辑相等。</p><pre><code class="java">Point point1 = new Point(0,0);Point point2 = new Point(0,0);point1.equals(point2);//我们希望这个结果是相等的，因为他们在同一点上，尽管他们的对象引用不同。</code></pre></blockquote><h4 id="1-2-性质"><a href="#1-2-性质" class="headerlink" title="1.2 性质"></a>1.2 性质</h4><ul><li>自反性 ：非null情况下<code>x.equals(x)</code>永远返回true。</li><li>对称性 :  <code>x.equals(y) 和 y.equals(x)</code>的值相同</li><li>传递性：<code>x.equals(y) 为true  y.equals(z) 为true 那么 z.equals(x) 为true</code></li><li>一致性：对于一个信息未变的对象调用equals()方法返回的结果一致。</li></ul><h3 id="2-hashCode"><a href="#2-hashCode" class="headerlink" title="2. hashCode()"></a>2. hashCode()</h3><h4 id="2-1含义"><a href="#2-1含义" class="headerlink" title="2.1含义"></a>2.1含义</h4><blockquote><p>用于散列集合的使用。</p></blockquote><h4 id="2-2-约定"><a href="#2-2-约定" class="headerlink" title="2.2 约定"></a>2.2 约定</h4><blockquote><ul><li>在应用程序的执行期间，只要equals()操作所用到的信息未发生变化，那么hashCode()的值应当一致。</li><li>如果两个对象是equals()的，那么他们的hashCode()方法值一定相同。</li><li>两个对象不是equals()的，那么他们的hashCode()方法值不一定不同。</li></ul></blockquote><h4 id="2-3-细节"><a href="#2-3-细节" class="headerlink" title="2.3 细节"></a>2.3 细节</h4><h5 id="实现一个良好的hashCode-方法时采取的规约"><a href="#实现一个良好的hashCode-方法时采取的规约" class="headerlink" title="实现一个良好的hashCode()方法时采取的规约:"></a>实现一个良好的hashCode()方法时采取的规约:</h5><pre><code class="java">/**之所以每次乘31,是因为如果域值不同，但是和相同也会造成hash冲突，这样能保证值得顺序。*/@Overridepublic int hashCode(){    //一个初始化的值，使hash值分布更均匀    int result = 17;    result = 31 * result + field1;    result = 31 * result + field2;    result = 31 * result + field3;    ...    result = 31 * result + fieldn;    return result;}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Median of Two Sorted Arrays</title>
+    <link href="undefined2018/08/10/LeetCode%20Median%20of%20Two%20Sorted%20Arrays/"/>
+    <url>2018/08/10/LeetCode%20Median%20of%20Two%20Sorted%20Arrays/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Median-of-Two-Sorted-Arrays"><a href="#LeetCode-Median-of-Two-Sorted-Arrays" class="headerlink" title="LeetCode:Median of Two Sorted Arrays"></a>LeetCode:<a href="https://leetcode.com/problems/median-of-two-sorted-arrays/" target="_blank" rel="noopener">Median of Two Sorted Arrays</a></h2><h3 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h3><blockquote><p>给两个排过序的数组，找出两个数组所有元素的中位数，要求时间复杂度为O(log(m+n))。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Example 1:nums1 = [1, 3]nums2 = [2]The median is 2.0Example 2:nums1 = [1, 2]nums2 = [3, 4]The median is (2 + 3)/2 = 2.5</code></pre></blockquote><h3 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h3><blockquote><p>其实这个题要是没有时间复杂度的限制很简单，但是有了这个时间复杂度的限制，那么可以看到遍历都是无法解决这个问题的，既然是排过序那么首先想到二分查找，但是怎么找到中位数呢。</p><pre><code class="java">这里就要说下中位数的概念了，一个数组arr的中位数代表什么？代表了1. len(0~i-1) == len(i~arr.length-1)2. arr[i-1] &lt;= arr[i]因此转换成两个数组这个性质也是不变的，下面讨论两个有序数组A,BA[0]...A[i-1] | A[i]...A[m-1]B[0]...B[j-1] | B[j]...B[n-1]----left------| ----right----有了如下的等式：1.i-1+j-1 = m-1+n-1 - i - j  ===&gt; j = (m+n+1)/2-i; (这里为什么加一，是因为要上取整)    即满足这个等式就可以使len(left) == len(right).2.现在需要满足的就是让A[i-1] &lt;= B[j] &amp;&amp; B[j-1] &lt;= A[i] 就可以找出中位数了。还有一点要注意的就是要保证 n&gt;m 这样j才不会取到负值</code></pre></blockquote><h3 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h3><pre><code class="java">class Solution {    public double findMedianSortedArrays(int[] A, int[] B) {            int[] longArr = null;            int[] shortArr = null;            if( A.length &lt;= B.length){                longArr = B;                shortArr = A;            }else{                longArr = A;                shortArr = B;            }            int m = shortArr.length,n = longArr.length;            if(n &lt; 1){                return 0;            }            int imin = 0,imax = m,halfLen = (m+n+1)/2;            while(imin &lt;= imax ){                int i = (imin + imax)/2;                int j = halfLen - i;                if(i &gt; 0 &amp;&amp; j &lt; n &amp;&amp; shortArr[i-1] &gt; longArr[j] ){                    imin = i - 1;                }else if( j &gt; 0 &amp;&amp; i &lt; m &amp;&amp; longArr[j-1] &gt; shortArr[i]){                    imin = i + 1;                }else{                    double leftMax = 0.0;                    if(i == 0){                        leftMax = longArr[j-1];                    }else if(j == 0){                        leftMax = shortArr[i-1];                    }else{                        leftMax = Math.max(shortArr[i-1],longArr[j-1]);                    }                    if( (m + n) % 2 == 1){                        return leftMax * 1.0;                    }                    double rightMin = 0.0;                    if(i == m){                        rightMin = longArr[j];                    }else if(j == n){                        rightMin = shortArr[i];                    }else{                        rightMin = Math.min(shortArr[i],longArr[j]);                    }                    return  (leftMax + rightMin)/2;                }            }            return 0.0;        }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Maximum Product Subarray</title>
+    <link href="undefined2018/08/10/LeetCode%20Maximum%20Product%20Subarray/"/>
+    <url>2018/08/10/LeetCode%20Maximum%20Product%20Subarray/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Maximum-Product-Subarray"><a href="#LeetCode-Maximum-Product-Subarray" class="headerlink" title="LeetCode: Maximum Product Subarray"></a>LeetCode: <a href="https://leetcode.com/problems/maximum-product-subarray/" target="_blank" rel="noopener">Maximum Product Subarray</a></h2><h3 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h3><blockquote><p>给一个数组，找出这个数组的最大子数组的乘积</p></blockquote><h3 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h3><blockquote><pre><code class="java">Example 1:Input: [2,3,-2,4]Output: 6Explanation: [2,3] has the largest product 6.Example 2:Input: [-2,0,-1]Output: 0Explanation: The result cannot be 2, because [-2,-1] is not a subarray.</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>其实可以明显感觉出这个题和最大子数组和有很大关系，但是区别在于乘积的话如果有偶数个负数，之前最小的乘积也可能是最大的。因此这个题就需要多保存一个值，那就是最小值。</p></blockquote><h3 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h3><pre><code class="java">class Solution {    public int maxProduct(int[] A) {        if (A.length == 0) {            return 0;        }        int maxherepre = A[0];        int minherepre = A[0];        int maxsofar = A[0];        int maxhere, minhere;        for (int i = 1; i &lt; A.length; i++) {            maxhere = Math.max(Math.max(maxherepre * A[i], minherepre * A[i]), A[i]);            minhere = Math.min(Math.min(maxherepre * A[i], minherepre * A[i]), A[i]);            maxsofar = Math.max(maxhere, maxsofar);            maxherepre = maxhere;            minherepre = minhere;        }        return maxsofar;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-House Robber</title>
+    <link href="undefined2018/08/10/LeetCode%20House%20Robber/"/>
+    <url>2018/08/10/LeetCode%20House%20Robber/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-House-Robber"><a href="#LeetCode-House-Robber" class="headerlink" title="LeetCode:House Robber"></a>LeetCode:<a href="https://leetcode.com/problems/house-robber/" target="_blank" rel="noopener">House Robber</a></h2><h3 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h3><blockquote><p>给你一个数组，从中取值，不能连续取相邻的值，求这个数组可取的最大值。</p></blockquote><h3 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h3><blockquote><pre><code class="java">Example 1:Input: [1,2,3,1]Output: 4Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).             Total amount you can rob = 1 + 3 = 4.Example 2:Input: [2,7,9,3,1]Output: 12Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).             Total amount you can rob = 2 + 9 + 1 = 12.</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题若想暴力求解情况是很复杂的，因为要考虑要当前的值，就不能要左右的值。若用DP的思维，这个题就很简单了，就考虑当前的值拿不拿，而拿与不拿取决于之前不拿的最大值和当前值的和与上一个值拿的值哪个大。</p></blockquote><h3 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h3><blockquote><p>可以看到代码十分简洁，dp的题都是这样。</p></blockquote><pre><code class="java">class Solution {    public int rob(int[] nums) {        if(nums == null || nums.length &lt; 1){            return 0;        }        int rob = 0;        int notRob = 0;        for(int i = 0; i &lt; nums.length;i++){            int currentRob = rob;            //拿当前的值            rob = Math.max(notRob+nums[i],rob);            //不拿当前的值            notRob = Math.max(currentRob,notRob);        }        return Math.max(rob,notRob);    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Delete and Earn</title>
+    <link href="undefined2018/08/10/LeetCode%20Delete%20and%20Earn/"/>
+    <url>2018/08/10/LeetCode%20Delete%20and%20Earn/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Delete-and-Earn"><a href="#LeetCode-Delete-and-Earn" class="headerlink" title="LeetCode: Delete and Earn"></a>LeetCode: <a href="https://leetcode.com/problems/delete-and-earn/" target="_blank" rel="noopener">Delete and Earn</a></h2><h3 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h3><blockquote><p>给一个数组，可以有这样的操作，如果你拿了nums[i]的值，则你现在有nums[i]的积分，但是你要把数组中值为nums[i]-1或nums[i]+1的值都删掉。返回一个该数组拿值得到最大积分的方式。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Example 1:Input: nums = [3, 4, 2]Output: 6Explanation: 拿4所以3被删掉了，而还剩2，所以最终为6Example 2:Input: nums = [2, 2, 3, 3, 3, 4]Output: 9Explanation: 如果拿所有的2的话，因为要删掉所有的3，拿4同理，整个数组最大值为8；拿所有的三个话，2，4被删，整个数组最大的值为9，所以是9</code></pre></blockquote><h3 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h3><blockquote><p>这个题乍一看很花，但是隐隐觉得和HouseRobber有一些关系，想来想去感觉把相同的值加起来不能取相邻的不就是HouseRobber嘛。但是这里少考虑了数组中不止存在相邻的值。所以这个做法行不通。但是换个思路想，因为限制了nums[i]的最大值，所以我们可以结合一个桶，将所有相同的值归类，不取相邻的值，即转换成了HouseRobber的题。</p></blockquote><h3 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h3><blockquote><p>依然十分简洁，可以看到主体和HouseRobber完全一样。所以要识别出同类的题并转化也是一中做题的好方式。</p></blockquote><pre><code class="java">class Solution {    public int deleteAndEarn(int[] nums) {        if(nums== null || nums.length&lt;1){            return 0;        }        int max = 0;        for (int i : nums) {            max = Math.max(i, max);        }        int[] val = new int[max+1];        for(int i=0; i&lt;nums.length ; i++){            val[nums[i]]++;        }        int skip = 0;        int notSkip = 0;        for(int i = 1; i &lt; max+1; i++){            int cur = notSkip;            notSkip = Math.max(val[i]*i+skip,notSkip);            skip = Math.max(cur,skip);        }        return Math.max(skip,notSkip);    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Remove Duplicates from Sorted Array II</title>
+    <link href="undefined2018/08/09/LeetCode%20Remove%20Duplicates%20from%20Sorted%20Array%20II/"/>
+    <url>2018/08/09/LeetCode%20Remove%20Duplicates%20from%20Sorted%20Array%20II/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Remove-Duplicates-from-Sorted-Array-II"><a href="#LeetCode-Remove-Duplicates-from-Sorted-Array-II" class="headerlink" title="LeetCode:Remove Duplicates from Sorted Array II"></a>LeetCode:<a href="https://leetcode.com/problems/remove-duplicates-from-sorted-array-ii/" target="_blank" rel="noopener">Remove Duplicates from Sorted Array II</a></h2><h3 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h3><blockquote><p>给一个排好序的数组，其中有重复元素，要求用O(1)的空间复杂度修改输入的数组。并返回数组最后有效长度。</p></blockquote><h3 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h3><blockquote><pre><code class="java">Example 1:Given nums = [1,1,1,2,2,3],Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.It doesn&#39;t matter what you leave beyond the returned length.Example 2:Given nums = [0,0,1,1,1,1,2,3,3],Your function should return length = 7, with the first seven elements of nums being modified to 0, 0, 1, 1, 2, 3 and 3 respectively.超出length的数值是多少是无关紧要的。</code></pre></blockquote><h3 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h3><blockquote><p>一开始就想到一个很容易操作的思路，就是遍历数组，用count来记录遇到当前值的次数，少于2就把长度和count值递增，然后遇到下一个不一样的值时若count大于2则需要移动一下数组的值。</p></blockquote><h3 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h3><blockquote><p>这个算法虽然可以解决这个题，但是效率有些低，因为需要移动数组的值所以最坏复杂度为O(n^2)。</p></blockquote><pre><code class="java">class Solution {    public int removeDuplicates(int[] nums) {        if(nums == null || nums.length &lt; 1){            return 0;        }        int result = 1;        int count = 0;        int temp = nums[0];        int length = nums.length;        for(int i = 1; i &lt; length; i++){            if(temp == nums[i]){                if(count &lt; 1){                    count++;                    result++;                }else{                    count++;                }            }else{                if(count &gt; 1){                    int move = count - 1;                    for(int j = i - move; j &lt; length - move ;j++){                        nums[j] = nums[j+move];                    }                    i -= move;                    length -= move;                }                count = 0;                result ++;            }            temp = nums[i];        }        return result;    }}</code></pre><h3 id="思路二："><a href="#思路二：" class="headerlink" title="思路二："></a>思路二：</h3><blockquote><p>其实移动的操作完全可以用一个指针来代替，一个遍历指针，一个数组有效长度指针。代码如下</p></blockquote><h3 id="代码二："><a href="#代码二：" class="headerlink" title="代码二："></a>代码二：</h3><blockquote><p>可以看到因为移动不需要额外操作，所以复杂度为O(n)，提高了不少。</p></blockquote><pre><code class="java">class Solution {    public int removeDuplicates(int[] nums) {        if(nums == null || nums.length &lt; 1){            return 0;        }        int i =1, j = 1;        int cnt = 1;        int k = 2;        int n = nums.length;        while( j &lt; n){            if(nums[j] != nums[j-1]){                cnt = 1;                nums[i++] = nums[j];            }else{                if(cnt &lt; k){                    cnt++;                    nums[i++] = nums[j];                }else{                    cnt++;                }            }            j++;        }        return i;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>CentOS下自动清理超过10天的日志文件</title>
+    <link href="undefined2018/08/08/CentOS%E4%B8%8B%E8%87%AA%E5%8A%A8%E6%B8%85%E7%90%86%E8%B6%85%E8%BF%8710%E5%A4%A9%E7%9A%84%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6/"/>
+    <url>2018/08/08/CentOS%E4%B8%8B%E8%87%AA%E5%8A%A8%E6%B8%85%E7%90%86%E8%B6%85%E8%BF%8710%E5%A4%A9%E7%9A%84%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6/</url>
+    
+    <content type="html"><![CDATA[<h2 id="CentOS下自动清理超过10天的日志文件"><a href="#CentOS下自动清理超过10天的日志文件" class="headerlink" title="CentOS下自动清理超过10天的日志文件"></a>CentOS下自动清理超过10天的日志文件</h2><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><blockquote><p>通常来讲一个线上服务都会在服务端生成按日期滚动的日志文件，但是这里有个隐患，因为服务是不停运转的，所以总有一天日志文件可能把服务器硬盘撑满。所以就有了自动清理达到某些条件的日志文件自动清理掉。</p></blockquote><h3 id="find命令"><a href="#find命令" class="headerlink" title="find命令"></a>find命令</h3><blockquote><p>首先我们肯定需要定位到需要清除的文件，这里就需要一个很有用的命令find。正好学习下。</p></blockquote><pre><code class="shell">#语法:find(选项)(参数)#选项:-amin&lt;分钟&gt;：查找在指定时间曾被存取过的文件或目录，单位以分钟计算；-anewer&lt;参考文件或目录&gt;：查找其存取时间较指定文件或目录的存取时间更接近现在的文件或目录；-atime&lt;24小时数&gt;：查找在指定时间曾被存取过的文件或目录，单位以24小时计算；-cmin&lt;分钟&gt;：查找在指定时间之时被更改过的文件或目录；-cnewer&lt;参考文件或目录&gt;查找其更改时间较指定文件或目录的更改时间更接近现在的文件或目录；-ctime&lt;24小时数&gt;：查找在指定时间之时被更改的文件或目录，单位以24小时计算；-daystart：从本日开始计算时间；-depth：从指定目录下最深层的子目录开始查找；-expty：寻找文件大小为0 Byte的文件，或目录下没有任何子目录或文件的空目录；-exec&lt;执行指令&gt;：假设find指令的回传值为True，就执行该指令；-false：将find指令的回传值皆设为False；-fls&lt;列表文件&gt;：此参数的效果和指定“-ls”参数类似，但会把结果保存为指定的列表文件；-follow：排除符号连接；-fprint&lt;列表文件&gt;：此参数的效果和指定“-print”参数类似，但会把结果保存成指定的列表文件；-fprint0&lt;列表文件&gt;：此参数的效果和指定“-print0”参数类似，但会把结果保存成指定的列表文件；-fprintf&lt;列表文件&gt;&lt;输出格式&gt;：此参数的效果和指定“-printf”参数类似，但会把结果保存成指定的列表文件；-fstype&lt;文件系统类型&gt;：只寻找该文件系统类型下的文件或目录；-gid&lt;群组识别码&gt;：查找符合指定之群组识别码的文件或目录；-group&lt;群组名称&gt;：查找符合指定之群组名称的文件或目录；-help或——help：在线帮助；-ilname&lt;范本样式&gt;：此参数的效果和指定“-lname”参数类似，但忽略字符大小写的差别；-iname&lt;范本样式&gt;：此参数的效果和指定“-name”参数类似，但忽略字符大小写的差别；-inum&lt;inode编号&gt;：查找符合指定的inode编号的文件或目录；-ipath&lt;范本样式&gt;：此参数的效果和指定“-path”参数类似，但忽略字符大小写的差别；-iregex&lt;范本样式&gt;：此参数的效果和指定“-regexe”参数类似，但忽略字符大小写的差别；-links&lt;连接数目&gt;：查找符合指定的硬连接数目的文件或目录；-iname&lt;范本样式&gt;：指定字符串作为寻找符号连接的范本样式；-ls：假设find指令的回传值为Ture，就将文件或目录名称列出到标准输出；-maxdepth&lt;目录层级&gt;：设置最大目录层级；-mindepth&lt;目录层级&gt;：设置最小目录层级；-mmin&lt;分钟&gt;：查找在指定时间曾被更改过的文件或目录，单位以分钟计算；-mount：此参数的效果和指定“-xdev”相同；-mtime&lt;24小时数&gt;：查找在指定时间曾被更改过的文件或目录，单位以24小时计算；-name&lt;范本样式&gt;：指定字符串作为寻找文件或目录的范本样式；-newer&lt;参考文件或目录&gt;：查找其更改时间较指定文件或目录的更改时间更接近现在的文件或目录；-nogroup：找出不属于本地主机群组识别码的文件或目录；-noleaf：不去考虑目录至少需拥有两个硬连接存在；-nouser：找出不属于本地主机用户识别码的文件或目录；-ok&lt;执行指令&gt;：此参数的效果和指定“-exec”类似，但在执行指令之前会先询问用户，若回答“y”或“Y”，则放弃执行命令；-path&lt;范本样式&gt;：指定字符串作为寻找目录的范本样式；-perm&lt;权限数值&gt;：查找符合指定的权限数值的文件或目录；-print：假设find指令的回传值为Ture，就将文件或目录名称列出到标准输出。格式为每列一个名称，每个名称前皆有“./”字符串；-print0：假设find指令的回传值为Ture，就将文件或目录名称列出到标准输出。格式为全部的名称皆在同一行；-printf&lt;输出格式&gt;：假设find指令的回传值为Ture，就将文件或目录名称列出到标准输出。格式可以自行指定；-prune：不寻找字符串作为寻找文件或目录的范本样式;-regex&lt;范本样式&gt;：指定字符串作为寻找文件或目录的范本样式；-size&lt;文件大小&gt;：查找符合指定的文件大小的文件；-true：将find指令的回传值皆设为True；-typ&lt;文件类型&gt;：只寻找符合指定的文件类型的文件；-uid&lt;用户识别码&gt;：查找符合指定的用户识别码的文件或目录；-used&lt;日数&gt;：查找文件或目录被更改之后在指定时间曾被存取过的文件或目录，单位以日计算；-user&lt;拥有者名称&gt;：查找符和指定的拥有者名称的文件或目录；-version或——version：显示版本信息；-xdev：将范围局限在先行的文件系统中；-xtype&lt;文件类型&gt;：此参数的效果和指定“-type”参数类似，差别在于它针对符号连接检查。</code></pre><blockquote><p>可以看到这个命令有非常多的参数，所以他的功能也是非常强大的，可以利用其中的部分功能来解决各式各样的问题。</p></blockquote><h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><h4 id="根据文件或正则匹配"><a href="#根据文件或正则匹配" class="headerlink" title="根据文件或正则匹配"></a>根据文件或正则匹配</h4><pre><code class="shell">#列出当前目录及子目录下所有文件和文件夹find .#在/home目录下查找以.txt结尾的文件名find /home -name &quot;*.txt&quot;#同上，但忽略大小写find /home -iname &quot;*.txt&quot;#当前目录及子目录下查找所有以.txt和.pdf结尾的文件find . \( -name &quot;*.txt&quot; -o -name &quot;*.pdf&quot; \)#或find . -name &quot;*.txt&quot; -o -name &quot;*.pdf&quot; #基于正则表达式匹配文件路径find . -regex &quot;.*\(\.txt\|\.pdf\)$&quot;</code></pre><h4 id="否定参数"><a href="#否定参数" class="headerlink" title="否定参数"></a>否定参数</h4><pre><code class="shell">#找出/home下不是以.txt结尾的文件find /home ! -name &quot;*.txt&quot;</code></pre><h4 id="基于目录深度搜索"><a href="#基于目录深度搜索" class="headerlink" title="基于目录深度搜索"></a>基于目录深度搜索</h4><pre><code class="shell">#向下最大深度限制为3find . -maxdepth 3 -type f#搜索出深度距离当前目录至少2个子目录的所有文件find . -mindepth 2 -type f</code></pre><h4 id="根据文件时间戳进行搜索"><a href="#根据文件时间戳进行搜索" class="headerlink" title="根据文件时间戳进行搜索"></a>根据文件时间戳进行搜索</h4><blockquote><p>UNIX/Linux文件系统每个文件都有三种时间戳：</p><ul><li><strong>访问时间</strong>（-atime/天，-amin/分钟）：用户最近一次访问时间。</li><li><strong>修改时间</strong>（-mtime/天，-mmin/分钟）：文件最后一次修改时间。</li><li><strong>变化时间</strong>（-ctime/天，-cmin/分钟）：文件数据元（例如权限等）最后一次修改时间。</li></ul></blockquote><pre><code class="shell">#搜索最近七天内被访问过的所有文件find . -type f -atime -7#搜索恰好在七天前被访问过的所有文件find . -type f -atime 7#搜索超过七天内被访问过的所有文件find . -type f -atime +7#搜索访问时间超过10分钟的所有文件find . -type f -amin +10#找出比file.log修改时间更长的所有文件find . -type f -newer file.log</code></pre><h4 id="根据文件大小进行匹配"><a href="#根据文件大小进行匹配" class="headerlink" title="根据文件大小进行匹配"></a>根据文件大小进行匹配</h4><blockquote><pre><code class="shell">find . -type f -size 文件大小单元</code></pre><p>文件大小单元：</p><ul><li><strong>b</strong> —— 块（512字节）</li><li><strong>c</strong> —— 字节</li><li><strong>w</strong> —— 字（2字节）</li><li><strong>k</strong> —— 千字节</li><li><strong>M</strong> —— 兆字节</li><li><strong>G</strong> —— 吉字节</li></ul></blockquote><pre><code class="shell">#搜索大于10KB的文件find . -type f -size +10k#搜索小于10KB的文件find . -type f -size -10k#搜索等于10KB的文件find . -type f -size 10k</code></pre><h4 id="删除匹配文件"><a href="#删除匹配文件" class="headerlink" title="删除匹配文件"></a>删除匹配文件</h4><pre><code class="shell">#删除当前目录下所有.txt文件find . -type f -name &quot;*.txt&quot; -delete</code></pre><h4 id="根据文件权限-所有权进行匹配"><a href="#根据文件权限-所有权进行匹配" class="headerlink" title="根据文件权限/所有权进行匹配"></a>根据文件权限/所有权进行匹配</h4><pre><code class="shell">#当前目录下搜索出权限为777的文件find . -type f -perm 777#找出当前目录下权限不是644的php文件find . -type f -name &quot;*.php&quot; ! -perm 644#找出当前目录用户tom拥有的所有文件find . -type f -user tom#找出当前目录用户组sunk拥有的所有文件find . -type f -group sunk</code></pre><h4 id="借助-exec选项与其他命令结合使用"><a href="#借助-exec选项与其他命令结合使用" class="headerlink" title="借助-exec选项与其他命令结合使用"></a>借助<code>-exec</code>选项与其他命令结合使用</h4><pre><code class="shell">#找出当前目录下所有root的文件，并把所有权更改为用户tomfind .-type f -user root -exec chown tom {} \;#上例中，{} 用于与-exec选项结合使用来匹配所有文件，然后会被替换为相应的文件名。#找出自己家目录下所有的.txt文件并删除find $HOME/. -name &quot;*.txt&quot; -ok rm {} \;#上例中，-ok和-exec行为一样，不过它会给出提示，是否执行相应的操作。#查找当前目录下所有.txt文件并把他们拼接起来写入到all.txt文件中find . -type f -name &quot;*.txt&quot; -exec cat {} \;&gt; all.txt#将30天前的.log文件移动到old目录中find . -type f -mtime +30 -name &quot;*.log&quot; -exec cp {} old \;#找出当前目录下所有.txt文件并以“File:文件名”的形式打印出来find . -type f -name &quot;*.txt&quot; -exec printf &quot;File: %s\n&quot; {} \;#因为单行命令中-exec参数中无法使用多个命令，以下方法可以实现在-exec之后接受多条命令-exec ./text.sh {} \;</code></pre><h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><blockquote><p>可以看到find命令非常强大，能根据大小和修改时间来找文件。我们这里就用其能用修改时间找文件的功能。</p></blockquote><pre><code class="shell">#目标代码find /opt/logs/ -type f -mtime +10 -name &quot;*.log&quot; -exec rm -f {} \;</code></pre><blockquote><p>但是这时还是需要手动执行，怎么办呢。把这句话放到一个shell文件中，用crontab帮我们完成自动执行的任务。</p></blockquote><pre><code class="shell">30 0 * * * /usr/scripts/clearLog.sh &gt; /dev/null 2&gt;&amp;1</code></pre><p>至此就大功告成了~</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>linux</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>ThreadLocal线程安全问题</title>
+    <link href="undefined2018/08/06/ThreadLocal%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/"/>
+    <url>2018/08/06/ThreadLocal%E7%BA%BF%E7%A8%8B%E5%AE%89%E5%85%A8%E9%97%AE%E9%A2%98/</url>
+    
+    <content type="html"><![CDATA[<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><blockquote><p>ThreadLocal大家可能或多或少接触过，多线程编程中也都把它作为实现线程安全的一种方式，至于实现细节不过多在这里讨论，主要是通过一个线程id和一个Map做对应，用空间换取线程安全的一种方式。所以在传统后端开发使用的过程中一般都用它来存储用户的一些信息，比如认证成功后就把用户的信息存入到ThreadLocal中，在后面的业务逻辑中可以取到对应的用户信息做相关操作。那么这样使用一定能保证线程安全吗？</p></blockquote><h3 id="问题发现"><a href="#问题发现" class="headerlink" title="问题发现"></a>问题发现</h3><blockquote><p>在一次项目的service中使用了<code>@Async</code>这样一个异步方法，方法中使用了ThreadLocal获取用户的信息，然而却出现了与预期不一致的结果。Spring的<code>@Async</code>的本质也是使用线程池管理这样的请求，从而达到异步的目的。</p></blockquote><h3 id="问题根源"><a href="#问题根源" class="headerlink" title="问题根源"></a>问题根源</h3><blockquote><p>到这儿其实对线程池比较了解的已经明白了应该，对于一个使用ThreadPoolExecutor类创建的线程池来讲，有线程闲置这样一个概念，新请求来了后不是为每一个请求创建一个新的线程，而是若当前池中有闲置的线程，则使用该闲置的线程。Web容器其实类似Jetty也是一样的会复用线程以提高效率。但是这个效率的提高和ThreadLocal的结合就会出现问题。</p><p>下面结合代码举例说明这个问题：</p><pre><code class="java">//测试所用的controller @RequestMapping(&quot;/demo/async&quot;) public Object asyncTest() {     demoService.funA();     demoService.funB(UserUtils.getUser());     return AjaxResultUtil.success(UserUtils.getUser()); }    @Async @Override public void funA() {     try {         System.out.println(&quot;===========funA() Begin===========&quot;);         //直接在异步方法中获取ThreadLocal中的对象         System.out.println(UserUtils.getUser());         System.out.println(&quot;===========funA() Begin===========&quot;);         Thread.sleep(5000);     } catch (InterruptedException e) {         e.printStackTrace();     } } @Async @Override public void funB(User user) {     try {         Thread.sleep(1000);         System.out.println(&quot;===========funB() Begin===========&quot;);         //将ThreadLocal中的对象作为参数传递给异步方法         System.out.println(user);         System.out.println(&quot;===========funB() Begin===========&quot;);         Thread.sleep(1000);     } catch (InterruptedException e) {         e.printStackTrace();     } }/* 输出：===========funA() Begin===========User{id=1, login=&#39;zhangsan&#39;, name=&#39;张三&#39;}===========funA() Begin======================funB() Begin===========User{id=1, login=&#39;zhangsan&#39;, name=&#39;张三&#39;}===========funB() Begin======================funA() Begin===========User{id=1, login=&#39;zhangsan&#39;, name=&#39;张三&#39;}===========funA() Begin======================funB() Begin===========User{id=2, login=&#39;lisi&#39;, name=&#39;李四&#39;}===========funB() Begin===========*/</code></pre></blockquote><h4 id="操作流程"><a href="#操作流程" class="headerlink" title="操作流程"></a>操作流程</h4><blockquote><ol><li>使用张三登录访问上述接口</li><li>注销张三用户，登录李四账户</li><li>使用李四账户访问上述接口</li></ol></blockquote><h4 id="结果分析"><a href="#结果分析" class="headerlink" title="结果分析"></a>结果分析</h4><blockquote><p>可以看到第一次是正常的，但是这里有个细节，就是直接获取ThreadLocal还是可以获取值，这里分析ThreadLocal默认是继承自父线程的，所以会产生如上结果。</p><p>而第二次就不正常了，因为明明当前登录用户是李四，怎么还是张三呢，原因就在于这个线程复用的是第一次访问的线程。所以出现了问题。</p><p>至此，可以得出结论，线程安全还是要结合实际场景，具体问题具体分析。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>Thread</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Thread</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>JVM总结</title>
+    <link href="undefined2018/08/01/JVM%E6%80%BB%E7%BB%93/"/>
+    <url>2018/08/01/JVM%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h2 id="JVM总结"><a href="#JVM总结" class="headerlink" title="JVM总结"></a>JVM总结</h2><h3 id="1-类加载机制"><a href="#1-类加载机制" class="headerlink" title="1.类加载机制"></a>1.类加载机制</h3><h4 id="1-1类加载时机"><a href="#1-1类加载时机" class="headerlink" title="1.1类加载时机:"></a>1.1类加载时机:</h4><blockquote><p>加载–&gt; 验证–&gt;准备–&gt;解析—&gt;初始化–&gt;使用—&gt;卸载</p></blockquote><h5 id="初始化的触发时机（主动引用）："><a href="#初始化的触发时机（主动引用）：" class="headerlink" title="初始化的触发时机（主动引用）："></a>初始化的触发时机（主动引用）：</h5><blockquote><ul><li>new一个新对象，或者调用这个类的静态方法或静态参数时。</li><li>对类进行反射调用时</li><li>初始化一个类，发现其父类还没有初始化时</li><li>当虚拟机启动时，用户指定了一个主类，发现其主类还没有进行初始化时。</li></ul></blockquote><h4 id="1-2类的加载过程："><a href="#1-2类的加载过程：" class="headerlink" title="1.2类的加载过程："></a>1.2类的加载过程：</h4><h5 id="1-2-1加载"><a href="#1-2-1加载" class="headerlink" title="1.2.1加载"></a>1.2.1加载</h5><p><strong>所完成的事情</strong></p><blockquote><ol><li>通过一个类的全限定名来获取定义此类的二进制字节流。</li><li>将这个字节流转化为方法区的运行时数据结构</li><li>在内存中生成一个代表这个类的java.lang.Class对象。</li></ol></blockquote><h5 id="1-2-2验证"><a href="#1-2-2验证" class="headerlink" title="1.2.2验证"></a>1.2.2验证</h5><p><strong>验证内容</strong></p><blockquote><ol><li>文件格式验证（流—&gt;方法区的数据结构）</li><li>元数据验证</li><li>字节码验证</li><li>符号引用验证</li></ol></blockquote><h5 id="1-2-3准备"><a href="#1-2-3准备" class="headerlink" title="1.2.3准备"></a>1.2.3准备</h5><blockquote><p>为类变量分配内存并设置类变量初始值的阶段。</p></blockquote><h5 id="1-2-4解析"><a href="#1-2-4解析" class="headerlink" title="1.2.4解析"></a>1.2.4解析</h5><blockquote><p>将符号引用替换为直接引用的过程。</p></blockquote><h5 id="1-2-5初始化"><a href="#1-2-5初始化" class="headerlink" title="1.2.5初始化"></a>1.2.5初始化</h5><blockquote><p>执行构造器的过程</p></blockquote><h3 id="2-可达性分析算法"><a href="#2-可达性分析算法" class="headerlink" title="2.可达性分析算法"></a>2.可达性分析算法</h3><blockquote><p>当一个对象到GC Roots没有任何引用链相连时，就是从GC Roots不可到达这个对象时，这个对象时不可达的。</p></blockquote><p><strong>在Java中，可以作为GC Roots的对象包括以下几种：</strong></p><ul><li>虚拟机栈中引用的对象</li><li>方法区中类静态属性引用的对象</li><li>方法区中常量引用的对象</li><li>本地方法栈中JNI引用的对象</li></ul><h3 id="3-引用类型"><a href="#3-引用类型" class="headerlink" title="3.引用类型"></a>3.引用类型</h3><h4 id="3-1-强引用"><a href="#3-1-强引用" class="headerlink" title="3.1 强引用"></a>3.1 强引用</h4><blockquote><p>new出来的对象引用。</p></blockquote><h4 id="3-2-软引用"><a href="#3-2-软引用" class="headerlink" title="3.2 软引用"></a>3.2 软引用</h4><blockquote><p>有用但非必须的对象，空间足够会留存，不足则会把这些对象做二次回收。</p></blockquote><h4 id="3-3-弱引用"><a href="#3-3-弱引用" class="headerlink" title="3.3 弱引用"></a>3.3 弱引用</h4><blockquote><p>即便空间足够也只能生存到下次回收前。</p></blockquote><h4 id="3-4-虚引用"><a href="#3-4-虚引用" class="headerlink" title="3.4 虚引用"></a>3.4 虚引用</h4><blockquote><p>紧紧是为了使这样的对象在回收前引用出可收到通知。</p></blockquote><h4 id="3-5对象的自救方法"><a href="#3-5对象的自救方法" class="headerlink" title="3.5对象的自救方法"></a>3.5对象的自救方法</h4><blockquote><p>finalize()方法。当对象没有覆盖finalize()方法或已经执行过，则不会再执行这个方法。</p></blockquote><h3 id="4-垃圾回收算法"><a href="#4-垃圾回收算法" class="headerlink" title="4.垃圾回收算法"></a>4.垃圾回收算法</h3><h4 id="4-1标记-清除算法"><a href="#4-1标记-清除算法" class="headerlink" title="4.1标记-清除算法"></a>4.1标记-清除算法</h4><blockquote><p>先对不用的对象进行标记，然后统一回收。</p><p><strong>不足:</strong></p><ul><li>大量的空间碎片</li><li>效率不高</li></ul></blockquote><h4 id="4-2复制算法"><a href="#4-2复制算法" class="headerlink" title="4.2复制算法"></a>4.2复制算法</h4><blockquote><p>将内存划分为两块，垃圾回收时将其中一块的有用对象直接移动到另一个区域中，效率高且不会产生碎片。</p><p><strong>不足：</strong></p><ul><li>浪费空间</li></ul></blockquote><h4 id="4-3标记-整理算法"><a href="#4-3标记-整理算法" class="headerlink" title="4.3标记-整理算法"></a>4.3标记-整理算法</h4><blockquote><p>先标记要回收的对象，然后移动存活对象到一段，最后统一移动到一段。对剩下的东西进行统一清除。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>编程</category>
+      
+      <category>Jvm</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Jvm</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>ConcurrentHashMap学习</title>
+    <link href="undefined2018/07/31/ConcurrentHashMap%E5%AD%A6%E4%B9%A0/"/>
+    <url>2018/07/31/ConcurrentHashMap%E5%AD%A6%E4%B9%A0/</url>
+    
+    <content type="html"><![CDATA[<h2 id="ConcurrentHashMap学习"><a href="#ConcurrentHashMap学习" class="headerlink" title="ConcurrentHashMap学习"></a>ConcurrentHashMap学习</h2><h3 id="官方文档："><a href="#官方文档：" class="headerlink" title="官方文档："></a>官方文档：</h3><blockquote><p>ConcurrentHashMap提供了和hashTable同样的线程安全性，但是实现细节却完全不一样。取值操作是不加锁的，而且也不提供方法锁住整个表。</p><p>因为get操作不加锁，所以很多更新操作可能会同时发生。取回的值意味着最近完成的结果。对于并集操作，例如 {@code putAll} 和{@code clear}, 并发取值意味着紧紧一部分Node的插入和删除操作。同时，一次只允许一个线程做iterator操作。</p></blockquote><h3 id="重要方法"><a href="#重要方法" class="headerlink" title="重要方法:"></a>重要方法:</h3><h4 id="get"><a href="#get" class="headerlink" title="get:"></a>get:</h4><blockquote><p>可以看到get操作是不经过加锁的。</p></blockquote><pre><code class="java"> /**     * Returns the value to which the specified key is mapped,     * or {@code null} if this map contains no mapping for the key.     *     * &lt;p&gt;More formally, if this map contains a mapping from a key     * {@code k} to a value {@code v} such that {@code key.equals(k)},     * then this method returns {@code v}; otherwise it returns     * {@code null}.  (There can be at most one such mapping.)     *     * @throws NullPointerException if the specified key is null     */    public V get(Object key) {        Node&lt;K,V&gt;[] tab; Node&lt;K,V&gt; e, p; int n, eh; K ek;        int h = spread(key.hashCode());        if ((tab = table) != null &amp;&amp; (n = tab.length) &gt; 0 &amp;&amp;            (e = tabAt(tab, (n - 1) &amp; h)) != null) {            if ((eh = e.hash) == h) {                if ((ek = e.key) == key || (ek != null &amp;&amp; key.equals(ek)))                    return e.val;            }            else if (eh &lt; 0)                return (p = e.find(h, key)) != null ? p.val : null;            while ((e = e.next) != null) {                if (e.hash == h &amp;&amp;                    ((ek = e.key) == key || (ek != null &amp;&amp; key.equals(ek))))                    return e.val;            }        }        return null;    }</code></pre><h3 id="put"><a href="#put" class="headerlink" title="put:"></a>put:</h3><blockquote><p>一个map的存储数据的入口，可以看到put的锁粒度很小，只以Node为锁，所以如果hash没有落到一个Node节点下的话是完全可以并发操作的。</p></blockquote><pre><code class="java">/** Implementation for put and putIfAbsent */    final V putVal(K key, V value, boolean onlyIfAbsent) {        //可以看到key和value都不允许为空        if (key == null || value == null) throw new NullPointerException();        //计算hash        int hash = spread(key.hashCode());        int binCount = 0;        //开始插入操作        for (Node&lt;K,V&gt;[] tab = table;;) {            Node&lt;K,V&gt; f; int n, i, fh;            //如果当前table为空，初始化            if (tab == null || (n = tab.length) == 0)                tab = initTable();            //尝试直接在对应位置CAS插入，如果成功就返回            else if ((f = tabAt(tab, i = (n - 1) &amp; hash)) == null) {                if (casTabAt(tab, i, null,                             new Node&lt;K,V&gt;(hash, key, value, null)))                    break;                   // no lock when adding to empty bin            }            //如果当前表正处于扩容拷贝阶段，则这个线程也帮着拷贝            else if ((fh = f.hash) == MOVED)                tab = helpTransfer(tab, f);            //找到对应的Node头结点，并以它为锁            else {                V oldVal = null;                synchronized (f) {                    if (tabAt(tab, i) == f) {                        if (fh &gt;= 0) {                            binCount = 1;                            for (Node&lt;K,V&gt; e = f;; ++binCount) {                                K ek;                                //这里的操作是判定当前的key存不存在，根据状态选择不同策略                                if (e.hash == hash &amp;&amp;                                    ((ek = e.key) == key ||                                     (ek != null &amp;&amp; key.equals(ek)))) {                                    oldVal = e.val;                                    if (!onlyIfAbsent)                                        e.val = value;                                    break;                                }                                Node&lt;K,V&gt; pred = e;                                if ((e = e.next) == null) {                                    pred.next = new Node&lt;K,V&gt;(hash, key,                                                              value, null);                                    break;                                }                            }                        }                        //如果是一个树节点，则用树节点的方式更新                        else if (f instanceof TreeBin) {                            Node&lt;K,V&gt; p;                            binCount = 2;                            if ((p = ((TreeBin&lt;K,V&gt;)f).putTreeVal(hash, key,                                                           value)) != null) {                                oldVal = p.val;                                if (!onlyIfAbsent)                                    p.val = value;                            }                        }                    }                }                //判断一下是否要扩展成红黑树                if (binCount != 0) {                    if (binCount &gt;= TREEIFY_THRESHOLD)                        treeifyBin(tab, i);                    if (oldVal != null)                        return oldVal;                    break;                }            }        }        //增加当前表的元素个数        addCount(1L, binCount);        return null;    }</code></pre><h3 id="remove"><a href="#remove" class="headerlink" title="remove:"></a>remove:</h3><blockquote><p>remove操作是通过replaceNode方法实现的。可以看到删除操作其实就是把对应的key的值设置成null。</p></blockquote><pre><code class="java"> /**     * Removes the key (and its corresponding value) from this map.     * This method does nothing if the key is not in the map.     *     * @param  key the key that needs to be removed     * @return the previous value associated with {@code key}, or     *         {@code null} if there was no mapping for {@code key}     * @throws NullPointerException if the specified key is null     */    public V remove(Object key) {        return replaceNode(key, null, null);    }    /**     * Implementation for the four public remove/replace methods:     * Replaces node value with v, conditional upon match of cv if     * non-null.  If resulting value is null, delete.     */    final V replaceNode(Object key, V value, Object cv) {        int hash = spread(key.hashCode());        for (Node&lt;K,V&gt;[] tab = table;;) {            Node&lt;K,V&gt; f; int n, i, fh;            //如果不存在表，或当前位置没有头结点，直接返回            if (tab == null || (n = tab.length) == 0 ||                (f = tabAt(tab, i = (n - 1) &amp; hash)) == null)                break;            //帮助扩容            else if ((fh = f.hash) == MOVED)                tab = helpTransfer(tab, f);            else {                V oldVal = null;                boolean validated = false;                synchronized (f) {                    if (tabAt(tab, i) == f) {                        if (fh &gt;= 0) {                            validated = true;                            for (Node&lt;K,V&gt; e = f, pred = null;;) {                                K ek;                                if (e.hash == hash &amp;&amp;                                    ((ek = e.key) == key ||                                     (ek != null &amp;&amp; key.equals(ek)))) {                                    V ev = e.val;                                    if (cv == null || cv == ev ||                                        (ev != null &amp;&amp; cv.equals(ev))) {                                        oldVal = ev;                                        //如果值不为空，替换                                        if (value != null)                                            e.val = value;                                        //值为空把这个节点直接删除                                        else if (pred != null)                                            pred.next = e.next;                                        //没有前驱且值为空，Cas替换头结点的值                                        else                                            setTabAt(tab, i, e.next);                                    }                                    break;                                }                                pred = e;                                if ((e = e.next) == null)                                    break;                            }                        }                        else if (f instanceof TreeBin) {                            validated = true;                            TreeBin&lt;K,V&gt; t = (TreeBin&lt;K,V&gt;)f;                            TreeNode&lt;K,V&gt; r, p;                            if ((r = t.root) != null &amp;&amp;                                (p = r.findTreeNode(hash, key, null)) != null) {                                V pv = p.val;                                if (cv == null || cv == pv ||                                    (pv != null &amp;&amp; cv.equals(pv))) {                                    oldVal = pv;                                    if (value != null)                                        p.val = value;                                    else if (t.removeTreeNode(p))                                        setTabAt(tab, i, untreeify(t.first));                                }                            }                        }                    }                }                if (validated) {                    if (oldVal != null) {                        if (value == null)                            addCount(-1L, -1);                        return oldVal;                    }                    break;                }            }        }        return null;    }</code></pre><h3 id="size"><a href="#size" class="headerlink" title="size:"></a>size:</h3><blockquote><p>关于size方法，因为这是一个全局的计数统计，但是要使用这个方法又不能把整个表锁住，所以他是一个估计值，根据baseCount和cas更新失败的计数来决定的一个大概的值。官方也说明要考虑用mappingCount来替换size方法。</p></blockquote><pre><code class="java"> /**     * {@inheritDoc}     */    public int size() {        long n = sumCount();        return ((n &lt; 0L) ? 0 :                (n &gt; (long)Integer.MAX_VALUE) ? Integer.MAX_VALUE :                (int)n);    } /**     * A padded cell for distributing counts.  Adapted from LongAdder     * and Striped64.  See their internal docs for explanation.     */    @sun.misc.Contended static final class CounterCell {        volatile long value;        CounterCell(long x) { value = x; }    }    final long sumCount() {        CounterCell[] as = counterCells; CounterCell a;        long sum = baseCount;        if (as != null) {            for (int i = 0; i &lt; as.length; ++i) {                if ((a = as[i]) != null)                    sum += a.value;            }        }        return sum;    } /**     * Returns the number of mappings. This method should be used     * instead of {@link #size} because a ConcurrentHashMap may     * contain more mappings than can be represented as an int. The     * value returned is an estimate; the actual count may differ if     * there are concurrent insertions or removals.     *     * @return the number of mappings     * @since 1.8     */    public long mappingCount() {        long n = sumCount();        return (n &lt; 0L) ? 0L : n; // ignore transient negative values    }</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-N Queens</title>
+    <link href="undefined2018/07/24/LeetCode%20N-Queens/"/>
+    <url>2018/07/24/LeetCode%20N-Queens/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-N-Queens"><a href="#LeetCode-N-Queens" class="headerlink" title="LeetCode: N-Queens"></a>LeetCode: <a href="https://leetcode.com/problems/n-queens/" target="_blank" rel="noopener">N-Queens</a></h2><h4 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h4><blockquote><p>输入一个数字n，输出一个n*n大小的棋盘能放下n个皇后的所有情况的集合。</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Input: 4Output: [ [&quot;.Q..&quot;,  // Solution 1  &quot;...Q&quot;,  &quot;Q...&quot;,  &quot;..Q.&quot;], [&quot;..Q.&quot;,  // Solution 2  &quot;Q...&quot;,  &quot;...Q&quot;,  &quot;.Q..&quot;]]解释：对于4皇后来说有以上两种独特的解法</code></pre></blockquote><h4 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h4><blockquote><p>不难想象解这个题需要回溯法，每一行只可能有一个Queen，所以通过行来找，每一行放置一个Q即结束。我的解法思路和之前解数独问题的解法一致。</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><blockquote><p>虽然代码思路差不多，但是有很多细节也比较麻烦，比如判断这个地方能否放置Queen。</p></blockquote><pre><code class="java">class Solution {   public List&lt;List&lt;String&gt;&gt; solveNQueens(int n) {            List&lt;List&lt;String&gt;&gt; result = new ArrayList&lt;&gt;();            if(n&lt;1){                return result;            }            char[][] chess = new char[n][n];            for (int i = 0; i &lt; chess.length; i++) {                for (int j = 0; j &lt; chess.length; j++) {                    chess[i][j] = &#39;.&#39;;                }            }            backtrace(result, n, 0, chess);            return result;        }        private boolean backtrace(List&lt;List&lt;String&gt;&gt; list, int queenCount, int row, char[][] chess) {            if (queenCount == 0) {                List&lt;String&gt; solution = covertSolution(chess);                list.add(solution);             } else {                if(row &lt; chess.length){                    for (int j = 0; j &lt; chess.length; j++) {                        if (isValid(chess, row, j)) {                            chess[row][j] = &#39;Q&#39;;                            if (backtrace(list, queenCount - 1, row + 1, chess)) {                                return true;                            } else {                                chess[row][j] = &#39;.&#39;;                            }                        }                    }                }             }            return false;        }        private boolean isValid(char[][] chess, int row, int colum) {            //column            for (int i = 0; i &lt; row; i++) {                if (chess[i][colum] == &#39;Q&#39;) {                    return false;                }            }            //diagonal            for (int i = row - 1; i &gt;= 0; i--) {                int i1 = colum - (row - i);                if (i1 &gt;= 0 &amp;&amp; chess[i][i1] == &#39;Q&#39;) {                    return false;                }                int i2 = colum + row - i;                if (i2 &lt; chess.length &amp;&amp; chess[i][i2] == &#39;Q&#39;) {                    return false;                }            }            return true;        }        private List&lt;String&gt; covertSolution(char[][] chess) {            List&lt;String&gt; result = new ArrayList&lt;&gt;();            for (int i = 0; i &lt; chess.length; i++) {                StringBuilder sb = new StringBuilder();                for (int j = 0; j &lt; chess.length; j++) {                    sb.append(chess[i][j]);                }                result.add(sb.toString());            }            return result;        }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Merge Intervals</title>
+    <link href="undefined2018/07/24/LeetCode%20Merge%20Intervals/"/>
+    <url>2018/07/24/LeetCode%20Merge%20Intervals/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Merge-Intervals"><a href="#LeetCode-Merge-Intervals" class="headerlink" title="LeetCode:Merge Intervals"></a>LeetCode:<a href="https://leetcode.com/problems/merge-intervals/" target="_blank" rel="noopener">Merge Intervals</a></h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>给一个集合的区间，把有重叠的区间合并起来</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Example 1:Input: [[1,3],[2,6],[8,10],[15,18]]Output: [[1,6],[8,10],[15,18]]Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].Example 2:Input: [[1,4],[4,5]]Output: [[1,5]]Explanation: Intervals [1,4] and [4,5] are considerred overlapping.</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>一开始我的思路是把start排序一遍，这样O(n)的复杂度就可以搞定，但是越写越恶心，因为边界情况很多。</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><pre><code class="java">/** * Definition for an interval. * public class Interval { *     int start; *     int end; *     Interval() { start = 0; end = 0; } *     Interval(int s, int e) { start = s; end = e; } * } */class Solution {    public List&lt;Interval&gt; merge(List&lt;Interval&gt; intervals) {         List&lt;Interval&gt; result = new ArrayList&lt;&gt;();            if (intervals == null || intervals.size() &lt; 1) {                return result;            }            Object[] intervalArr = intervals.toArray();            Arrays.sort(intervalArr, new Comparator&lt;Object&gt;() {                @Override                public int compare(Object o1, Object o2) {                    Interval interval1 = (Interval) o1;                    Interval interval2 = (Interval) o2;                    return Integer.compare(interval1.start, interval2.start);                }            });             for (int i = 1; i &lt; intervalArr.length; i++) {                Interval ibefore = (Interval) intervalArr[i - 1];                Interval intervalI = (Interval) intervalArr[i];                if (intervalI.start &lt;= ibefore.end) {                    Interval newInter = new Interval(ibefore.start, intervalI.end &gt; ibefore.end ? intervalI.end : ibefore.end);                    intervalArr[i] = newInter;                    addInterval(result, newInter);                } else {                    addInterval(result, ibefore);                }            }            addInterval(result,(Interval)intervalArr[intervalArr.length-1]);            return result;        }        private void addInterval(List&lt;Interval&gt; result, Interval interval) {            Interval intervalTemp = null;            if (result.size() &gt; 0) {                intervalTemp = result.get(result.size() - 1);                if (intervalTemp.start == interval.start &amp;&amp; intervalTemp.end &lt; interval.end) {                    result.remove(result.size() - 1);                }            }            if (intervalTemp == null || intervalTemp.start != interval.start || intervalTemp.end != interval.end) {                result.add(interval);            }        }}</code></pre><h4 id="解法二："><a href="#解法二：" class="headerlink" title="解法二："></a>解法二：</h4><blockquote><p>将start，end分别排序，然后重新划区间，这个思路很清晰，代码看着也很舒服。</p></blockquote><pre><code class="java">/** * Definition for an interval. * public class Interval { *     int start; *     int end; *     Interval() { start = 0; end = 0; } *     Interval(int s, int e) { start = s; end = e; } * } */class Solution {    public List&lt;Interval&gt; merge(List&lt;Interval&gt; intervals) {        List&lt;Interval&gt; result = new ArrayList&lt;&gt;();        if(intervals == null || intervals.size()&lt;1){            return result;        }        int length = intervals.size();        int[] start = new int[length];        int[] end = new int[length];        for(int i = 0; i&lt;length; i++){            start[i] = intervals.get(i).start;            end[i] = intervals.get(i).end;        }        Arrays.sort(start);        Arrays.sort(end);        for(int i=0,j=0; i&lt;length; i++){            if(i == length-1 || start[i+1] &gt; end[i]){                result.add(new Interval(start[j],end[i]));                j = i+1;            }        }        return result;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Rotate Image</title>
+    <link href="undefined2018/07/23/LeetCode%20Rotate%20Image/"/>
+    <url>2018/07/23/LeetCode%20Rotate%20Image/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Rotate-Image"><a href="#LeetCode-Rotate-Image" class="headerlink" title="LeetCode:Rotate Image"></a>LeetCode:<a href="https://leetcode.com/problems/rotate-image/" target="_blank" rel="noopener">Rotate Image</a></h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>将一个矩阵顺时针旋转90度，要求空间复杂度为<code>O(1)</code></p></blockquote><h4 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h4><blockquote><pre><code class="java">Given input matrix = [  [1,2,3],  [4,5,6],  [7,8,9]],rotate the input matrix in-place such that it becomes:[  [7,4,1],  [8,5,2],  [9,6,3]]</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>说来惭愧，这个题一开始拿到没思路，因为没有暴力方法，搁置几天后再看发现其实可以通过翻转来解题，先以反对角线为轴旋转，然后在水平翻转即为旋转90度的效果。</p><pre><code class="java">[1,2,3]             [9,6,3]            [7,4,1][4,5,6]   --&gt;    [8,5,2]    --&gt;        [8,5,2][7,8,9]             [7,4,1]            [9,6,3]</code></pre></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><blockquote><p>做完居然是标答超过100%</p></blockquote><pre><code class="java">class Solution {    public void rotate(int[][] matrix) {        if( matrix == null || matrix.length &lt; 1){            return;        }        int rowLength = matrix.length;        int colLength = matrix[0].length;        for(int i = 0; i &lt; rowLength - 1;i++ ){            for(int j = 0; j &lt; rowLength-i-1; j++){                swap(matrix,i,j,colLength-j-1,rowLength-i-1);            }        }        for(int i = 0; i &lt; rowLength/2; i++){            for(int j = 0; j &lt; colLength; j++){                swap(matrix,i,j,rowLength-i-1,j);            }        }    }    private void swap(int[][] nums,int fromX,int fromY,int toX,int toY){        int temp = nums[fromX][fromY];        nums[fromX][fromY] = nums[toX][toY];        nums[toX][toY] = temp;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Group Anagrams</title>
+    <link href="undefined2018/07/23/LeetCode%20Group%20Anagrams/"/>
+    <url>2018/07/23/LeetCode%20Group%20Anagrams/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Group-Anagrams"><a href="#LeetCode-Group-Anagrams" class="headerlink" title="LeetCode:Group Anagrams"></a>LeetCode:<a href="https://leetcode.com/problems/group-anagrams/" target="_blank" rel="noopener">Group Anagrams</a></h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>给一个数组的字符串，将其中含有相同字母的分组</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Input: [&quot;eat&quot;, &quot;tea&quot;, &quot;tan&quot;, &quot;ate&quot;, &quot;nat&quot;, &quot;bat&quot;],Output:[  [&quot;ate&quot;,&quot;eat&quot;,&quot;tea&quot;],  [&quot;nat&quot;,&quot;tan&quot;],  [&quot;bat&quot;]]</code></pre></blockquote><h4 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h4><blockquote><p>这道题很简单，就是遍历数组，放进Map中，但是第一次我将字符的和作为Key，这里就出问题了，因为存在不同字符组合相同值得情况，比如ad和bc。后面改成用排过序的字符数组新生成的字符串作为Key就没问题了。但是这个做法复杂度为<code>O(nmlogm)</code>，有优化空间。</p></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java">class Solution {    public List&lt;List&lt;String&gt;&gt; groupAnagrams(String[] strs) {        List&lt;List&lt;String&gt;&gt; result = new ArrayList&lt;&gt;();        if(strs == null || strs.length &lt; 1){            return result;        }        Map&lt;String,List&lt;String&gt;&gt; map = new HashMap&lt;&gt;();        for(String str: strs){            int temp = 0;            char[] chars = str.toCharArray();            Arrays.sort(chars);            String key = new String(chars);            if( map.containsKey(key)){                map.get(key).add(str);            }else{                List&lt;String&gt; list = new ArrayList&lt;&gt;();                list.add(str);                map.put(key,list);            }        }        result.addAll(map.values());        return result;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Bulb Switcher</title>
+    <link href="undefined2018/07/20/LeetCode%20Bulb%20Switcher/"/>
+    <url>2018/07/20/LeetCode%20Bulb%20Switcher/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Bulb-Switcher"><a href="#LeetCode-Bulb-Switcher" class="headerlink" title="LeetCode: Bulb Switcher"></a>LeetCode: <a href="https://leetcode.com/problems/bulb-switcher/" target="_blank" rel="noopener">Bulb Switcher</a></h2><h4 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h4><blockquote><p>初始时有 <em>n</em> 个灯泡关闭。 第 1 轮，你打开所有的灯泡。 第 2 轮，每两个灯泡你关闭一次。 第 3 轮，每三个灯泡切换一次开关（如果关闭则开启，如果开启则关闭）。第 <em>i</em> 轮，每 <em>i</em> 个灯泡切换一次开关。 对于第 <em>n</em> 轮，你只切换最后一个灯泡的开关。 找出 <em>n</em> 轮后有多少个亮着的灯泡。</p></blockquote><h4 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h4><blockquote><pre><code class="java">Input: 3Output: 1 Explanation: At first, the three bulbs are [off, off, off].After first round, the three bulbs are [on, on, on].After second round, the three bulbs are [on, off, on].After third round, the three bulbs are [on, off, off]. So you should return 1, because there is only one bulb is on.</code></pre></blockquote><h4 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h4><blockquote><p>一开始我想的是就根据他的描述做，就是每一轮toggle一次当前下标及其倍数的数组位置的值。但是这个思路会超时。但这个思路的算法复杂度其实为<code>O(nlogn)</code>，所以说明这道题只可以遍历一遍，后来发现其实每次输出是固定有规律的，每<code>2i+1</code>个值为一组，含一个1。下面是AC代码。</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><pre><code class="java">class Solution {    public int bulbSwitch(int n) {        int result = 0;        int i = 1;        while(n &gt; 0){            n = n - (2*i+1);            result++;            i++;        }        return result;    }}</code></pre><h4 id="其他人的答案："><a href="#其他人的答案：" class="headerlink" title="其他人的答案："></a>其他人的答案：</h4><blockquote><p>有些费解，但是看来找到一种求开平方的方法。</p></blockquote><pre><code class="java">class Solution {    public int bulbSwitch(int n) {        return (int)Math.sqrt(n);    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Trapping Rain Water</title>
+    <link href="undefined2018/07/19/LeetCode%20Trapping%20Rain%20Water/"/>
+    <url>2018/07/19/LeetCode%20Trapping%20Rain%20Water/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Trapping-Rain-Water"><a href="#LeetCode-Trapping-Rain-Water" class="headerlink" title="LeetCode: Trapping Rain Water"></a>LeetCode: <a href="https://leetcode.com/problems/trapping-rain-water/" target="_blank" rel="noopener">Trapping Rain Water</a></h2><h4 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h4><blockquote><p>给一个不含负值的数组，求其最大的容水量。</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><p>结合下图看</p><p><img src="../images/leetcode/rainwatertrap.png" srcset="/img/loading.gif" alt="img"></p><pre><code class="java">Input: [0,1,0,2,1,0,1,3,2,1,2,1]Output: 6</code></pre></blockquote><h4 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h4><blockquote><p>这道题经历了很久才完成，主要是感觉很棘手，不好找切入点。后来借鉴了一个思路，就是每次找最高的点，然后找到次高的左右各一个点，以次高的点为容器边缘，算它们与最高点之间的容水量，然后通过递归，再找次高点之外的的存水量。</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><blockquote><p>有些丑陋，但是效率击败了96%的人。</p></blockquote><pre><code class="java">class Solution {    public int trap(int[] height) {        if( height == null || height.length &lt; 3){            return 0;        }        int total =  getTheTotalWater(height,0,height.length,0);        return total;    }    private int getTheTotalWater(int[] height,int start,int end,int index){        if (start &lt; end - 1) {            int containsLeft = 0;            int containsRight = 0;            //find current max value index            int max = findTheMax(height,start,end,index);            //find left second max value index            int left = findTheMax(height,start,max,max);            //find right second max value index            int right = findTheMax(height,max+1,end,max);            //left water capcity            containsLeft = getTheWater(height,left,max,height[left]);            if(right &lt; end){               //right water capcity                containsRight = getTheWater(height,max,right+1,height[right]);            }            //find outward            return getTheTotalWater(height,start,left+1,left)                +getTheTotalWater(height,right,end,right)                +containsLeft+containsRight;        }        return 0;    }    private int findTheMax(int[] nums,int start,int end,int prevMaxIndex){        int max = Integer.MIN_VALUE;        int index = start;        int dist = 0;        for(int i = start; i &lt; end; i++){            int tempDis = Math.abs(prevMaxIndex - i);            if(max &lt; nums[i] ){                max = nums[i];                index = i;            }else if (max == nums[i] &amp;&amp; dist &lt; tempDis){                index = i;                dist = tempDis;            }        }        return index;    }    private int getTheWater(int[] nums,int start,int end,int height){        int total = 0;        for(int i = start;i&lt;end; i++){            if(nums[i]&lt;=height){                total+=(height - nums[i]);            }        }        return total;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Find the Duplicate Number</title>
+    <link href="undefined2018/07/19/LeetCode%20Find%20the%20Duplicate%20Number/"/>
+    <url>2018/07/19/LeetCode%20Find%20the%20Duplicate%20Number/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Find-the-Duplicate-Number"><a href="#LeetCode-Find-the-Duplicate-Number" class="headerlink" title="LeetCode: Find the Duplicate Number"></a>LeetCode: Find the Duplicate Number</h2><h4 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h4><blockquote><p>一个<code>n+1</code>长度的数组，其中的值为<code>1~n</code>，所以肯定有一个重复的值，找出这个重复的值，并且只用<code>O(n)</code>的时间复杂度，<code>O(1)</code>的空间复杂度</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Input: [1,3,4,2,2]Output: 2</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>这个题是当时小米面试我的一道题，当时思路已经想出来了，但是代码没写出来，很遗憾。思路就是把当前的值不在对应的下标时则替换，如果当前的值等于对应下标的值，也就说明重复了，返回即可。</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><pre><code class="java">class Solution {    public int findDuplicate(int[] nums) {        if( nums == null || nums.length &lt; 1){            return 0;        }        int i = 0;           while(nums[i] != i){            if(nums[nums[i]] == nums[i]){                return nums[i];            }            swap(nums,i,nums[i]);        }              return 0;    }    private void swap(int[] nums , int i, int j){        int temp = nums[i];        nums[i] = nums[j];        nums[j] = temp;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Spiral Matrix II</title>
+    <link href="undefined2018/07/18/LeetCode%20Spiral%20Matrix%20II/"/>
+    <url>2018/07/18/LeetCode%20Spiral%20Matrix%20II/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Spiral-Matrix-II"><a href="#LeetCode-Spiral-Matrix-II" class="headerlink" title="LeetCode: Spiral Matrix II"></a>LeetCode: Spiral Matrix II</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>输入一个n，返回它的平方的一个顺时针排列的矩阵</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Input: 3Output:[ [ 1, 2, 3 ], [ 8, 9, 4 ], [ 7, 6, 5 ]]</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>同顺时针打印矩阵一样，甚至要简单一些，因为不会存在只剩1行，1列的情况</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><pre><code class="java">class Solution {    public int[][] generateMatrix(int n) {        if(n == 0){            return null;        }        int[][] result = new int[n][n];        int rowBegin = 0;        int rowEnd = n - 1;        int colBegin = 0;        int colEnd = n - 1;        int index = 1;        while( rowBegin &lt;= rowEnd &amp;&amp; colBegin &lt;= colEnd){            for(int j=colBegin; j &lt;= colEnd ; j++){                result[rowBegin][j] = index++;            }            rowBegin ++;            for(int i=rowBegin; i&lt;=rowEnd; i++ ){                result[i][colEnd] = index++;            }            colEnd--;            for(int j=colEnd; j&gt;=colBegin; j--){                result[rowEnd][j] = index++;            }            rowEnd--;            for(int i=rowEnd; i&gt;=rowBegin; i--){                result[i][colBegin] = index++;            }            colBegin++;        }        return result;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Spiral Matrix</title>
+    <link href="undefined2018/07/18/LeetCode%20Spiral%20Matrix%20/"/>
+    <url>2018/07/18/LeetCode%20Spiral%20Matrix%20/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Spiral-Matrix"><a href="#LeetCode-Spiral-Matrix" class="headerlink" title="LeetCode: Spiral Matrix"></a>LeetCode: Spiral Matrix</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>顺时针打印矩阵</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote><pre><code class="java">Example 1:Input:[ [ 1, 2, 3 ], [ 4, 5, 6 ], [ 7, 8, 9 ]]Output: [1,2,3,6,9,8,7,4,5]Example 2:Input:[  [1, 2, 3, 4],  [5, 6, 7, 8],  [9,10,11,12]]Output: [1,2,3,4,8,12,11,10,9,5,6,7]</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>就是从左至右，从上至下，从右至左，从下至上进行打印矩阵即可，但是这里要注意只剩1行和1列的处理</p></blockquote><h4 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h4><pre><code class="java">class Solution {    public List&lt;Integer&gt; spiralOrder(int[][] matrix) {        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();        if(matrix == null || matrix.length == 0){            return result;        }        int rowBegin = 0;        int rowEnd = matrix.length - 1;        int colBegin = 0;        int colEnd = matrix[0].length -1;        while(rowBegin &lt;= rowEnd &amp;&amp; colBegin &lt;= colEnd){            for(int j = colBegin; j &lt;= colEnd; j++){                result.add(matrix[rowBegin][j]);            }            rowBegin ++;            for(int i = rowBegin; i &lt;= rowEnd ; i++){                result.add(matrix[i][colEnd]);            }            colEnd -- ;            if(rowBegin &lt;= rowEnd){                for(int j = colEnd ; j &gt;= colBegin ;j-- ){                    result.add(matrix[rowEnd][j]);                }            }            rowEnd --;            if(colBegin &lt;= colEnd){                for(int i = rowEnd ; i &gt;= rowBegin; i--){                    result.add(matrix[i][colBegin]);                }            }            colBegin ++;        }        return result;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Product of Array Except Self</title>
+    <link href="undefined2018/07/17/LeetCode%20Product%20Except%20Self/"/>
+    <url>2018/07/17/LeetCode%20Product%20Except%20Self/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode：Product-of-Array-Except-Self"><a href="#LeetCode：Product-of-Array-Except-Self" class="headerlink" title="LeetCode：Product of Array Except Self"></a>LeetCode：Product of Array Except Self</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>给一个长度大于1的数组，返回一个数组使得<code>output[i]</code> 等于nums中元素除了自身（<code>nums[i]</code>）的乘积。要<code>O(n)</code>的复杂度。</p></blockquote><h4 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h4><blockquote><pre><code class="java">Input:  [1,2,3,4]Output: [24,12,8,6]</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>算出一个总的乘积，当前位置就是总的乘积除以当前的值。</p></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java">class Solution {    public int[] productExceptSelf(int[] nums) {        if( nums == null || nums.length &lt; 2){            return nums;        }        int length = nums.length;        long total = 1L;        int zeroCount = 0;        for(int i = 0; i &lt; length; i++){            if(nums[i] != 0){                total = nums[i] * total;            }else{                zeroCount ++;            }        }        if(zeroCount &gt; 1){            Arrays.fill(nums,0);            return nums;        }        for(int i = 0; i &lt; length; i++){            int temp = nums[i];            if(temp!= 0){                if(zeroCount &gt; 0){                    nums[i] = 0;                }else{                    nums[i] = (int)(total / temp);                }            }else{                nums[i] = (int)total;            }        }        return nums;    }}</code></pre><h4 id="增加条件："><a href="#增加条件：" class="headerlink" title="增加条件："></a>增加条件：</h4><blockquote><p>当不能用除法的时候。这时就需要计算一个分界，左边和右边的乘积，这样就能刨除自己算出当前的值。</p></blockquote><h5 id="代码"><a href="#代码" class="headerlink" title="代码:"></a>代码:</h5><pre><code class="java">public int[] productExceptSelf(int[] nums) {    if (nums == null || nums.length &lt; 2) {        return nums;    }    int length = nums.length;    int[] res = new int[length];    res[0] = 1;    for (int i = 1; i &lt; length; i++) {        res[i] = res[i - 1] * nums[i - 1];    }    int right = 1;    for (int i = length - 1; i &gt;= 0; i--) {        res[i] = right * res[i];        right = right * nums[i];    }    return res;}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Jump Game II</title>
+    <link href="undefined2018/07/17/LeetCode%20Jump%20Game%20II/"/>
+    <url>2018/07/17/LeetCode%20Jump%20Game%20II/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Jump-Game-II"><a href="#LeetCode-Jump-Game-II" class="headerlink" title="LeetCode : Jump Game II"></a>LeetCode : Jump Game II</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>给出一个只含正数的数组，一开始你就在数组的第一个索引上，每个元素代表你能跳的最大步数，你的目标是用最小的跳数跳到数组末尾。保证不会存在不能跳到数组末尾的情况（不保证的话可以判断一下就是JUMP GAME I）。</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote></blockquote><h4 id="思路"><a href="#思路" class="headerlink" title="思路:"></a>思路:</h4><blockquote><p>显然这是一个贪心算法，从后往前看，每次获取到最靠前的索引值，然后用这个索引值进行迭代就可以解题。但是我这么做时间复杂度是O（n^2），并没有发挥贪心的特性。</p></blockquote><h4 id="解法一："><a href="#解法一：" class="headerlink" title="解法一："></a>解法一：</h4><pre><code class="java">class Solution {    public int jump(int[] nums) {            if(nums== null || nums.length &lt; 2){                return 0;            }            int count = 0;            int length = nums.length;            int lastPos = length -1;            int minIndex = length -1;            for(int i = length - 2; i &gt;= 0;){                for(int j = i ; j &gt;= 0; j--){                    if(nums[j] + j &gt;= lastPos &amp;&amp; minIndex &gt; j){                        minIndex = j;                    }                }                lastPos = minIndex;                if(minIndex &gt;= 0){                    count ++;                }                if (minIndex == 0){                    break;                }                i = minIndex;            }            return count;        }}</code></pre><h4 id="解法二："><a href="#解法二：" class="headerlink" title="解法二："></a>解法二：</h4><blockquote><p>正宗贪心 O(n)的复杂度，十分漂亮</p></blockquote><pre><code class="java">class Solution {    public int jump(int[] nums) {            if(nums== null || nums.length &lt; 2){                return 0;            }            int count = 0;            int length = nums.length;            int nextMax = 0;            int curMax = 0;            for(int i = 0; i &lt; length -1; i++){                nextMax = Math.max(nextMax,nums[i]+i);                if(i == curMax){                    count ++;                    curMax = nextMax;                }            }            return count;        }}</code></pre><h4 id="解法三："><a href="#解法三：" class="headerlink" title="解法三："></a>解法三：</h4><blockquote><p>Dp 可以获取到每一个元素的最少跳数，且自带判断是否可达最后一个元素O(n^2)的复杂度</p></blockquote><pre><code class="java">class Solution {    public int jump(int[] nums) {        if (nums == null || nums.length == 0)            return 0;        int[] dp = new int[nums.length];        dp[nums.length-1] = 0;        for (int i = nums.length-2; i &gt;= 0; i--){            int curr = nums.length;            for (int j = 1; j &lt;= nums[i]; j ++) {                if (i + j &lt;= nums.length-1) {                    curr = Math.min(curr, dp[i+j]);                }            }            dp[i] = curr+1;        }        return dp[0];    }}</code></pre><h4 id="解法四："><a href="#解法四：" class="headerlink" title="解法四："></a>解法四：</h4><blockquote><p>BFS 的思想，找出每层能达到的最远的地方，然后从那个地方开始往下继续找。</p></blockquote><pre><code class="java">int jump(int A[], int n) {     if(n&lt;2)return 0;     int level=0,currentMax=0,i=0,nextMax=0;     while(currentMax-i+1&gt;0){        //nodes count of current level&gt;0         level++;         for(;i&lt;=currentMax;i++){    //traverse current level , and update the max reach of next level            nextMax=max(nextMax,A[i]+i);            if(nextMax&gt;=n-1)return level;   // if last element is in level+1,  then the min jump=level          }         currentMax=nextMax;     }     return 0; }</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Valid Sudoku</title>
+    <link href="undefined2018/06/29/LeetCode%20Valid%20Sudoku/"/>
+    <url>2018/06/29/LeetCode%20Valid%20Sudoku/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Valid-Sudoku"><a href="#LeetCode-Valid-Sudoku" class="headerlink" title="LeetCode : Valid Sudoku"></a>LeetCode : Valid Sudoku</h2><h4 id="题目"><a href="#题目" class="headerlink" title="题目:"></a>题目:</h4><blockquote><p>验证一个未填满的9x9的数独盘是否遵守如下法则：</p><ol><li>每一行只出现一次1-9的数字</li><li>每一列只出现一次1-9的数字</li><li>每一个3x3的小方格只出现一次1-9的数字</li></ol></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><blockquote></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>很简单，就是分别进行行，列，方格的字符校验即可。</p></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java">class Solution {    public boolean isValidSudoku(char[][] board) {        int length = board.length;        Map&lt;Character,Integer&gt; rowTemp = new HashMap&lt;&gt;(length);        Map&lt;Character,Integer&gt; columTemp = new HashMap&lt;&gt;(length);        //row colum        for(int i = 0; i&lt;length;i++ ){            for(int j = 0; j&lt;length;j++){                //row                if (checkBoardValid(board, rowTemp, i, j)) return false;                //colum                if (checkBoardValid(board, columTemp, j, i)) return false;            }            columTemp.clear();            rowTemp.clear();        }        //boxes        for(int i= 0; i &lt; length; i+=3){            for(int j = 0; j &lt; length; j+=3){                boolean flag = checkBoxes(board,i,j);                if(!flag){                    return false;                }            }        }        return true;    }    private boolean checkBoardValid(char[][] board, Map&lt;Character, Integer&gt; tempMap, int i, int j) {        if(board[i][j] == &#39;.&#39; ){            tempMap.put(&#39;.&#39;,0);        }else if(board[i][j] != &#39;.&#39;){            if(tempMap.get(board[i][j])!=null){                return true;            }else{                tempMap.put(board[i][j],1);            }        }        return false;    }    private boolean checkBoxes(char[][] board,int startI,int startJ){        Map&lt;Character,Integer&gt; map = new HashMap&lt;&gt;();        for(int i = startI; i&lt; startI+3; i++){            for(int j = startJ; j &lt; startJ+3; j++){                if (checkBoardValid(board, map, i, j)) return false;            }        }        map.clear();        return true;    }}</code></pre><h4 id="有趣的解法："><a href="#有趣的解法：" class="headerlink" title="有趣的解法："></a>有趣的解法：</h4><pre><code class="java">public boolean isValidSudoku(char[][] board) {    Set seen = new HashSet();    for (int i=0; i&lt;9; ++i) {        for (int j=0; j&lt;9; ++j) {            char number = board[i][j];            if (number != &#39;.&#39;)                if (!seen.add(number + &quot; in row &quot; + i) ||                    !seen.add(number + &quot; in column &quot; + j) ||                    !seen.add(number + &quot; in block &quot; + i/3 + &quot;-&quot; + j/3))                    return false;        }    }    return true;}</code></pre><blockquote><p>非常简短可读性也非常高，优秀！</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Search for a Range</title>
+    <link href="undefined2018/06/28/LeetCode%20Search%20Of%20Range/"/>
+    <url>2018/06/28/LeetCode%20Search%20Of%20Range/</url>
+    
+    <content type="html"><![CDATA[<h2 id="LeetCode-Search-for-a-Range"><a href="#LeetCode-Search-for-a-Range" class="headerlink" title="LeetCode: Search for a Range"></a>LeetCode: Search for a Range</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>给出一个递增数组，找到<code>target</code>的开始和结束为止并返回。复杂度必须为<code>O(logn)</code>，如果没找到返回<code>[-1,-1]</code>;</p></blockquote><h4 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h4><blockquote><pre><code class="java">//例一Input: nums = [5,7,7,8,8,10], target = 8Output: [3,4]//例二Input: nums = [5,7,7,8,8,10], target = 6Output: [-1,-1]</code></pre></blockquote><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>我的思路是既然是递增序列，肯定首选二分查找，关键在于找边界，其实也不难，找到其中一个值，向两边顺序找左边界和右边界，返回即可。不过最坏的时间复杂度是O(n/2)，即整个数组全为同一个值的情况。但是实际运行效果还是超过了80%的人。</p></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java"> public int[] searchRange(int[] nums, int target) {        if (nums == null || nums.length &lt; 1) {            return new int[]{-1, -1};        }        int length = nums.length;        int index = binarySearch(nums, 0, length - 1, target);        if (index == -1) {            return new int[]{-1, -1};        }        int temp = index;        int left, right;        while (temp &gt;= 0 &amp;&amp; nums[index] == nums[temp]) temp--;        left = temp + 1;        temp = index;        while (temp &lt; length &amp;&amp; nums[index] == nums[temp]) temp++;        right = temp - 1;        return new int[]{left, right};    }    private int binarySearch(int[] arr, int start, int end, int target) {        int low = start, high = end;        while (low &lt;= high) {            int mid = (high - low) / 2 + low;            if (arr[mid] == target) {                return mid;            } else if (arr[mid] &gt; target) {                high = mid - 1;            } else {                low = mid + 1;            }        }        return -1;    }</code></pre><h4 id="一个很有技巧性的解法"><a href="#一个很有技巧性的解法" class="headerlink" title="一个很有技巧性的解法:"></a>一个很有技巧性的解法:</h4><pre><code class="java">public class Solution {    public int[] searchRange(int[] A, int target) {        int start = Solution.firstGreaterEqual(A, target);        if (start == A.length || A[start] != target) {            return new int[]{-1, -1};        }        return new int[]{start, Solution.firstGreaterEqual(A, target + 1) - 1};    }    //find the first number that is greater than or equal to target.    //could return A.length if target is greater than A[A.length-1].    //actually this is the same as lower_bound in C++ STL.    private static int firstGreaterEqual(int[] A, int target) {        int low = 0, high = A.length;        while (low &lt; high) {            int mid = low + ((high - low) &gt;&gt; 1);            //low &lt;= mid &lt; high            if (A[mid] &lt; target) {                low = mid + 1;            } else {                //should not be mid-1 when A[mid]==target.                //could be mid even if A[mid]&gt;target because mid&lt;high.                high = mid;            }        }        return low;    }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LeetCode-Next Permutation</title>
+    <link href="undefined2018/06/25/LeetCode%20Next%20Permutation/"/>
+    <url>2018/06/25/LeetCode%20Next%20Permutation/</url>
+    
+    <content type="html"><![CDATA[<h1 id="LeetCode-Next-Permutation"><a href="#LeetCode-Next-Permutation" class="headerlink" title="LeetCode: Next Permutation"></a>LeetCode: Next Permutation</h1><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote><p>大意就是找出以当前数组从左至右为一个数字的下一个大的数字的数组组合，只能用常量的空间。若已经为最大数，则返回递增数组。</p></blockquote><h4 id="例子："><a href="#例子：" class="headerlink" title="例子："></a>例子：</h4><p><code>1,2,3</code> → <code>1,3,2</code><br><code>3,2,1</code> → <code>1,2,3</code><br><code>1,1,5</code> → <code>1,5,1</code></p><h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote><p>其实这个题我一开始想的思路是从后往前找第一个比前一个值大的数，该位置就称为index好了，要满足nums[index]&gt;nums[index-1]，交换就OK，但是仔细想了下不对，应该是找到那个位置，然后从后往前找出最小的那个比nums[index-1]大的值，交换后排序index-1后的数组就OK了。</p></blockquote><h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java">class Solution {    public void nextPermutation(int[] nums) {            if(nums == null || nums.length &lt;= 1){                return;            }            int length = nums.length;            int tail = Integer.MAX_VALUE;            int right = length -1;            int rightMin = Integer.MAX_VALUE;            while(right &gt; 0){                if(nums[right] &gt; nums[right -1] ){                    break;                }                right--;            }            int index = length -1;            while(index &gt;= right &amp;&amp; right &gt; 0){                if(rightMin&gt;nums[index] &amp;&amp; nums[index] &gt; nums[right -1]){                    rightMin = nums[index];                    tail = index;                }                index --;            }            if (right &gt; 0) {                swap(nums, tail, right - 1);                reverseSort(nums, right, length);            } else {                reverseSort(nums,0,length);            }        }        private void reverseSort(int[] nums,int start,int end){            for (int i = 0; i &lt; (end-start) / 2; i++) {                swap(nums, start+i, end - i - 1);            }        }        private void swap(int[] arr,int i,int j){            int temp = arr[i];            arr[i] = arr[j];            arr[j] = temp;        }}</code></pre>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+      <category>算法</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+      <tag>Leetcode</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>synchronized理解与实践</title>
     <link href="undefined2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/"/>
     <url>2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/</url>
@@ -13,9 +1411,9 @@
     
     <categories>
       
-      <category>编程</category>
-      
       <category>Java</category>
+      
+      <category>编程</category>
       
     </categories>
     
@@ -40,9 +1438,9 @@
     
     <categories>
       
-      <category>编程</category>
-      
       <category>Java</category>
+      
+      <category>编程</category>
       
     </categories>
     
@@ -141,8 +1539,6 @@
     
     
     <categories>
-      
-      <category>Java</category>
       
       <category>编程</category>
       

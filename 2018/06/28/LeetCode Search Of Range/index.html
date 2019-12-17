@@ -15,7 +15,7 @@
   <meta name="description" content="">
   <meta name="author" content="John Doe">
   <meta name="keywords" content="">
-  <title>Category - 编程 ~ Soul</title>
+  <title>LeetCode-Search for a Range ~ Soul</title>
 
   <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"  >
 <link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css"  >
@@ -38,7 +38,7 @@
 
 
 <body>
-  <header style="height: 80vh;">
+  <header style="height: 70vh;">
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
@@ -98,7 +98,7 @@
 </nav>
 
     <div class="view intro-2" id="background"
-         style="background: url('/img/wolf.jpg')no-repeat center center;
+         style="background: url('/img/post.jpg')no-repeat center center;
            background-size: cover;
            background-attachment: fixed;">
       <div class="full-bg-img">
@@ -108,6 +108,41 @@
               
             </span>
 
+            
+              <br>
+              
+                <p class="mt-3">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>&nbsp;
+                  Thursday, June 28th 2018, 4:37 pm
+                </p>
+              
+
+              <p>
+                
+                  
+                  &nbsp;<i class="far fa-chart-bar"></i>
+                  <span class="post-count">
+                    458 字
+                  </span>&nbsp;
+                
+
+                
+                  
+                  &nbsp;<i class="far fa-clock"></i>
+                  <span class="post-count">
+                      2 分钟
+                  </span>&nbsp;
+                
+
+                
+                  <!-- 不蒜子统计文章PV -->
+                  
+                  &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;
+                  <span id="busuanzi_container_page_pv">
+                    <span id="busuanzi_value_page_pv"></span> 次
+                  </span>&nbsp;
+                
+              </p>
             
           </div>
 
@@ -119,36 +154,149 @@
 
   <main>
     
-      <div class="container nopadding-md">
-        <div class="py-5 z-depth-3" id="board">
-          
-          <div class="container">
-            <div class="row">
-              <div class="col-12 col-md-10 m-auto">
-                
-
-<div class="list-group">
-<!--  <p class="h4">1 posts in total.</p>-->
-  <hr>
-  
-    
       
-      <p class="h5">2017</p>
-    
-    <a href="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/" class="list-group-item list-group-item-action">
-      <span class="archive-post-title">Java实现二叉树的三种非递归遍历</span>
-      <span style="float: right;">11-11</span>
-    </a>
-  
-</div>
 
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <h2 id="LeetCode-Search-for-a-Range"><a href="#LeetCode-Search-for-a-Range" class="headerlink" title="LeetCode: Search for a Range"></a>LeetCode: Search for a Range</h2><h4 id="题目："><a href="#题目：" class="headerlink" title="题目："></a>题目：</h4><blockquote>
+<p>给出一个递增数组，找到<code>target</code>的开始和结束为止并返回。复杂度必须为<code>O(logn)</code>，如果没找到返回<code>[-1,-1]</code>;</p>
+</blockquote>
+<h4 id="例子"><a href="#例子" class="headerlink" title="例子:"></a>例子:</h4><blockquote>
+<pre><code class="java">//例一
+Input: nums = [5,7,7,8,8,10], target = 8
+Output: [3,4]
 
+//例二
+Input: nums = [5,7,7,8,8,10], target = 6
+Output: [-1,-1]</code></pre>
+</blockquote>
+<h4 id="思路："><a href="#思路：" class="headerlink" title="思路："></a>思路：</h4><blockquote>
+<p>我的思路是既然是递增序列，肯定首选二分查找，关键在于找边界，其实也不难，找到其中一个值，向两边顺序找左边界和右边界，返回即可。不过最坏的时间复杂度是O(n/2)，即整个数组全为同一个值的情况。但是实际运行效果还是超过了80%的人。</p>
+</blockquote>
+<h4 id="代码："><a href="#代码：" class="headerlink" title="代码："></a>代码：</h4><pre><code class="java"> public int[] searchRange(int[] nums, int target) {
+        if (nums == null || nums.length &lt; 1) {
+            return new int[]{-1, -1};
+        }
+        int length = nums.length;
+        int index = binarySearch(nums, 0, length - 1, target);
+        if (index == -1) {
+            return new int[]{-1, -1};
+        }
+        int temp = index;
+        int left, right;
+        while (temp &gt;= 0 &amp;&amp; nums[index] == nums[temp]) temp--;
+        left = temp + 1;
+        temp = index;
+        while (temp &lt; length &amp;&amp; nums[index] == nums[temp]) temp++;
+        right = temp - 1;
 
-              </div>
-            </div>
+        return new int[]{left, right};
+    }
+
+    private int binarySearch(int[] arr, int start, int end, int target) {
+        int low = start, high = end;
+        while (low &lt;= high) {
+            int mid = (high - low) / 2 + low;
+            if (arr[mid] == target) {
+                return mid;
+            } else if (arr[mid] &gt; target) {
+                high = mid - 1;
+            } else {
+                low = mid + 1;
+            }
+        }
+        return -1;
+    }</code></pre>
+<h4 id="一个很有技巧性的解法"><a href="#一个很有技巧性的解法" class="headerlink" title="一个很有技巧性的解法:"></a>一个很有技巧性的解法:</h4><pre><code class="java">public class Solution {
+    public int[] searchRange(int[] A, int target) {
+        int start = Solution.firstGreaterEqual(A, target);
+        if (start == A.length || A[start] != target) {
+            return new int[]{-1, -1};
+        }
+        return new int[]{start, Solution.firstGreaterEqual(A, target + 1) - 1};
+    }
+
+    //find the first number that is greater than or equal to target.
+    //could return A.length if target is greater than A[A.length-1].
+    //actually this is the same as lower_bound in C++ STL.
+    private static int firstGreaterEqual(int[] A, int target) {
+        int low = 0, high = A.length;
+        while (low &lt; high) {
+            int mid = low + ((high - low) &gt;&gt; 1);
+            //low &lt;= mid &lt; high
+            if (A[mid] &lt; target) {
+                low = mid + 1;
+            } else {
+                //should not be mid-1 when A[mid]==target.
+                //could be mid even if A[mid]&gt;target because mid&lt;high.
+                high = mid;
+            }
+        }
+        return low;
+    }
+}</code></pre>
+
+            <hr>
+          </div>
+          <br>
+          <div>
+            <p>
+            
+              <span>
+                <i class="iconfont icon-inbox"></i>
+                
+                  <a class="hover-with-bg" href="/categories/%E7%BC%96%E7%A8%8B">编程</a>
+                  &nbsp;
+                
+                  <a class="hover-with-bg" href="/categories/%E7%AE%97%E6%B3%95">算法</a>
+                  &nbsp;
+                
+              </span>&nbsp;&nbsp;
+            
+            
+              <span>
+                <i class="iconfont icon-tag"></i>
+                
+                  <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95">算法</a>
+                
+                  <a class="hover-with-bg" href="/tags/Leetcode">Leetcode</a>
+                
+              </span>
+            
+            </p>
+            
+              <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+            
           </div>
         </div>
       </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      
+  <div id="toc">
+    <p class="h4"><i class="far fa-list-alt"></i>&nbsp;TOC</p>
+    <div id="tocbot"></div>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- custom -->
+
+
+<!-- Comments -->
+<div class="col-lg-7 mx-auto nopadding-md">
+  <div class="container comments mx-auto" id="comments">
+    
+  </div>
+</div>
+
     
   </main>
 
@@ -223,6 +371,11 @@
 
 
 
+  
+    <script src="/lib/tocbot/tocbot.min.js" ></script>
+  
+  <script src="/js/post.js" ></script>
+
 
 
   <script src="/lib/smooth-scroll/smooth-scroll.min.js" ></script>
@@ -263,7 +416,7 @@
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "Category - 编程&nbsp;",
+        "LeetCode-Search for a Range&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
