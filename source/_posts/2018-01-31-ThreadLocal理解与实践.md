@@ -2,8 +2,8 @@
 title: ThreadLocal理解与实践
 date: 2018-01-31 16:26:03
 categories: 
-- 编程
-- Java
+- [编程]
+- [Java]
 tags:
 - Java
 ---

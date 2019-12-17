@@ -2,8 +2,8 @@
 title: synchronized理解与实践
 date: 2018-02-02 16:37:05
 categories:
-- 编程
-- Java
+- [编程]
+- [Java]
 tags:
 - Thread
 ---
