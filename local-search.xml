@@ -4,23 +4,25 @@
   
   
   <entry>
-    <title>learnHexo</title>
-    <link href="undefined2019/12/11/learnHexo/"/>
-    <url>2019/12/11/learnHexo/</url>
+    <title>synchronized理解与实践</title>
+    <link href="undefined2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/"/>
+    <url>2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/</url>
     
-    <content type="html"><![CDATA[<h3 id="文章相关命令"><a href="#文章相关命令" class="headerlink" title="文章相关命令"></a>文章相关命令</h3><h4 id="新文章"><a href="#新文章" class="headerlink" title="新文章"></a>新文章</h4><pre><code>System.out.println(&quot;hello world&quot;);123112312312</code></pre><pre><code>alert(&#39;Hello World!&#39;);</code></pre><blockquote><p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque hendrerit lacus ut purus iaculis feugiat. Sed nec tempor elit, quis aliquam neque. Curabitur sed diam eget dolor fermentum semper at eu lorem.</p></blockquote><pre><code class="java">System.out.println(&quot;hello world&quot;);123112312312    /**    */</code></pre><h4 id="引用图片"><a href="#引用图片" class="headerlink" title="引用图片"></a>引用图片</h4><pre><code class="shell">{% assert_img slug [title] %}asdasdasdasdasdasdas</code></pre><p>hexo</p><img src="/2019/12/11/learnHexo/java%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" class=".&#x2F;2019-12-11-learnHexo&#x2F;"><p>asdasdasdasdasdas</p><p><img src="./2019-12-11-learnHexo/java%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" alt=""></p>]]></content>
+    <content type="html"><![CDATA[<blockquote><p>作为Java使用者，对于synchronized肯定不陌生，它是多线程中重要的一个机制，能够保证多线程程序在共享数据时的正确性。但是最近遇到一个问题，久久没有想明白，查阅了很多博客和资料最终终于想明白了，决定写记录下来。</p></blockquote><p><strong>如果想了解synchronized的机制以及原理可以参考：</strong></p><p><a href="https://juejin.im/post/594a24defe88c2006aa01f1c" target="_blank" rel="noopener">Java 之 synchronized 详解</a></p><h3 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h3><pre><code class="java">    private static void synchronizedDemo() {        Task task = new Task();        for (int i = 0; i &lt; 10; i++) {            new Thread(task).start();        }    }    private static class Task implements Runnable {        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;        private Integer value = 0;        private static SimpleDateFormat sdf = new SimpleDateFormat(&quot;HH:mm:ss|SSS&quot;);        @Override        public void run() {            createOrder();        }        private void createOrder() {            synchronized (MY_LOCK_DATE) {                String format = sdf.format(new Date());                System.out.println(Thread.currentThread().getName() + &quot;生成的订单号是：&quot; + format);               }        }    }</code></pre><blockquote><p>对于这段代码，想必大家大概能看出我的意图，我想用当前时间来生成唯一的订单号，这里是模拟的业务场景，所以生成订单号一定是在多线程场景下的。所以这里我使用了一个<code>MY_LOCK_DATE</code>锁来保证线程访问的唯一性。然而最后的输出结果是这样的：</p></blockquote><pre><code class="java">Thread-3生成的订单号是：11:29:49|357Thread-7生成的订单号是：11:29:49|358Thread-2生成的订单号是：11:29:49|358Thread-4生成的订单号是：11:29:49|358Thread-6生成的订单号是：11:29:49|358Thread-8生成的订单号是：11:29:49|358Thread-10生成的订单号是：11:29:49|358Thread-1生成的订单号是：11:29:49|370Thread-5生成的订单号是：11:29:49|370Thread-9生成的订单号是：11:29:49|370</code></pre><h3 id="经过"><a href="#经过" class="headerlink" title="经过"></a>经过</h3><p><strong>这怎么行，不管在什么场景中订单号一定是唯一的！难道是锁没有起作用？修改一下代码，看看到底是不是锁的问题：</strong></p><pre><code class="java">private static class Task implements Runnable {        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;        private Integer value = 0;        private static SimpleDateFormat sdf = new SimpleDateFormat(&quot;HH:mm:ss|SSS&quot;);        @Override        public void run() {            createOrder();        }        private void createOrder() {            synchronized (MY_LOCK_DATE) {                String format = sdf.format(new Date());                System.out.println(Thread.currentThread().getName() + &quot;生成的订单号是：&quot; + format);                value++;                System.out.println(Thread.currentThread().getName() + &quot;当前的value值为：&quot; + value);            }        }    }</code></pre><p><strong>这里就是加入了一个value变量，每生成一个订单就让其加一并输出。看下结果：</strong></p><pre><code class="java">Thread-1生成的订单号是：11:32:20|270Thread-1当前的value值为：1Thread-7生成的订单号是：11:32:20|271Thread-7当前的value值为：2Thread-9生成的订单号是：11:32:20|271Thread-9当前的value值为：3Thread-5生成的订单号是：11:32:20|271Thread-5当前的value值为：4Thread-10生成的订单号是：11:32:20|271Thread-10当前的value值为：5Thread-6生成的订单号是：11:32:20|271Thread-6当前的value值为：6Thread-8生成的订单号是：11:32:20|271Thread-8当前的value值为：7Thread-4生成的订单号是：11:32:20|271Thread-4当前的value值为：8Thread-3生成的订单号是：11:32:20|271Thread-3当前的value值为：9Thread-2生成的订单号是：11:32:20|271Thread-2当前的value值为：10</code></pre><p><strong>说明锁确实起作用了，但是为什么我的订单号还是一片重复，损失上亿不说，我可是要做Java王的男人啊，这点问题都搞不定嘛。于是我灵光一闪，发现可能是Date的问题。扫了一眼源码，发现其就是<code>System.currentTimeMillis();</code>的封装啊。</strong></p><h3 id="结果"><a href="#结果" class="headerlink" title="结果"></a>结果</h3><blockquote><p>到这里其实问题就解决了，这个系统时间的方法并不是线程安全的，各个线程任何时刻都可以获取到，但是可能有人问即使它不安全，但是我加锁了呀。确实，而且可以看到锁也生效了，但是要知道处理器的执行速度非常快，那几个订单号的生成加线程切换可能不足1毫秒。所以怎么解决这个问题呢？看最终代码：</p></blockquote><pre><code class="java">private static class Task implements Runnable {        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;        private static Integer value = 0;        private static SimpleDateFormat sdf = new SimpleDateFormat(&quot;HH:mm:ss|SSS&quot;);        @Override        public void run() {            createOrder();        }        private void createOrder() {            synchronized (MY_LOCK_DATE) {                try {                    Thread.sleep(1); //让该线程睡1毫秒                } catch (InterruptedException e) {                    e.printStackTrace();                }                System.currentTimeMillis();                String format = sdf.format(new Date());                System.out.println(Thread.currentThread().getName() + &quot;生成的订单号是：&quot; + format);                value++;                System.out.println(Thread.currentThread().getName() + &quot;当前的value值为：&quot; + value);            }        }    }//输出===================================Thread-3生成的订单号是：11:45:35|147Thread-3当前的value值为：1Thread-10生成的订单号是：11:45:35|148Thread-10当前的value值为：2Thread-6生成的订单号是：11:45:35|149Thread-6当前的value值为：3Thread-2生成的订单号是：11:45:35|150Thread-2当前的value值为：4Thread-8生成的订单号是：11:45:35|151Thread-8当前的value值为：5Thread-7生成的订单号是：11:45:35|153Thread-7当前的value值为：6Thread-4生成的订单号是：11:45:35|156Thread-4当前的value值为：7Thread-9生成的订单号是：11:45:35|157Thread-9当前的value值为：8Thread-5生成的订单号是：11:45:35|158Thread-5当前的value值为：9Thread-1生成的订单号是：11:45:35|159Thread-1当前的value值为：10</code></pre><p>细心的同学已经发现了就是让持有锁的线程睡一毫秒。诶呀，结果也很漂亮，基本都是挨着的订单号。但是肯定有人说这样好麻烦啊，是的，所以个人建议<strong>最好不要利用Date来作为任何一个主键</strong>，而且<strong>在多线程的环境中，使用Date一定要小心。</strong>不然很容易出现意想不到的结果。那么有的人说我就要用Date怎么办？那么你可以去了解一下<strong>分布式锁</strong>，这个很好的解决了这个问题。</p><h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><p><strong>给大家出一个小题，看看这个程序的输出：</strong></p><pre><code class="java">   private static void synchronizedDemo() {        for (int i = 0; i &lt; 10; i++) {            new Thread(new Task()).start();        }    }    private static class Task implements Runnable {        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;        private Integer value = 0;        private static SimpleDateFormat sdf = new SimpleDateFormat(&quot;HH:mm:ss|SSS&quot;);        @Override        public void run() {            createOrder();        }        private void createOrder() {            synchronized (MY_LOCK_DATE) {                try {                    Thread.sleep(1);                } catch (InterruptedException e) {                    e.printStackTrace();                }                String format = sdf.format(new Date());                System.out.println(Thread.currentThread().getName() + &quot;生成的订单号是：&quot; + format);                value++;                System.out.println(Thread.currentThread().getName() + &quot;当前的value值为：&quot; + value);            }        }    }</code></pre>]]></content>
     
     
     <categories>
       
-      <category>hexo</category>
+      <category>编程</category>
+      
+      <category>Java</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>hexo</tag>
+      <tag>Thread</tag>
       
     </tags>
     
@@ -29,51 +31,25 @@
   
   
   <entry>
-    <title>test3</title>
-    <link href="undefined2019/12/10/test3/"/>
-    <url>2019/12/10/test3/</url>
+    <title>ThreadLocal理解与实践</title>
+    <link href="undefined2018/01/31/ThreadLocal%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/"/>
+    <url>2018/01/31/ThreadLocal%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/</url>
     
-    <content type="html"><![CDATA[]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>test2</title>
-    <link href="undefined2019/12/10/test2/"/>
-    <url>2019/12/10/test2/</url>
-    
-    <content type="html"><![CDATA[]]></content>
-    
-    
-    
-  </entry>
-  
-  
-  
-  <entry>
-    <title>test</title>
-    <link href="undefined2019/12/10/test/"/>
-    <url>2019/12/10/test/</url>
-    
-    <content type="html"><![CDATA[<h2 id="MySQL必知必会"><a href="#MySQL必知必会" class="headerlink" title="MySQL必知必会"></a>MySQL必知必会</h2><h3 id="1-检索数据"><a href="#1-检索数据" class="headerlink" title="1.检索数据"></a>1.检索数据</h3><h4 id="1-1-distinct"><a href="#1-1-distinct" class="headerlink" title="1.1 distinct"></a>1.1 distinct</h4><pre><code>##用于检索出单一的行值select distinct vend_id from products.##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。select distinct vend_id,vend_name from products.mysql&gt; select * from test;+----+------+-------+| id | name | photo |+----+------+-------+|  1 | tony | photo ||  1 | tom  | photo ||  2 | tony | photo ||  2 | tom  | photo ||  2 | tom  | photo |+----+------+-------+5 rows in setmysql&gt; select distinct id,name from test;+----+------+| id | name |+----+------+|  1 | tony ||  1 | tom  ||  2 | tony ||  2 | tom  |+----+------+4 rows in setmysql&gt; select distinct id,photo from test;+----+-------+| id | photo |+----+-------+|  1 | photo ||  2 | photo |+----+-------+2 rows in set</code></pre><h4 id="1-2-多个字段倒序"><a href="#1-2-多个字段倒序" class="headerlink" title="1.2 多个字段倒序"></a>1.2 多个字段倒序</h4><blockquote><p>多个字段想使用倒序时，必须为每个字段单独使用倒序，否则不会生效。</p></blockquote><blockquote><p>test2222222222222222222222</p><footer><strong>[asdasd[</strong><cite>文章]] [http://localhost:4000/2019/12/10/test2/] [test2]</cite></footer></blockquote><pre><code>System.out.println(&quot;hello world&quot;);</code></pre>]]></content>
+    <content type="html"><![CDATA[<p>​        首先贴出源码的对于该类的注释，大意讲的是这个类提供了线程封闭的变量。所谓线程封闭指的是其他线程不可以访问这个变量，每一个线程对应该变量的一个副本。当ThreadLocal被声明成private static时，一般用来将一个属性与当前线程联系起来（比如当前的线程ID，用户ID）。</p><pre><code class="java">/** * This class provides thread-local variables.  These variables differ from * their normal counterparts in that each thread that accesses one (via its * {@code get} or {@code set} method) has its own, independently initialized * copy of the variable.  {@code ThreadLocal} instances are typically private * static fields in classes that wish to associate state with a thread (e.g., * a user ID or Transaction ID). */</code></pre><h3 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h3><blockquote><p>官方文档给了一个示例：</p></blockquote><pre><code class="java">public class d_ReorderingDemo {    private static class ReaderThread extends Thread {        private static final AtomicInteger threadId = new AtomicInteger(0);        private static final ThreadLocal&lt;Integer&gt; threadLocal =          ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式        public long getId() {            return threadLocal.get();        }        @Override        public void run() {            System.out.println(&quot;当前线程Id:&quot; + threadLocal.get());            System.out.println(&quot;当前AtomicInteger的值：&quot; + threadId.get());        }    }    public static void main(String[] args) {        for (int i = 0; i &lt; 10; i++) {            new ReaderThread().start();        }    }}//输出：=======================================================当前线程Id:0当前AtomicInteger的值：1当前线程Id:1当前AtomicInteger的值：2当前线程Id:2当前AtomicInteger的值：3当前线程Id:3当前AtomicInteger的值：4当前线程Id:4当前AtomicInteger的值：5当前线程Id:5当前AtomicInteger的值：6当前线程Id:6当前AtomicInteger的值：7当前线程Id:7当前AtomicInteger的值：8当前线程Id:8当前AtomicInteger的值：9当前线程Id:9当前AtomicInteger的值：10</code></pre><blockquote><p>可以看出来使用很简单，初始化值，通过{@code get} or {@code set}方法获取要绑定的值即可。那么为什么ThreadLocal可以实现这样的功能呢。我们分析一下他的源码。</p></blockquote><h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><p><strong>set方法:</strong></p><pre><code class="java">public void set(T value) {        Thread t = Thread.currentThread();//获取当前的线程        ThreadLocalMap map = getMap(t);   //根据当前线程获取该线程的ThreadLocalMap        if (map != null)            map.set(this, value);          //如果这个map不等于空就把新加入的值和当前线程绑定        else            createMap(t, value);          //如果不存在则创建这个map并把值绑定    }</code></pre><p><strong>createMap方法：</strong></p><pre><code class="java">void createMap(Thread t, T firstValue) {          //很简单就是给当前线程生成一个ThreadLocalMap并且绑定初值        t.threadLocals = new ThreadLocalMap(this, firstValue);    }</code></pre><p><strong>get方法：</strong></p><pre><code class="java">public T get() {        Thread t = Thread.currentThread();        ThreadLocalMap map = getMap(t);        if (map != null) {            ThreadLocalMap.Entry e = map.getEntry(this); //map不空根据键取值            if (e != null) {                @SuppressWarnings(&quot;unchecked&quot;)                T result = (T)e.value;                return result;            }        }        return setInitialValue(); //否则设置初始值并返回，若没有初始值则会返回空    }</code></pre><blockquote><p>可以发现ThreadLocal真正起作用的其实是其中的ThreadLocalMap，所以当ThreadLocal被声明为static时，相关线程都可以访问同一份ThreadLocal对象，但是其中的值是和其线程绑定的，因此不会产生干扰。但是当ThreadLocal不被声明为static时，其实更好理解，它就是一个局部的只能存一个值key为当前线程的map变量，也就不存在其它线程访问的问题了。<strong>ThreadLocal&lt; T &gt; 类似于包含了Map&lt; Thread,T &gt;对象，其中保存了特定于该线程的值，但其实现并非如此。这些特定于线程的值保存在Thread对象中，当线程终止后，这些值会作为垃圾回收。</strong> </p></blockquote><p><strong>下面代码和最初的演示代码逻辑相同，但是输出结果不同，大家可以想想为什么。</strong></p><pre><code class="java">public class d_ReorderingDemo {    private static class ReaderThread extends Thread {        private AtomicInteger threadId = new AtomicInteger(0);        private ThreadLocal&lt;Integer&gt; threadLocal =        ThreadLocal.withInitial(threadId::getAndIncrement);//这里只是λ表达式的初始化形式        public long getId() {            return threadLocal.get();        }        @Override        public void run() {            System.out.println(&quot;当前线程Id:&quot; + threadLocal.get());            System.out.println(&quot;当前AtomicInteger的值：&quot; + threadId.get());        }    }    public static void main(String[] args) {        for (int i = 0; i &lt; 10; i++) {            new ReaderThread().start();        }    }}//输出：=========================================当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1当前线程Id:0当前AtomicInteger的值：1</code></pre>]]></content>
     
     
     <categories>
       
-      <category>test</category>
+      <category>编程</category>
       
-      <category>test1</category>
+      <category>Java</category>
       
     </categories>
     
     
     <tags>
       
-      <tag>test</tag>
+      <tag>Java</tag>
       
     </tags>
     
@@ -82,13 +58,312 @@
   
   
   <entry>
-    <title>MySQL必知必会</title>
-    <link href="undefined2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/"/>
-    <url>2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/</url>
+    <title>2017总结</title>
+    <link href="undefined2018/01/02/2017%E6%80%BB%E7%BB%93/"/>
+    <url>2018/01/02/2017%E6%80%BB%E7%BB%93/</url>
     
-    <content type="html"><![CDATA[<h2 id="MySQL必知必会"><a href="#MySQL必知必会" class="headerlink" title="MySQL必知必会"></a>MySQL必知必会</h2><p>[TOC]</p><h3 id="1-检索数据"><a href="#1-检索数据" class="headerlink" title="1.检索数据"></a>1.检索数据</h3><h4 id="1-1-distinct"><a href="#1-1-distinct" class="headerlink" title="1.1 distinct"></a>1.1 distinct</h4><blockquote><pre><code class="sql">##用于检索出单一的行值select distinct vend_id from products.##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。select distinct vend_id,vend_name from products.mysql&gt; select * from test;+----+------+-------+| id | name | photo |+----+------+-------+|  1 | tony | photo ||  1 | tom  | photo ||  2 | tony | photo ||  2 | tom  | photo ||  2 | tom  | photo |+----+------+-------+5 rows in setmysql&gt; select distinct id,name from test;+----+------+| id | name |+----+------+|  1 | tony ||  1 | tom  ||  2 | tony ||  2 | tom  |+----+------+4 rows in setmysql&gt; select distinct id,photo from test;+----+-------+| id | photo |+----+-------+|  1 | photo ||  2 | photo |+----+-------+2 rows in set</code></pre></blockquote><h4 id="1-2-多个字段倒序"><a href="#1-2-多个字段倒序" class="headerlink" title="1.2 多个字段倒序"></a>1.2 多个字段倒序</h4><blockquote><p>多个字段想使用倒序时，必须为每个字段单独使用倒序，否则不会生效。</p></blockquote>]]></content>
+    <content type="html"><![CDATA[<p>&emsp;&emsp;时光匆匆，一转眼一年又过去了。很多事情都像是昨天刚刚发生的一样，越长大就越感觉到时间流逝之快远远超过预料。从前老师给布置任务让做年终个人总结，但当时从来都是敷衍，现在才感觉到这不失为一种记录时间的方法，所以就用这篇流水账记录一下我的2017。</p><h3 id="学业"><a href="#学业" class="headerlink" title="学业"></a>学业</h3><p>&emsp;&emsp;今年到头来虽然也感觉自己不会的知识很多，但是比起一年前的自己还是很有进步的。当然也有更多不足之处，需要在新的一年里努力加油的。</p><p>&emsp;&emsp;细算一下进步体现在以下几个方面。首先是专业知识的理解加深，包括对整个计算机的理解，对工作语言Java本身的理解，对所应用到的一些知识的理解也都进了一步，不过这都是在结合别人建议之后进行加深的，这也是以后的方向，毕竟一个剑客也要对自己的剑了如指掌，才能在交战中取得胜利，才能够格参透更高深的剑意。其次是专业知识的广度也有所增长，了解到了很多新的专业方向，但是了解都很泛，明年一定要选其中的几个深入理解，只有看得招数多了，才能悟出自己的招数，就似独孤九剑，所谓无招胜有招不过就是临敌经验，以及对抓重点能力的锻炼。再次是对专业知识外的书籍的阅读，知晓了王阳明的知行合一与致良知，重新理解了格物致知，看到了东野圭吾除了悬疑推理的另一面，说到这里还是应当感谢曾老师，真的是他带我体会到了阅读的乐趣。最后是关于实习工作上的，从小公司到大公司，一方面认识到了小组内很多优秀的人，另一方面就是看到了优秀的人是如何设计，如何写代码的，致使我对面向对象有了新的认识，参与开发之后再回头看自己几个月前写的代码，实在觉得丑陋无比，新的一年也应当加油，写出更优雅的代码，将优雅当成一种习惯。</p><p>&emsp;&emsp;不足之处其实非常多，大的方面就是以下几个。第一，基础知识不牢固，这一点是硬伤，一方面是因为类似操作系统，编译原理，没有系统的学习，造成自己对一些知识不能够连贯起来，这方面一定要补，下半年或者明年，毕竟根基不稳，大厦很容易倒塌；另一方面在于学过的知识在用的时候会想不起来，例如B树，图，这些知识并不冷门，解决方法就是一定要温故而知新，并且做到深入理解，只有理解了才会不容易忘掉。第二，对自己所用工具参透不够，很多东西都是会用的程度，这不是个好事情，只有真正理解了剑招，才会不拘泥于招式本身，才能发现其更深层的东西。第三，对于新知识的获取，这一年感觉自己的视野在学习这一块儿过于狭隘了，很多所使用的技术都是陈旧的技术，应当树立起获取新知识的意识，明白时势走向；这一点和内外功都有关系，这一年的目标就是先深入理解自己所用，再竭尽所能了解语言发展的趋势。</p><p>&emsp;&emsp;回头看来，2017年我的进步本可以更大，因为不得法，也浪费了很多时间，现在既然明白了很多学习方法，那么新的一年将是提速的一年。</p><h3 id="为人处事"><a href="#为人处事" class="headerlink" title="为人处事"></a>为人处事</h3><p>&emsp;&emsp;按理来说添一岁就要在这方面有更大的进步，虽然整体上来看是有进步的，但是2017年这一方面的进步也不是很大。不知道是不是长时间和计算机打交道就会延缓这方面的长进，我觉得应当不是的，计算机也不会接这个锅。还是自己过于懒惰，其实社交并不比做题要简单，自己潜意识里因为觉得复杂可能就不去做了，这样是不行的，新的一年首先也克服这方面的惰性。</p><p>&emsp;&emsp;待人方面可能确实是阅读的缘故，比以前来讲能够更加体谅别人了，不会过于的冲动。但还不够，还应当多试着真正地站到对方的角度思考问题，而不是揣着自己的思想，自己的想法替别人思考，那还是自己想要达到的目的，自己还是受益者。第二，自己还是过于的小气，对一些事物，不能够正确的看待，总觉得自己会吃亏，这样也是不好的，服务于人才能受惠于人，而不是让别人先服务自己，这一方面应该加强提高，大丈夫应当心怀天下，包容万物，不应睚眦必报。</p><p>&emsp;&emsp;对于父母，这一年自己表现得非常差。母亲身上确实现在在我看来有很多不足，这也激发了我态度上的不恭敬，总感觉自己读了一些书就可以选择不听甚至驳斥母亲，导致发生了很多不愉快的事情。母亲其实心我从来都没有怀疑过，对我肯定是好的，但是做事上可能确实是由于文化程度不高，找不到一个合理的方式来处理。很多时候母亲的唠叨，故意找事情，确实也是因为其实我在家时间并不长，想和我熟络熟络。母亲爱说话，爱说车轱辘话，对很多事物想要了解，这些在我看来是缺点，但母亲可能只是真的是感到孤独了。在新的一年自己一定一定要好好对待母亲，不入耳的事情就左耳朵进右耳朵出，不要和母亲发生争执，毕竟对外人都可以做到有耐心，怎么对最亲近的人却不行。每个人都不可能是完美的，不是有这样的问题就是有那样的问题，既然这样那就认可这样的问题。今年目标，发现母亲身上5个优点。</p><h3 id="最有感悟的事"><a href="#最有感悟的事" class="headerlink" title="最有感悟的事"></a>最有感悟的事</h3><p>&emsp;&emsp;是在读王阳明时书中的一则故事，在宁王造反时欲攻南京，途中遇到一个小城，守城将士才三千人，宁王有数万大军，宁王劝其守城太守投降，并许以高官厚禄，但这位不知名的太守大骂宁王造反之徒，并且顽强抵抗。直到王阳明攻取宁王南昌府邸。之前不明白文人的气节为何物，看到这个故事才有所理解。并且古时的做官之人大多都是文人，但守城带兵毫不逊色，真的是很厉害。</p><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>&emsp;&emsp;小小流水账实在难以容下一年的时光，2017对于我来说也算是蛮不顺的一年，既然已经过去，那新的一年就要有新的气象。希望自己不忘初心，不负青春。</p>]]></content>
     
     
+    <categories>
+      
+      <category>其他</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>日常</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Maven的filtering和profile标签使用</title>
+    <link href="undefined2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/"/>
+    <url>2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/</url>
+    
+    <content type="html"><![CDATA[<h2 id="使用Maven-将项目分版"><a href="#使用Maven-将项目分版" class="headerlink" title="使用Maven 将项目分版"></a>使用Maven 将项目分版</h2><h4 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h4><blockquote><p>每个项目通常都会用不同的配置文件对应不同的版本，例如开发版和上线版本的配置通常会是不同的。此时就会产生一个问题，当项目需要从开发版切换到上线版时，总是会避免不了更改很多配置项，或者切换配置文件，但是不管哪一种都不方便配置。使用Maven就可以很方便的帮助我们应对这种问题，本文就简单介绍一下使用方法。</p></blockquote><h4 id="resources属性"><a href="#resources属性" class="headerlink" title="resources属性"></a>resources属性</h4><blockquote><p>这个属性就是指定构建项目时需要将哪些配置文件打包，其本身包含很多子标签，这里就不一一介绍了，只介绍相关的。其中<strong>include</strong>就是指定需要包含在最终项目中的资源。</p></blockquote><pre><code class="xml"> &lt;resources&gt;            &lt;resource&gt;                &lt;directory&gt;src/main/java&lt;/directory&gt;                &lt;includes&gt;                    &lt;include&gt;**/*.xml&lt;/include&gt;                &lt;/includes&gt;            &lt;/resource&gt;            &lt;resource&gt;                &lt;directory&gt;src/main/resources&lt;/directory&gt;                &lt;filtering&gt;true&lt;/filtering&gt;                &lt;includes&gt;                    &lt;include&gt;*.properties&lt;/include&gt;                    &lt;include&gt;*.xml&lt;/include&gt;                &lt;/includes&gt;            &lt;/resource&gt;</code></pre><blockquote><p>在上面的<strong>resource</strong>标签意思是将src/main/java/下的文件夹及其子文件夹的xml文件在编译时包含在最终工程中。<strong>这个配置可以解决mybatis的将mapper接口和mapper.xml放在同一个文件夹下找不到mapper的问题</strong>。</p><p>下面的<strong>resource</strong>标签是本文重点要介绍的。其含义是扫描src/main/resources/下的所有properties和xml文件将其中的${}引用在打包时换成直接引用。<strong>filtering</strong>标签的作用就是这个。</p></blockquote><h4 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h4><img src="/2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/1.jpg" srcset="/img/loading.gif" class=""><blockquote><p>上图为本次示例的项目结构，dev.properties对应开发版配置，prod.properties对应上线版配置。</p></blockquote><pre><code class="properties">#prod.properties#databasejdbc.mysql.url=jdbc:mysql://localhost:3306/car?useUnicode=true&amp;characterEncoding=UTF-8jdbc.mysql.driver=com.mysql.jdbc.Driverjdbc.mysql.user=guojingjdbc.mysql.password=huangrong</code></pre><pre><code class="properties">#config.properties#databasejdbc.url=${jdbc.mysql.url}jdbc.driver=${jdbc.mysql.driver}jdbc.user=${jdbc.mysql.user}jdbc.password=${jdbc.mysql.password}</code></pre><h5 id="通过profile标签使上线版配置文件生效"><a href="#通过profile标签使上线版配置文件生效" class="headerlink" title="通过profile标签使上线版配置文件生效"></a>通过profile标签使上线版配置文件生效</h5><pre><code class="xml">&lt;profiles&gt;        &lt;profile&gt;            &lt;id&gt;dev&lt;/id&gt;            &lt;build&gt;                &lt;filters&gt;                    &lt;filter&gt;src/main/resources/filters/dev.properties&lt;/filter&gt;                &lt;/filters&gt;            &lt;/build&gt;        &lt;/profile&gt;        &lt;profile&gt;            &lt;id&gt;prod&lt;/id&gt;              &lt;activation&gt; &lt;!-- 这里是关键，让这个版本默认激活 --&gt;                &lt;activeByDefault&gt;true&lt;/activeByDefault&gt;            &lt;/activation&gt;            &lt;build&gt;                &lt;filters&gt;                    &lt;filter&gt;src/main/resources/filters/prod.properties&lt;/filter&gt;                &lt;/filters&gt;            &lt;/build&gt;        &lt;/profile&gt;    &lt;/profiles&gt;</code></pre><img src="/2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/2.jpg" srcset="/img/loading.gif" class=""><img src="/2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/3.jpg" srcset="/img/loading.gif" class=""><blockquote><p>设置完毕后可以通过ctrl加鼠标左键点击符号引用可以直接跳转到内容，编译后可以发现符号引用变成了实际内容，至此完成了使用Maven分版本开发配置。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Maven</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>实习面试记录</title>
+    <link href="undefined2017/11/20/%E5%AE%9E%E4%B9%A0%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/"/>
+    <url>2017/11/20/%E5%AE%9E%E4%B9%A0%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/</url>
+    
+    <content type="html"><![CDATA[<h4 id="spring相关"><a href="#spring相关" class="headerlink" title="spring相关"></a>spring相关</h4><blockquote><p>1.springmvc 工作流程</p><p>2.springmvc mapping种类</p><p>3.spirng 工作原理</p><p>4.Aop 概念以及spring aop实现的方式</p><p>5.spring 启动过程</p></blockquote><h4 id="集合框架"><a href="#集合框架" class="headerlink" title="集合框架"></a>集合框架</h4><blockquote><p>1.hashmap原理</p><p>2.concurrentHashMap和hashtable，hashmap的区别</p></blockquote><h4 id="多线程"><a href="#多线程" class="headerlink" title="多线程"></a>多线程</h4><blockquote><p>1.原子类</p><p>2.wait和sleep的区别</p><p>3.某线程获得锁后能否反复进入被synchronized加锁的代码或方法</p><p>4.countdownLaunch的实现原理</p><p>5.多线程的学习方法：没有困难制造困难。</p></blockquote><h4 id="jvm相关"><a href="#jvm相关" class="headerlink" title="jvm相关"></a>jvm相关</h4><blockquote><p>1.jvm编译时做了哪些优化（我说我挺懂jvm的，直接给我抛出了这个问题，当时就感觉自己嘴怎么这么贱。。）</p><p>2.堆内存如何分配的（当时答得不好，他提示说新生代和老年代是不一样的，面试完才想起来这不就是垃圾回收算法的知识嘛。。还是不熟，死记课本不行啊。。）</p></blockquote><h4 id="数据结构"><a href="#数据结构" class="headerlink" title="数据结构"></a>数据结构</h4><blockquote><p>1.B树，B*树，能否根据所给数组形成B树（当时都忘了B树是啥样的了，只记得可以做索引。。平时一定要来回翻看，不然就会感觉到书到用时方恨少了。。）</p><p>2.红黑树原理，作用</p><p>3.堆排序（要能写代码，当时怂了说可以试试，虽然复习了一下但是记得不牢）</p></blockquote><h4 id="Java基础"><a href="#Java基础" class="headerlink" title="Java基础"></a>Java基础</h4><blockquote><p>1.Object类的常用方法</p><p>2.hashCode()的作用</p><p>3.equals和==的区别</p></blockquote><h4 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h4><blockquote><p>1.Mysql索引数据结构</p><p>2.Mysql的DB种类，区别，各有什么有点</p><p>3.Mysql调优</p></blockquote><h4 id="Redis"><a href="#Redis" class="headerlink" title="Redis"></a>Redis</h4><blockquote><p>1.redis应用场景</p><p>2.redis数据类型</p><p>3.redis的底层原理</p><p>4.redis是单线程还是多线程</p></blockquote><h4 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h4><blockquote><p>1.tcp三次握手</p><p>2.netty的实现原理（也是当时嘴贱了，说自己会用netty，但是已经好久没用了。。）</p><p>3.如何构建一个类似微博的发布订阅系统（面试官大哥循循善诱，但最后都是大哥说出来的。。战战兢兢）</p><p>4.zookeeper的作用，原理（分布式服务注册和发现）</p></blockquote><h4 id="算法题"><a href="#算法题" class="headerlink" title="算法题"></a>算法题</h4><blockquote><p>1.输入：一个无序数组，长度为n。</p><p>​    输出：随便一个可以拆成两个数组其他成员的值。</p><p>​    例子：输入：{2,3,1,3,9,5}     输出：5</p><p>​     思路：可用map做，从后往前扫描，时间复杂度为O(n)</p><p>2.输入：一个大小为n的数组，值域为[0,n-1]</p><p>输出：找出一个重复的值并返回</p><p>例子：输入：{3,2,5,1,2,8}         输出：2</p><p>​    思路一：可用一个长度为n的char数组，其值代表原数组中的等于此下标的值出现的次数。时间复杂度为O(n),空间复杂度为O(n)。</p><p>​     思路二：可以通过对比当前值和以当前值为索引的数组值是否相等，若不相等，赋值给以当前值为索引值的位置，将原位置的值按同样逻辑进行迭代，最后相等即返回。</p><p>3.输入：大小为n的数组，其他不规定</p><p>输出：出现奇数次的唯一的一个值</p><p>例子：输入：{1,1,2,2,3,4,4,5,5}          输出：3</p><p>思路：用异或的特性，一个数异或自己等于0</p><p>4.上一题的变形，其他数都出现三次（可从位运算入手）</p></blockquote><h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><blockquote><p>1.牢牢把握住基础知识。面试官其实说了对应届生的要求就是基础知识要牢固（操作系统，算法，数据结构，网络，语言本身），对于其中的基础算法和数据结构，懂原理，能手写是基本，若写不出来为减分项。</p><p>2.手写代码能力要加强。其中小米面试很独特，算法几乎都要手写，不管难易。其他的一些也一样，但是要求会松一点。不过这是一个趋势。</p><p>3.把使用的工具深入理解。不能过于浮于应用的表面，应当深入理解原理。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>面试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>面试</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Java实现二叉树的三种非递归遍历</title>
+    <link href="undefined2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/"/>
+    <url>2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Java-实现二叉树的三种非递归遍历"><a href="#Java-实现二叉树的三种非递归遍历" class="headerlink" title="Java 实现二叉树的三种非递归遍历"></a>Java 实现二叉树的三种非递归遍历</h2><h3 id="1-思路"><a href="#1-思路" class="headerlink" title="1.思路"></a>1.思路</h3><blockquote><p>其实思路就是递归的思路，无非就是加入了栈这个数据结构。</p><p>具体来看代码吧，个人觉得还算简洁。</p></blockquote><h3 id="2-实现"><a href="#2-实现" class="headerlink" title="2.实现"></a>2.实现</h3><h4 id="首先是结点数据结构的设置："><a href="#首先是结点数据结构的设置：" class="headerlink" title="首先是结点数据结构的设置："></a>首先是结点数据结构的设置：</h4><pre><code class="java">/** * @author WK */public class SearchBinaryTree {    //存放的结点标志    public String tag = &quot;&quot;;    //是否被便利的标志    public boolean flag = false;    //左孩子    public SearchBinaryTree leftChild = null;    //右孩子    public SearchBinaryTree rightChild = null;  //省略了getter，setter以及构造函数}</code></pre><h4 id="前序遍历"><a href="#前序遍历" class="headerlink" title="- 前序遍历"></a>- 前序遍历</h4><pre><code class="java">/**     *     * @param T 传入的树的根结点     */    public static void priorOrderNonRecursive(SearchBinaryTree T) {        //构造stack        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();        SearchBinaryTree p = T;        //保证所有节点被遍历过        while (p != null || (!binaryTrees.empty())) {            //未被遍历则输出tag，入栈            if (p.flag == false) {                System.out.println(p.tag);                p.flag = true;                binaryTrees.push(p);            }            //左孩子不为空且左孩子未被遍历过（防止重复入栈）            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {                p = p.leftChild;                continue;            }            //右孩子不为空且右孩子未被遍历过（防止重复入栈）            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {                p = p.rightChild;                continue;            }            //如果左右孩子都为空则需要出栈。            if (!binaryTrees.empty())                p = binaryTrees.pop();            else                p = null;        }    }</code></pre><h4 id="中序遍历"><a href="#中序遍历" class="headerlink" title="- 中序遍历"></a>- 中序遍历</h4><pre><code class="java"> /**     * 中序遍历和前序的区别就在于遍历的位置，也就是输出tag的位置，其他完全类似     * @param root 传入的树的根结点     */    public static void infixOrderNonRecursive(SearchBinaryTree root) {        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();        SearchBinaryTree p = root;        while (p != null || (!binaryTrees.empty())) {            if (p.flag == false)                binaryTrees.push(p);            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {                p = p.leftChild;                continue;            }            if (p.flag == false) {                System.out.println(p.tag);                p.flag = true;            }            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {                p = p.rightChild;                continue;            }            if (!binaryTrees.empty())                p = binaryTrees.pop();            else                p = null;        }    }</code></pre><h4 id="后序遍历"><a href="#后序遍历" class="headerlink" title="- 后序遍历"></a>- 后序遍历</h4><pre><code class="java">/**     *可以发现其实后序遍历的代码与前两个也类似，只是遍历位置不同，由此可见非循环遍历其实也并不难，掌握其中一个其他的也就掌握了     * @param root     */    public static void postOrderNonRecursive(SearchBinaryTree root) {        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();        SearchBinaryTree p = root;        while (p != null || (!binaryTrees.empty())) {            if (p.flag == false)                binaryTrees.push(p);            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {                p = p.leftChild;                continue;            }            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {                p = p.rightChild;                continue;            }            if (p.flag == false) {                System.out.println(p.tag);                p.flag = true;            }            if (!binaryTrees.empty())                p = binaryTrees.pop();            else                p = null;        }    }</code></pre><h3 id="3-测试"><a href="#3-测试" class="headerlink" title="3.测试"></a>3.测试</h3><p> 以这棵树为例：</p><img src="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/1.png" srcset="/img/loading.gif" class=""><p>初始化代码：</p><pre><code class="java">private static SearchBinaryTree initTree() {        SearchBinaryTree A = new SearchBinaryTree(&quot;A&quot;);        SearchBinaryTree B = new SearchBinaryTree(&quot;B&quot;);        SearchBinaryTree C = new SearchBinaryTree(&quot;C&quot;);        SearchBinaryTree D = new SearchBinaryTree(&quot;D&quot;);        SearchBinaryTree E = new SearchBinaryTree(&quot;E&quot;);        SearchBinaryTree F = new SearchBinaryTree(&quot;F&quot;);        SearchBinaryTree G = new SearchBinaryTree(&quot;G&quot;);        A.leftChild = B;        A.rightChild = F;        B.leftChild = C;        B.rightChild = D;        D.leftChild = E;        F.leftChild = G;        return A;    }</code></pre><p>测试：</p><pre><code class="java">  SearchBinaryTree root = initTree();        System.out.println(&quot;--------前序遍历开始：&quot;);        priorOrderNonRecursive(root);        System.out.println(&quot;--------中序遍历开始：&quot;);        root = initTree();        infixOrderNonRecursive(root);        System.out.println(&quot;--------后序遍历开始：&quot;);        root = initTree();        postOrderNonRecursive(root);</code></pre><p>结果：</p><pre><code class="java">--------前序遍历开始：ABCDEFG--------中序遍历开始：CBEDAGF--------后序遍历开始：CEDBGFA</code></pre><h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h3><blockquote><p>实现之后发现静下心来思考的话这个问题并不难，说明对其他事物来讲也应该这样，静心下来去做。</p></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>算法</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Vmare克隆虚拟机</title>
+    <link href="undefined2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/"/>
+    <url>2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/</url>
+    
+    <content type="html"><![CDATA[<h2 id="克隆虚拟机"><a href="#克隆虚拟机" class="headerlink" title="克隆虚拟机"></a>克隆虚拟机</h2><p>​    VMware虚拟机安装系统虽然方便，但是搭集群时如果每个结点都重新安装的话也是很耗时的。幸好VMware有个克隆功能，用起来非常方便，非常爽。下面就给出简单的克隆教程。前提是你已经有一个安装好系统且配置好环境的虚拟机。</p><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/0.png" srcset="/img/loading.gif" class=""><p>这里我就用图上的nginx虚拟机做演示，我安装的是centos7。</p><h3 id="1、右键nginx虚拟机–》快照–》拍摄快照"><a href="#1、右键nginx虚拟机–》快照–》拍摄快照" class="headerlink" title="1、右键nginx虚拟机–》快照–》拍摄快照"></a>1、右键nginx虚拟机–》快照–》拍摄快照</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/1.png" srcset="/img/loading.gif" class=""><h3 id="2、点击拍摄快照，快照拍摄成功。名称可自填"><a href="#2、点击拍摄快照，快照拍摄成功。名称可自填" class="headerlink" title="2、点击拍摄快照，快照拍摄成功。名称可自填"></a>2、点击拍摄快照，快照拍摄成功。名称可自填</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/2.png" srcset="/img/loading.gif" class=""><h3 id="3、再右键nginx虚拟机–》管理–》克隆"><a href="#3、再右键nginx虚拟机–》管理–》克隆" class="headerlink" title="3、再右键nginx虚拟机–》管理–》克隆"></a>3、再右键nginx虚拟机–》管理–》克隆</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/3.png" srcset="/img/loading.gif" class=""><h3 id="4、下一步"><a href="#4、下一步" class="headerlink" title="4、下一步"></a>4、下一步</h3><h3 id="5、选择现有快照–》下一步"><a href="#5、选择现有快照–》下一步" class="headerlink" title="5、选择现有快照–》下一步"></a>5、选择现有快照–》下一步</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/4.png" srcset="/img/loading.gif" class=""><h3 id="6、选择创建完整克隆–》下一步"><a href="#6、选择创建完整克隆–》下一步" class="headerlink" title="6、选择创建完整克隆–》下一步"></a>6、选择创建完整克隆–》下一步</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/5.png" srcset="/img/loading.gif" class=""><h3 id="7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。"><a href="#7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。" class="headerlink" title="7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。"></a>7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/6.png" srcset="/img/loading.gif" class=""><h3 id="8、至此我们完成了克隆虚拟机的任务"><a href="#8、至此我们完成了克隆虚拟机的任务" class="headerlink" title="8、至此我们完成了克隆虚拟机的任务"></a>8、至此我们完成了克隆虚拟机的任务</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/7.png" srcset="/img/loading.gif" class=""><h3 id="9、配置网络"><a href="#9、配置网络" class="headerlink" title="9、配置网络"></a>9、配置网络</h3><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/8.png" srcset="/img/loading.gif" class=""><p>​    什么都没设置网络居然是好的，但是回头看原虚拟机，发现原虚拟机访问不了网络了，果然有问题。</p><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/9.png" srcset="/img/loading.gif" class=""><h4 id="①、删除-etc-sysconfig-network-scripts-ifcfg-ens33-的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。"><a href="#①、删除-etc-sysconfig-network-scripts-ifcfg-ens33-的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。" class="headerlink" title="①、删除/etc/sysconfig/network-scripts/ifcfg-ens33 的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。"></a>①、删除/etc/sysconfig/network-scripts/ifcfg-ens33 的UUID这一行，因为每张网卡的<a href="http://www.itnpc.com/news/technology/" target="_blank" rel="noopener">mac地址</a>是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。</h4><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/10.png" srcset="/img/loading.gif" class=""><h4 id="②、进入-etc-udev-rules-d-这个目录，删除文件70-persistent-ipoib-rules然后重启。"><a href="#②、进入-etc-udev-rules-d-这个目录，删除文件70-persistent-ipoib-rules然后重启。" class="headerlink" title="②、进入/etc/udev/rules.d/这个目录，删除文件70-persistent-ipoib.rules然后重启。"></a>②、进入/etc/udev/rules.d/这个目录，删除文件70-persistent-ipoib.rules然后重启。</h4><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/11.png" srcset="/img/loading.gif" class=""><p>注意MAC地址和上面发生了变化，IP地址是我自己配的。至此网络也配好了。</p><img src="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/12.png" srcset="/img/loading.gif" class=""><p>外网也可以ping通。完美！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>vmare</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>编译安装nginx的坑</title>
+    <link href="undefined2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/"/>
+    <url>2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/</url>
+    
+    <content type="html"><![CDATA[<h2 id="编译安装nginx的坑"><a href="#编译安装nginx的坑" class="headerlink" title="编译安装nginx的坑"></a>编译安装nginx的坑</h2><h3 id="报错信息"><a href="#报错信息" class="headerlink" title="报错信息"></a>报错信息</h3><pre><code class="shell">make -f objs/Makefilemake[1]: Entering directory `/data/source/nginx&#39;cd /usr/local/ufo/lib/pcre \&amp;&amp; if [ -f Makefile ]; then make distclean; fi \&amp;&amp; CC=&quot;gcc&quot; CFLAGS=&quot;-O2 -fomit-frame-pointer -pipe &quot; \./configure --disable-shared/bin/sh: ./configure: No such file or directorymake[1]: *** [/usr/local/services/lib/pcre/Makefile] Error 127make[1]: Leaving directory `/data/source/nginx-0.7.61&#39;make: *** [build] Error 2</code></pre><h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><blockquote><p>一开始一点儿头绪都没有，上网查发现是少了pcre和zlib的包，后来添加上nginx自带的两个目录。./configure过了，但是make编译又出错，说是没找到pcre，但是我明明用<strong>–with-pcre=/pcre/home</strong>指定了啊，查来查去发现要指定源码目录。我用yum安装的pcre包，找了一下没找到源码啊，网上的博客也都是抄来抄去没解决我的问题，后来我就想没有那就下个源码包好了。就用下面两个命令下载好，解压好。终于编译通过。</p></blockquote><pre><code class="shell">wget https://jaist.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.gzwget https://jaist.dl.sourceforge.net/project/libpng/zlib/1.2.11/zlib-1.2.11.tar.gz</code></pre><blockquote><p>启动nginx发现外网访问无响应，才想起来防火墙没关，关掉防火墙访问，终于看到期待的画面。</p></blockquote><pre><code class="shell">systemctl stop firewalld.servicesystemctl disable firewalld.service</code></pre><img src="/2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/nginx_home.jpg" srcset="/img/loading.gif" class="">]]></content>
+    
+    
+    <categories>
+      
+      <category>编程</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>nginx</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>我们仨读后感</title>
+    <link href="undefined2017/10/28/%E6%88%91%E4%BB%AC%E4%BB%A8%E8%AF%BB%E5%90%8E%E6%84%9F/"/>
+    <url>2017/10/28/%E6%88%91%E4%BB%AC%E4%BB%A8%E8%AF%BB%E5%90%8E%E6%84%9F/</url>
+    
+    <content type="html"><![CDATA[<p>&emsp;&emsp;自从读完《围城》，似乎对读书就爱了起来。其实《围城》中多处的引经据典我都看不懂，但是依然觉得这本书写得是真好。因为从前那么不爱读书的我竟能不知不觉的看下去，直到看完才惊觉已然看完了。因此当然就对钱老产生了极大的兴趣，为什么作者这么厉害，看围城前对钱老的了解只是《寂静的钱钟书》那篇文章。后来慢慢了解到钱老经历之丰富，学识之渊博。真的是敬仰二字都不足以表达出我的感受。</p><p>&emsp;&emsp;读完《我们仨》才明白为什么围城中的序所写的钱老写书时给杨先生看，两人边看边笑。因为《围城》就是钱老回国后自己的故事啊，不同的是钱老有货真价实的学历与知识储备而且有他爱的圆圆。所以其实我很好奇《我们仨》中没写到的故事，就是钱老怎么和杨先生在一起，又有没有唐晓芙这个人呢？哈哈，就这两本书而言都给我同一种感觉，那就是读着不累，故事又很抓人，然而又不缺乏深度。我想这就是高级知识分子笔下的文章吧。</p><p>&emsp;&emsp;《我们仨》真的是一个非常温馨的故事，一家人不论什么时候总是彼此牵挂，在一起便无限欢喜，一家人在一起平平淡淡但又充满趣味。其中很有感触的一幕就是，钱老躺在船的床上，杨先生捏了捏钱老的手，而钱老动了动脚让圆圆抱住。一家人在那个时刻好像就融为了一体，谁都离不了谁。真的很美好，很幸福。</p><p>&emsp;&emsp;《我们仨》中就说到一次争吵，之后两人便商定不必求同。我想这才是真正的包容吧，虽然你我的想法完全不同，但我不否认你。不管是在学术上，还是在生活上，这一家人相互扶持，互相有完美切合。偶尔也奢望成为钱老家庭的一员，但是仔细一想，自己的知识水平也许连周阿姨也赶不上。</p><p>&emsp;&emsp;不过我也自有我的生活嘛。虽然肯定是离钱老一家人的状态差了十万八千里，但是这就是我的生活，独一无二。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>书籍</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>文学</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>大话设计模式读后感</title>
+    <link href="undefined2017/10/23/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E8%AF%BB%E5%90%8E%E6%84%9F/"/>
+    <url>2017/10/23/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E8%AF%BB%E5%90%8E%E6%84%9F/</url>
+    
+    <content type="html"><![CDATA[<p>&emsp;&emsp;算来从读这本书开始应该有一个多月了，刚开始读得时候真的是感觉像开启了新世界的大门，感觉太厉害了，全书都是一个个的小故事，故事中包含一个设计模式，真的让人感觉面向对象是一种思维，一门哲学，全书读起来十分抓人，个人感觉《HeadFirst设计模式》还要好。因为平时还有其他工作所以读完这本书花了一个月的时间，包括写书中的示例代码。虽然读完了这本书，但是感觉就如囫囵吞枣，很多东西都没理解，印象非常深刻的模式寥寥可数，还需要在实际的学习工作中深入理解。每个模式都非常的厉害，它们的存在让我感觉到写代码不是简单的复制粘贴，而是一门艺术。</p><p>&emsp;&emsp;看了设计模式之后感觉自己以前的代码真的是丑陋无比，简直就如建房子只会堆砖抹水泥一样。也终于体会到了一点儿工程师和码农的区别，体会到了一些什么才是真正的面向对象编程。并不是说用一门面向对象的语言就可以写出面向对象的代码。面向对象编程使代码耦合度的降低，因此软件的扩展性，复用性得到了极大的增强。</p><p>&emsp;&emsp;之前写代码真的是对设计几乎都没有如何想，觉得功能实现了就行了嘛，在适当地抽取一下复用的代码就算是对自己代码的最大优化。但是一旦因为需求变动修改代码时就会牵一发而动全身，很多地方都需要修改，自己隐隐也觉得不好，但是不得修改之法。在以后的工作中应当多思考如何应用所学的这些模式。</p><p>&emsp;&emsp;我一直觉得一篇文章，一本书只有让大家都能看进去，看懂，才能称得上是一篇优秀的文章，一本优秀的书。《大话设计模式》就是这样一本书。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>书籍</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>设计模式</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>LengthFieldBasedFrameDecoder官方文档翻译</title>
+    <link href="undefined2017/09/25/LengthFieldBasedFrameDecoder%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91/"/>
+    <url>2017/09/25/LengthFieldBasedFrameDecoder%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E7%BF%BB%E8%AF%91/</url>
+    
+    <content type="html"><![CDATA[<h2 id="Netty的LengthFieldBasedFrameDecoder解码器官方文档翻译"><a href="#Netty的LengthFieldBasedFrameDecoder解码器官方文档翻译" class="headerlink" title="Netty的LengthFieldBasedFrameDecoder解码器官方文档翻译"></a>Netty的LengthFieldBasedFrameDecoder解码器官方文档翻译</h2><blockquote><pre><code class="html">* A decoder that splits the received {@link ByteBuf}s dynamically by the* value of the length field in the message.  It is particularly useful when you* decode a binary message which has an integer header field that represents the* length of the message body or the whole message.* &lt;p&gt;* {@link LengthFieldBasedFrameDecoder} has many configuration parameters so* that it can decode any message with a length field, which is often seen in* proprietary client-server protocols. Here are some example that will give* you the basic idea on which option does what.*</code></pre></blockquote><blockquote><p>这是一个通过收到的消息的长度值动态分割消息的解码器。当你解码的二进制消息拥有一个整型的头部域（其中包含了消息体或整个消息的长度）时是非常有用的。</p><p>它有非常多的配置参数，因此它可以通过长度域解码任何消息，这在平常的客户端和服务器的协议中是很常见的。这儿有一些例子将会使你对这些参数做什么有个大概的了解。</p></blockquote><hr><blockquote><pre><code class="html">* &lt;h3&gt;2 bytes length field at offset 0, do not strip header&lt;/h3&gt;** The value of the length field in this example is &lt;tt&gt;12 (0x0C)&lt;/tt&gt; which* represents the length of &quot;HELLO, WORLD&quot;.  By default, the decoder assumes* that the length field represents the number of the bytes that follows the* length field.  Therefore, it can be decoded with the simplistic parameter* combination.* &lt;pre&gt;* &lt;b&gt;lengthFieldOffset&lt;/b&gt;   = &lt;b&gt;0&lt;/b&gt;* &lt;b&gt;lengthFieldLength&lt;/b&gt;   = &lt;b&gt;2&lt;/b&gt;* lengthAdjustment    = 0* initialBytesToStrip = 0 (= do not strip header)** BEFORE DECODE (14 bytes)         AFTER DECODE (14 bytes)* +--------+----------------+      +--------+----------------+* | Length | Actual Content |-----&gt;| Length | Actual Content |* | 0x000C | &quot;HELLO, WORLD&quot; |      | 0x000C | &quot;HELLO, WORLD&quot; |* +--------+----------------+      +--------+----------------+* &lt;/pre&gt;*</code></pre></blockquote><blockquote><p>例子一：2字节长偏移量为0，不去头</p><p>在这个例子中值的长度为12（0x0c），就是“HELLO, WORLD ”的长度。默认情况下，该解码器会假定长度域代表了跟在长度域后面的字节数。因此，它可以用最简单的参数组合解码。</p><pre><code class="html">&lt;b&gt;lengthFieldOffset&lt;/b&gt;   = &lt;b&gt;0&lt;/b&gt;* &lt;b&gt;lengthFieldLength&lt;/b&gt;   = &lt;b&gt;2&lt;/b&gt;* lengthAdjustment    = 0* initialBytesToStrip = 0 (= 不去头)BEFORE DECODE (14 bytes)         AFTER DECODE (14 bytes) * +--------+----------------+      +--------+----------------+ * | Length | Actual Content |-----&gt;| Length | Actual Content | * | 0x000C | &quot;HELLO, WORLD&quot; |      | 0x000C | &quot;HELLO, WORLD&quot; | * +--------+----------------+      +--------+----------------+ * &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code class="html">* &lt;h3&gt;2 bytes length field at offset 0, strip header&lt;/h3&gt;** Because we can get the length of the content by calling* {@link ByteBuf#readableBytes()}, you might want to strip the length* field by specifying &lt;tt&gt;initialBytesToStrip&lt;/tt&gt;.  In this example, we* specified &lt;tt&gt;2&lt;/tt&gt;, that is same with the length of the length field, to* strip the first two bytes.* &lt;pre&gt;* lengthFieldOffset   = 0* lengthFieldLength   = 2* lengthAdjustment    = 0* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt;2&lt;/b&gt; (= the length of the Length field)** BEFORE DECODE (14 bytes)         AFTER DECODE (12 bytes)* +--------+----------------+      +----------------+* | Length | Actual Content |-----&gt;| Actual Content |* | 0x000C | &quot;HELLO, WORLD&quot; |      | &quot;HELLO, WORLD&quot; |* +--------+----------------+      +----------------+* &lt;/pre&gt;*</code></pre></blockquote><blockquote><p>例子二: 2字节的长度域，偏移量为0，去头</p><p>因为我们通常可以调用ByteBuf的readableBytes()方法获得内容的长度，所以你可能会想且可以通过<strong>initialBytesToStrip</strong>去掉长度域。在这个例子中，我们指定其值为2，它和长度域的长度是相同的，去掉头两个字节。</p><pre><code>* &lt;pre&gt;* lengthFieldOffset   = 0* lengthFieldLength   = 2* lengthAdjustment    = 0* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt;2&lt;/b&gt; (= 长度域的长度)** BEFORE DECODE (14 bytes)         AFTER DECODE (12 bytes)* +--------+----------------+      +----------------+* | Length | Actual Content |-----&gt;| Actual Content |* | 0x000C | &quot;HELLO, WORLD&quot; |      | &quot;HELLO, WORLD&quot; |* +--------+----------------+      +----------------+* &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code class="html">** &lt;h3&gt;2 bytes length field at offset 0, do not strip header, the length field*     represents the length of the whole message&lt;/h3&gt;** In most cases, the length field represents the length of the message body* only, as shown in the previous examples.  However, in some protocols, the* length field represents the length of the whole message, including the* message header.  In such a case, we specify a non-zero* &lt;tt&gt;lengthAdjustment&lt;/tt&gt;.  Because the length value in this example message* is always greater than the body length by &lt;tt&gt;2&lt;/tt&gt;, we specify &lt;tt&gt;-2&lt;/tt&gt;* as &lt;tt&gt;lengthAdjustment&lt;/tt&gt; for compensation.* &lt;pre&gt;* lengthFieldOffset   =  0* lengthFieldLength   =  2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;-2&lt;/b&gt; (= the length of the Length field)* initialBytesToStrip =  0** BEFORE DECODE (14 bytes)         AFTER DECODE (14 bytes)* +--------+----------------+      +--------+----------------+* | Length | Actual Content |-----&gt;| Length | Actual Content |* | 0x000E | &quot;HELLO, WORLD&quot; |      | 0x000E | &quot;HELLO, WORLD&quot; |* +--------+----------------+      +--------+----------------+* &lt;/pre&gt;</code></pre></blockquote><blockquote><p>例子三: 2字节长度域偏移量为0，不去头，长度域的值代表了整个消息的长度。</p><p>在大多数情况下，长度域仅仅表示消息体的长度，就像之前的例子一样。然而，在一些协议中，长度域代表了整个消息的长度，包含消息头。在这样的情况下，我们指定一个负的<strong>lengthAdjustment</strong>。因为长度的值通常要比消息体的长度大<strong>2</strong>字节，我们为该值指定为<strong>-2</strong>。</p><pre><code class="html">* lengthFieldOffset   =  0* lengthFieldLength   =  2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;-2&lt;/b&gt; (= 长度域的长度)* initialBytesToStrip =  0** BEFORE DECODE (14 bytes)         AFTER DECODE (14 bytes)* +--------+----------------+      +--------+----------------+* | Length | Actual Content |-----&gt;| Length | Actual Content |* | 0x000E | &quot;HELLO, WORLD&quot; |      | 0x000E | &quot;HELLO, WORLD&quot; |* +--------+----------------+      +--------+----------------+* &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code>* &lt;h3&gt;3 bytes length field at the end of 5 bytes header, do not strip header&lt;/h3&gt;** The following message is a simple variation of the first example.  An extra* header value is prepended to the message.  &lt;tt&gt;lengthAdjustment&lt;/tt&gt; is zero* again because the decoder always takes the length of the prepended data into* account during frame length calculation.* &lt;pre&gt;* &lt;b&gt;lengthFieldOffset&lt;/b&gt;   = &lt;b&gt;2&lt;/b&gt; (= the length of Header 1)* &lt;b&gt;lengthFieldLength&lt;/b&gt;   = &lt;b&gt;3&lt;/b&gt;* lengthAdjustment    = 0* initialBytesToStrip = 0** BEFORE DECODE (17 bytes)                      AFTER DECODE (17 bytes)* +----------+----------+----------------+      +----------+----------+----------------+* | Header 1 |  Length  | Actual Content |-----&gt;| Header 1 |  Length  | Actual Content |* |  0xCAFE  | 0x00000C | &quot;HELLO, WORLD&quot; |      |  0xCAFE  | 0x00000C | &quot;HELLO, WORLD&quot; |* +----------+----------+----------------+      +----------+----------+----------------+* &lt;/pre&gt;*</code></pre></blockquote><blockquote><p>例子四: 3字节长度域在5字节的消息头最后，不去头</p><p>下面的消息是第一个例子的小变种。消息添加了一个额外的头部。<strong>lengthAdjustment</strong>还是0，因为解码器总是将添加的数据计算在内。</p><pre><code class="html">* &lt;pre&gt;* &lt;b&gt;lengthFieldOffset&lt;/b&gt;   = &lt;b&gt;2&lt;/b&gt; (= the length of Header 1)* &lt;b&gt;lengthFieldLength&lt;/b&gt;   = &lt;b&gt;3&lt;/b&gt;* lengthAdjustment    = 0* initialBytesToStrip = 0** BEFORE DECODE (17 bytes)                      AFTER DECODE (17 bytes)* +----------+----------+----------------+      +----------+----------+----------------+* | Header 1 |  Length  | Actual Content |-----&gt;| Header 1 |  Length  | Actual Content |* |  0xCAFE  | 0x00000C | &quot;HELLO, WORLD&quot; |      |  0xCAFE  | 0x00000C | &quot;HELLO, WORLD&quot; |* +----------+----------+----------------+      +----------+----------+----------------+* &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code class="html">* &lt;h3&gt;3 bytes length field at the beginning of 5 bytes header, do not strip header&lt;/h3&gt;** This is an advanced example that shows the case where there is an extra* header between the length field and the message body.  You have to specify a* positive &lt;tt&gt;lengthAdjustment&lt;/tt&gt; so that the decoder counts the extra* header into the frame length calculation.* &lt;pre&gt;* lengthFieldOffset   = 0* lengthFieldLength   = 3* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;2&lt;/b&gt; (= the length of Header 1)* initialBytesToStrip = 0** BEFORE DECODE (17 bytes)                      AFTER DECODE (17 bytes)* +----------+----------+----------------+      +----------+----------+----------------+* |  Length  | Header 1 | Actual Content |-----&gt;|  Length  | Header 1 | Actual Content |* | 0x00000C |  0xCAFE  | &quot;HELLO, WORLD&quot; |      | 0x00000C |  0xCAFE  | &quot;HELLO, WORLD&quot; |* +----------+----------+----------------+      +----------+----------+----------------+* &lt;/pre&gt;</code></pre></blockquote><blockquote><p>例子五: 3字节的长度域在5字节头的开头，不去头</p><p>这是一个进阶的例子，在长度域及消息体之间有其它的头信息。你不得不指定一个正的<strong>lengthAdjustment</strong>使得解码器在计算帧长度时算上额外的头部。</p><pre><code class="html">* &lt;pre&gt;* lengthFieldOffset   = 0* lengthFieldLength   = 3* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;2&lt;/b&gt; (= 额外头部的长度)* initialBytesToStrip = 0** BEFORE DECODE (17 bytes)                      AFTER DECODE (17 bytes)* +----------+----------+----------------+      +----------+----------+----------------+* |  Length  | Header 1 | Actual Content |-----&gt;|  Length  | Header 1 | Actual Content |* | 0x00000C |  0xCAFE  | &quot;HELLO, WORLD&quot; |      | 0x00000C |  0xCAFE  | &quot;HELLO, WORLD&quot; |* +----------+----------+----------------+      +----------+----------+----------------+* &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code class="html">** &lt;h3&gt;2 bytes length field at offset 1 in the middle of 4 bytes header,*     strip the first header field and the length field&lt;/h3&gt;** This is a combination of all the examples above.  There are the prepended* header before the length field and the extra header after the length field.* The prepended header affects the &lt;tt&gt;lengthFieldOffset&lt;/tt&gt; and the extra* header affects the &lt;tt&gt;lengthAdjustment&lt;/tt&gt;.  We also specified a non-zero* &lt;tt&gt;initialBytesToStrip&lt;/tt&gt; to strip the length field and the prepended* header from the frame.  If you don&#39;t want to strip the prepended header, you* could specify &lt;tt&gt;0&lt;/tt&gt; for &lt;tt&gt;initialBytesToSkip&lt;/tt&gt;.* &lt;pre&gt;* lengthFieldOffset   = 1 (= the length of HDR1)* lengthFieldLength   = 2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;1&lt;/b&gt; (= the length of HDR2)* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt;3&lt;/b&gt; (= the length of HDR1 + LEN)** BEFORE DECODE (16 bytes)                       AFTER DECODE (13 bytes)* +------+--------+------+----------------+      +------+----------------+* | HDR1 | Length | HDR2 | Actual Content |-----&gt;| HDR2 | Actual Content |* | 0xCA | 0x000C | 0xFE | &quot;HELLO, WORLD&quot; |      | 0xFE | &quot;HELLO, WORLD&quot; |* +------+--------+------+----------------+      +------+----------------+* &lt;/pre&gt;*</code></pre></blockquote><blockquote><p>例子六: 2字节长度域偏移量为1，在4字节头部的中间，去掉第一个和长度头部域。</p><p>这是一个前面全部例子的集合。长度域前后都有额外的信息。附加的头部信息影响了<strong>lengthFieldOffset</strong>的值，额外的头信息影响了<strong>lengthAdjustment</strong>的值。我们还需要指定一个负的<strong>initialBytesToStrip</strong>以去掉附加的和长度域头部。如果你不想去掉附加的头部域，你可以将<strong>initialBytesToSkip</strong>设置为0。</p><pre><code class="html">* &lt;pre&gt;* lengthFieldOffset   = 1 (= the length of HDR1)* lengthFieldLength   = 2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;1&lt;/b&gt; (= the length of HDR2)* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt;3&lt;/b&gt; (= the length of HDR1 + LEN)** BEFORE DECODE (16 bytes)                       AFTER DECODE (13 bytes)* +------+--------+------+----------------+      +------+----------------+* | HDR1 | Length | HDR2 | Actual Content |-----&gt;| HDR2 | Actual Content |* | 0xCA | 0x000C | 0xFE | &quot;HELLO, WORLD&quot; |      | 0xFE | &quot;HELLO, WORLD&quot; |* +------+--------+------+----------------+      +------+----------------+* &lt;/pre&gt;</code></pre></blockquote><hr><blockquote><pre><code>** &lt;h3&gt;2 bytes length field at offset 1 in the middle of 4 bytes header,*     strip the first header field and the length field, the length field*     represents the length of the whole message&lt;/h3&gt;** Let&#39;s give another twist to the previous example.  The only difference from* the previous example is that the length field represents the length of the* whole message instead of the message body, just like the third example.* We have to count the length of HDR1 and Length into &lt;tt&gt;lengthAdjustment&lt;/tt&gt;.* Please note that we don&#39;t need to take the length of HDR2 into account* because the length field already includes the whole header length.* &lt;pre&gt;* lengthFieldOffset   =  1* lengthFieldLength   =  2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;-3&lt;/b&gt; (= the length of HDR1 + LEN, negative)* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt; 3&lt;/b&gt;** BEFORE DECODE (16 bytes)                       AFTER DECODE (13 bytes)* +------+--------+------+----------------+      +------+----------------+* | HDR1 | Length | HDR2 | Actual Content |-----&gt;| HDR2 | Actual Content |* | 0xCA | 0x0010 | 0xFE | &quot;HELLO, WORLD&quot; |      | 0xFE | &quot;HELLO, WORLD&quot; |* +------+--------+------+----------------+      +------+----------------+* &lt;/pre&gt;</code></pre></blockquote><blockquote><p>例子七: 2字节长度域偏移量为1，在4字节头部的中间，去掉第一个头部域和长度域，长度域代表了整个信息的长度。</p><p>这个例子是上个例子的小变形。唯一不同就是长度域的值表示了整个信息的长度。我们不得不将第一个头部和长度域计算到<strong>lengthAdjustment</strong>。请记住我们不需要计算第二个头部域的长度，因为长度域已经包含了整个头部的长度。</p><pre><code>* &lt;pre&gt;* lengthFieldOffset   =  1* lengthFieldLength   =  2* &lt;b&gt;lengthAdjustment&lt;/b&gt;    = &lt;b&gt;-3&lt;/b&gt; (= the length of HDR1 + LEN, negative)* &lt;b&gt;initialBytesToStrip&lt;/b&gt; = &lt;b&gt; 3&lt;/b&gt;** BEFORE DECODE (16 bytes)                       AFTER DECODE (13 bytes)* +------+--------+------+----------------+      +------+----------------+* | HDR1 | Length | HDR2 | Actual Content |-----&gt;| HDR2 | Actual Content |* | 0xCA | 0x0010 | 0xFE | &quot;HELLO, WORLD&quot; |      | 0xFE | &quot;HELLO, WORLD&quot; |* +------+--------+------+----------------+      +------+----------------+* &lt;/pre&gt;</code></pre></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+      <tag>NIO</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>NIO学习总结</title>
+    <link href="undefined2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/"/>
+    <url>2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h1 id="NIO-学习总结"><a href="#NIO-学习总结" class="headerlink" title="NIO 学习总结"></a>NIO 学习总结</h1><h2 id="1-学习感悟"><a href="#1-学习感悟" class="headerlink" title="1.学习感悟"></a>1.学习感悟</h2><p>&emsp;&emsp;Java NIO是自jdk1.4以来就有的一个包。里面提供了大量的与普通IO不同的API。主要的不同点就在于N，有两种解释，一种是new，一种是nonblocking。学习完了之后我觉得两种说法都对，因为这部分API和典型的IO思想上完全不一样，而不一样之处中很重要的一点就是nonblocking这个特性。</p><p>&emsp;&emsp;整体的学习是从构建非阻塞型Socket通信开始的，之前是一直在学习Socket的知识，因为在项目中用到了而且对于自己来说是难点，所以特地学习了一下，收获也非常多，不过Socket部分另起一篇文章写。</p><p>&emsp;&emsp;NIO之前就明白很重要，但是一开始看Java核心技术的介绍并没有看进去，以为很难，学完之后发现并不然，重要的是要找到一个好的资源。我对NIO的学习大部分都是通过一个外国小哥的博客，链接在这里（tutorials.jenkov.com）。文章是14年就发表在网站上的，感觉自己要跟上这个时代真的是要做很多努力。博客中技术十分全面，Java的各种核心包都有教程，虽是英文，但是并不难懂，且有图有代码结合说明十分的便于理解。</p><p>&emsp;&emsp;目前基本明白了NIO的思想以及各种API的调用，但是缺乏实战经验，所以理解可能很片面，还需要不断的加深理解。毕竟这个行业是要不断学习的嘛。</p><h2 id="2-学习内容"><a href="#2-学习内容" class="headerlink" title="2.学习内容"></a>2.学习内容</h2><h3 id="1-三大组件"><a href="#1-三大组件" class="headerlink" title="1. 三大组件"></a>1. 三大组件</h3><ul><li>Buffer</li></ul><p>&emsp;&emsp;Buffer是什么呢？在我看来Buffer其实就是一个放数据的容器，换言之就是一个数组。可以向其中写数据，当然也可以向其中读数据。那么它内部是怎么控制的呢？</p><p>&emsp;&emsp;这其中涉及它的很重要的四个属性，<strong>mask</strong>、<strong>capacity</strong>、<strong>position</strong>、<strong>limit</strong>。其中mask就像它的字面意思，它用于用户做标记，通过合适的方法可以找到该标记然后对标记后的数据做处理。capacity是整个数组的长度，在创建Buffer实例时就已经确定了，是不变的。下面就是两个很重要的属性，关于怎么读写Buffer中的数据。position很好理解就是下一个要操作的数据位置，这个操作包括读写。而limit就是所能操作数据的界限。这四个属性有这样一种关系mask&lt;=position&lt;=limit&lt;=capacity。</p><p>&emsp;&emsp;Buffer中有两个有意思的方法特别说一下，其中一个是flip()，另一个是compact()。flip()的实现代码非常简单如下所示：</p><pre><code class="java">public final Buffer flip() {    limit = position;     position = 0;     mark = -1;     return this; }</code></pre><p> 这是什么意思呢，其实非常简单，调用这个方法就是意味着你要从Buffer中往外读取已经存在于Buffer中的数据了。</p><p>&emsp;&emsp;与之相对的就是clear()与compat()方法就是整理出合适的空间可以向Buffer中写数据。</p><ul><li><p>Channel</p><p>&emsp;&emsp;什么是Channel呢，与典型的IO中的Stream有些像，但是不一样，他也有很多种形式，比如处理文件的FileChannel和通信的SocketChannel等等。但是向其中读写数据的介质就是上面说到的Buffer。 数据的传送不像Stream一样是一个类似水管的形态，而更像矿车的轨道，Buffer就是矿车。</p><p> &emsp;&emsp;我自己对Channel的理解也不是很深刻，更深的理解只能等以后多实践才能得出吧。</p></li><li><p>Selector</p><p>&emsp;&emsp;说了这么半天，从一开头就说到nonblocking，但是还一直没介绍是啥呢。nonblocking就和Selector有关，Selector是一个nonblocking的Channel管理器，它的select方法告诉程序员哪些他们感兴趣的Channel可以用了。而兴趣可以在最开始注册的时候注册进去。</p><p>&emsp;&emsp;FileChannel不支持非阻塞型模式，所以以下所说的Channel都是SocketChannel。</p><p>&emsp;&emsp;这种方式的好处就是即使单线程也可以处理多个Channel，不像传统IO需要为每一个连接分配一个线程。在很多连接不是很活跃的情况下，极大的浪费了系统的资源。这里借鉴两个大佬的图。见下两图：</p><img src="/2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/nio-vs-io-3.png" srcset="/img/loading.gif" class=""></li></ul><p>上图为非阻塞形式</p><p> ​</p> <img src="/2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/nio-vs-io-4.png" srcset="/img/loading.gif" class=""><p>上图为阻塞形式</p><p>&emsp;&emsp;而不阻塞的好处就在于没有数据可读写的时候可以做一些其他的事情，比如记录服务器状态（还没有想到更好的可干的事儿）。而select方法干的事儿和传统IO的阻塞读写形式有一个很好的比喻，就是说朋友和你约好了要来你家，但是不知道具体什么时候来，正常我们会怎么做呢，是不是定时去门口看看朋友有没有来，如果没来的话就回到客厅做点儿别的事儿，非阻塞型IO就是这么做的，传统IO的话就会一直站在家门口等到朋友来了才和朋友一起进门。由此可见当然是非阻塞型IO好咯。</p><p>&emsp;&emsp;但也并不是说阻塞型IO一无是处，阻塞型IO的服务器实现起来非常简单，数据处理起来也非常容易。在并发量不是很大的情况下，阻塞型IO实现的服务器就够用了。</p><h3 id="2-为什么需要NIO"><a href="#2-为什么需要NIO" class="headerlink" title="2.为什么需要NIO"></a>2.为什么需要NIO</h3><p>&emsp;&emsp;因为线程是一个非常宝贵且费资源的资源，大佬的文章中写到要是有1,000,000个连接连接到服务器，且为每一个连接分配一个线程的话大概需要1TB的内存。所以说并发量很大的时候传统的阻塞型服务器是顶不住的，只有使用NIO，虽然编写NIO的服务器是很难的一件事，但是其突破了性能障碍。</p><h3 id="3-什么时候用NIO"><a href="#3-什么时候用NIO" class="headerlink" title="3.什么时候用NIO"></a>3.什么时候用NIO</h3><p>&emsp;&emsp;这里引用一下大佬的原文：</p><blockquote><p>NIO allows you to manage multiple channels (network connections or files) using only a single (or few) threads, but the cost is that parsing the data might be somewhat more complicated than when reading data from a blocking stream.</p><p>If you need to manage thousands of open connections simultanously, which each only send a little data, for instance a chat server, implementing the server in NIO is probably an advantage. Similarly, if you need to keep a lot of open connections to other computers, e.g. in a P2P network, using a single thread to manage all of your outbound connections might be an advantage. </p></blockquote><p>&emsp;&emsp;大意就是当需要构建一个并发量大切每次传输数据少的情境下，例如聊天服务器，P2P网络等等，需要用到NIO来构建服务器通讯。</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+      <tag>NIO</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Linux下安装ORACLE10g的部分注意事项总结</title>
+    <link href="undefined2017/06/03/Linux%E4%B8%8B%E5%AE%89%E8%A3%85ORACLE10g%E7%9A%84%E9%83%A8%E5%88%86%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E6%80%BB%E7%BB%93/"/>
+    <url>2017/06/03/Linux%E4%B8%8B%E5%AE%89%E8%A3%85ORACLE10g%E7%9A%84%E9%83%A8%E5%88%86%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9%E6%80%BB%E7%BB%93/</url>
+    
+    <content type="html"><![CDATA[<h1 id="Linux下安装ORACLE10g的注意事项总结"><a href="#Linux下安装ORACLE10g的注意事项总结" class="headerlink" title="Linux下安装ORACLE10g的注意事项总结"></a>Linux下安装ORACLE10g的注意事项总结</h1><h2 id="1-配置网络"><a href="#1-配置网络" class="headerlink" title="1. 配置网络"></a>1. 配置网络</h2><p>*<em>vi /etc/sysconfig/network-scripts/ifcfg-eth0 *</em></p><blockquote><p>DEVICE=eth0<br>TYPE=Ethernet<br>UUID=eecaa6f0-7a48-4807-8d64-c0b7d490f8b2<br>ONBOOT=yes<br>NM_CONTROLLED=yes<br>BOOTPROTO=none<br><u>IPADDR=192.168.152.136</u><br><u>NETMASK=255.255.255.0</u><br><u>GATEWAY=192.168.152.2</u><br><u>HWADDR=00:0C:29:A9:44:BC</u><br>PREFIX=24<br>DEFROUTE=yes<br>IPV4_FAILURE_FATAL=yes<br>IPV6INIT=no<br>NAME=”System eth0”<br>LAST_CONNECT=1495547591<br><u>DNS1=192.168.152.2</u></p></blockquote><p><strong>下划线部分以自己的机子为准，若能ping通ip地址而ping不同域名，可以加上最后一行的DNS，地址为网关地址</strong></p><h2 id="2-安装必要软件"><a href="#2-安装必要软件" class="headerlink" title="2. 安装必要软件"></a>2. 安装必要软件</h2><blockquote><p>libXp-1.0.0-8.1.el5.i386.rpm<br>binutils-2.17.50.0.6-12.el5.i386.rpm<br>compat-db-4.2.52-5.1.i386.rpm<br>compat-libstdc++-296-2.96-138.i386.rpm<br>control-center-2.16.0-16.el5.i386.rpm<br>gcc-4.1.2-46.el5.i386.rpm<br>gcc-c++-4.1.2-46.el5.i386.rpm<br>glibc-2.5-42.i386.rpm<br>glibc-common-2.5-42.i386.rpm<br>libstdc++-4.1.2-46.el5.i386.rpm<br>libstdc++-devel-4.1.2-46.el5.i386.rpm<br>make-3.81-3.el5.i386.rpm<br>pdksh-5.2.14-36.el5.i386.rpm<br>sysstat-7.0.2-3.el5.i386.rpm<br>setarch-2.0-1.1.i386.rpm</p></blockquote><p><strong>需要注意的是64位系统需要将32位软件也安装上，不然后面会报错。</strong></p><h2 id="3-配置java环境"><a href="#3-配置java环境" class="headerlink" title="3.配置java环境"></a>3.配置java环境</h2><blockquote><p>这一步不多说了，可以设置一个全局的环境变量</p></blockquote><p><strong>vi /etc/profile  在最底下加入</strong></p><blockquote><p>export JAVA_HOME=/home/app/jdk<br>export CLASSPATH=.:$JAVA_HOME/lib:$CLASSPATH<br>export PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin</p></blockquote><h2 id="4-设置必要的用户以及文件"><a href="#4-设置必要的用户以及文件" class="headerlink" title="4.设置必要的用户以及文件"></a>4.设置必要的用户以及文件</h2><blockquote><ul><li>创建用户和组</li></ul><p>[root@oracle ~]# groupadd dba<br>[root@oracle ~]# groupadd oinstall<br>[root@oracle ~]# groupadd oper<br>[root@oracle ~]# useradd -g oinstall -G dba,oper oracle</p><ul><li>添加文件</li></ul><p>[root@oracle ~]# vim /etc/sysctl.conf<br>kernel.shmall = 2097152<br>kernel.shmmax = 2147483648<br>kernel.shmmni = 4096<br>kernel.sem = 250 32000 100 128<br>fs.file-max = 65536<br>net.ipv4.ip_local_port_range = 1024 65000<br>net.core.rmem_default = 1048576<br>net.core.rmem_max = 1048576<br>net.core.wmem_default = 262144<br>net.core.wmem_max = 262144<br>[root@oracle ~]# vim /etc/security/limits.conf<br>oracle              soft    nproc   2047<br>oracle              hard    nproc   16384<br>oracle              soft    nofile  1024<br>oracle              hard    nofile  65536<br>[root@oracle ~]# vim /etc/pam.d/login<br>session    required     /lib/security/pam_limits.so<br>session    required     pam_limits.so<br>[root@oracle ~]# vi /etc/profile</p><pre><code class="shell">if [ $USER = &quot;oracle&quot; ]; then    if [ $SHELL = &quot;/bin/ksh&quot; ]; then         ulimit -p 16384         ulimit -n 65536   else         ulimit -u 16384 -n 65536   fifi</code></pre><ul><li>新建文件，修改权限</li></ul><p>[root@oracle ~]# mkdir /u01<br>[root@oracle ~]# mkdir -pv /u01/app/oracle<br>mkdir: created directory <code>/u01/app&#39;mkdir: created directory</code>/u01/app/oracle’<br>[root@oracle ~]# chown -R oracle:oinstall /u01/app/oracle/<br>[root@oracle ~]# chmod -R 775 /u01/app/oracle/<br>[root@oracle ~]# mkdir /u01/flash_recovery_area<br>[root@oracle ~]# chown oracle:oinstall /u01/flash_recovery_area/<br>[root@oracle ~]# chmod 755 /u01/flash_recovery_area/</p></blockquote><h2 id="5-安装oracle"><a href="#5-安装oracle" class="headerlink" title="5.安装oracle"></a>5.安装oracle</h2><ol><li><h4 id="添加以下几行"><a href="#添加以下几行" class="headerlink" title="添加以下几行"></a>添加以下几行</h4><blockquote><p>[root@oracle ~]# su - oracle<br>[oracle@oracle ~]$ vim .bash_profile<br>export ORACLE_BASE=/u01/app/oracle<br>export ORACLE_HOME=/u01/app/oracle/product/10.2.0<br>export ORACLE_SID=xjzhujunjie<br>[oracle@oracle ~]$ . .bash_profile<br>[oracle@oracle ~]$ env | grep ORA<br>ORACLE_SID=soul<br>ORACLE_BASE=/u01/app/oracle<br>ORACLE_HOME=/u01/app/oracle/product/10.2.0</p><p><strong>其中的ORACLE_SID可以写你自己的，但是要记住，后面要用</strong></p></blockquote></li><li><h4 id="找到runInstaller进行安装，要在图形化界面下才能成功"><a href="#找到runInstaller进行安装，要在图形化界面下才能成功" class="headerlink" title="找到runInstaller进行安装，要在图形化界面下才能成功"></a>找到runInstaller进行安装，要在图形化界面下才能成功</h4><p>基本的安装过程不是很难，一路点过去就可以了。在准备的时候可以不要它的oral数据库，后面自己建库。</p><blockquote><p><strong>过程中可能会出现一些问题，多看log进行解决</strong></p><p>大部分都是缺包，用yum把需要的包都打上就没问题了</p><p><code>yum install libXp.i686 libXp-devel.i686 libXt.i686 libXt-devel.i686 libXtst.i686 libXtst-devel.i686 make.x86_64 gcc.x86_64 libaio.x86_64 glibc-devel.i686 libgcc.i686</code><br><code>glibc-devel.x86_64 compat-libstdc++-33 -y</code><br><code>yum install glibc* gcc* make* compat-db* libstdc* libXp* libXtst* compat-libstdc++* -y</code> </p><p>*<em>Error in invoking target ‘collector’ of makefile ‘/u01/app/oracle/product/10.2.0/sysman/lib/ins_emdb.mk’. *</em></p><p>上面这个问题特殊的说一下。出现这个问题可以按continue。然后有两种解决方式：</p><p>1.修改bash_porfile 添加LD_LIBRARY_PATH=$ORACLE_HOME/lib</p><p>2.将/u01/app/oracle/product/10.2.0/bin下的oracle改成oracle.bin</p><p>并新建一个oracle在其中添加以下内容：</p><p><code>export DISABLE_HUGETLBFS=1</code><br><code>exec $ORACLE_HOME/bin/oracle.bin$@</code></p><p><code>EOF</code></p><p>两个方式我都用了，后面启动没有出现问题。</p></blockquote></li><li><h4 id="建立监听器–netca"><a href="#建立监听器–netca" class="headerlink" title="建立监听器–netca"></a>建立监听器–netca</h4><blockquote><p>在图形化界面下使用netca命令，按步骤添加就好，协议选择tcp。</p></blockquote></li><li><h4 id="查看监听器–lsnrctl-status"><a href="#查看监听器–lsnrctl-status" class="headerlink" title="查看监听器–lsnrctl status"></a>查看监听器–lsnrctl status</h4><blockquote><p>The command completed successfully</p><p>如果有上面这句话就说明监听器启动成功了，如果没成功，用<strong>lsnrctl start</strong> 开启，停用为<strong>lsnrctl stop</strong>命令</p></blockquote></li><li><h4 id="创建数据库–dbcp"><a href="#创建数据库–dbcp" class="headerlink" title="创建数据库–dbcp"></a>创建数据库–dbcp</h4><blockquote><p>一路点过去就行，注意SID属性选择之前你在配置文件中写的那个。最后注意将<strong>scott hr</strong>两个账户解锁。</p></blockquote></li><li><h4 id="启动数据库实例–sqlplus"><a href="#启动数据库实例–sqlplus" class="headerlink" title="启动数据库实例–sqlplus"></a>启动数据库实例–sqlplus</h4><blockquote><p>第一次账号为<strong>sys as sysdba</strong>密码为空</p><p>进去后挂载数据库<strong>startup</strong></p><p>至此就完成数据库的安装了。</p></blockquote></li></ol><h2 id="6-远程访问的问题"><a href="#6-远程访问的问题" class="headerlink" title="6.远程访问的问题"></a>6.远程访问的问题</h2><blockquote><p>因为我是在虚拟机中安装，本地环境为windows，所以特殊说明一下。</p><p>首先要安装sqlplus工具包并加入path中，然后在cmd中输入</p><p><code>sqlplus scott/tiger@oracle10:1521/soul</code></p><p>其中的oracle10是我设置的虚拟机域名。</p><p>可能会存在一些问题，<strong>ORA-12514</strong>等。</p><p>解决办法：</p><p>在$ORACLE_HOME/network/admin/listener.ora中更改</p><pre><code class="shell">SID_LIST_LISTENER =  (SID_LIST =  (SID_DESC =   (SID_NAME = PLSExtProc)   (ORACLE_HOME = /u01/app/oratt/product/10.2.0/dbhome_1)   (PROGRAM = extproc)  )  (SID_DESC =   (SID_NAME = webdb)   (ORACLE_HOME = /u01/app/oratt/product/10.2.0/dbhome_1)  )  )LISTENER =  (DESCRIPTION_LIST =  (DESCRIPTION =  (ADDRESS = (PROTOCOL = TCP)(HOST = serv1)(PORT = 1844))  (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC0))      )  )  </code></pre></blockquote>]]></content>
+    
+    
+    <categories>
+      
+      <category>RDBMS</category>
+      
+      <category>oracle</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>linux</tag>
+      
+      <tag>oracle</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Java-虚拟机工作原理</title>
+    <link href="undefined2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/"/>
+    <url>2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/</url>
+    
+    <content type="html"><![CDATA[<h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p><strong>java程序的工作流程</strong> </p><blockquote><p>可以看到我们平常首先会写一个java文件，然后经过java的编译器编译成字节码文件，也就是.class文件，这个过程中我们的程序还没有加载到内存之中。下一步便是通过JRE的类加载器将我们磁盘上的类文件加载到系统分配给JVM的内存区域–运行时数据区(Runtime Data Areas)。然后执行引擎解释或者编译类文件，转化为特定的CPU机器码，CPU执行机器码，至此完成整个过程。</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/java%E6%89%A7%E8%A1%8C%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" class=""><p>可以发现其中有几个概念， <strong>类加载器</strong>， <strong>运行时数据区</strong> ，<strong>执行引擎</strong> 。这些也都是java虚拟机中的核心概念。下面一一来介绍这些概念。</p><h2 id="类加载器"><a href="#类加载器" class="headerlink" title="类加载器"></a>类加载器</h2><p><strong>接下来就看一下   <em>类加载器</em> 为何物，又是怎么工作的。</strong></p><blockquote><p>层级结构</p><p>类加载器被组织成一种层级结构关系，也就是父子关系。其中，Bootstrap是所有类加载器的父亲。如图所示:</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8%E5%B1%82%E7%BA%A7%E7%BB%93%E6%9E%84.png" srcset="/img/loading.gif" class=""><ul><li><h4 id="Bootstrap-Class-Loader"><a href="#Bootstrap-Class-Loader" class="headerlink" title="Bootstrap Class Loader:"></a>Bootstrap Class Loader:</h4><blockquote><p>当运行java虚拟机时，这个类加载器被创建，它加载一些基本的JAVA API，包括Object这个类。需要注意的是，这个类加载器不是用java语言写的，使用C++写的，所以无法访问。</p></blockquote></li><li><h4 id="Extension-Class-Loader"><a href="#Extension-Class-Loader" class="headerlink" title="Extension Class Loader:"></a>Extension Class Loader:</h4><blockquote><p>这个加载器加载出了基本API之外的一些拓展类，包括一些与安全性能想过的类。</p></blockquote></li><li><h4 id="System-Class-Loader"><a href="#System-Class-Loader" class="headerlink" title="System Class Loader:"></a>System Class Loader:</h4><blockquote><p>它加载应用程序中的类，也就是在classpath中配置的类。</p></blockquote></li><li><h4 id="User-Defined-Class-Loader"><a href="#User-Defined-Class-Loader" class="headerlink" title="User-Defined Class Loader:"></a>User-Defined Class Loader:</h4><blockquote><p>这是开发人员通过拓展ClassLoader类定义的自定义加载器，加载程序员定义的一些类。</p></blockquote></li></ul><h3 id="委派模式（Delegation-Mode）"><a href="#委派模式（Delegation-Mode）" class="headerlink" title="委派模式（Delegation Mode）"></a><strong>委派模式（Delegation Mode）</strong></h3><blockquote><p>仔细看上面的层次结构，当JVM加载一个类的时候，下层的加载器会将任务委托给上一层类加载器，上一层加载检查它的命名空间中是否已经加载这个类，如果已经加载，则直接使用这个类。如果没有加载，则往下找它的子加载器，若它的子类加载器加载了，则直接使用，若没有加载，则往下一直找，若所有类加载器全部找完了后发现都无法加载该类，则报异常。</p><p>对于某个某个特定的类加载器来说，一个java类只能被载入一次，也就是说在Java虚拟机中，类的完整标识是（ClassLoader,package,className）。一个类可以被不同的加载器加载。</p></blockquote><blockquote><p>举个例子来说明，现在假如我有一个自己定义的MyClass需要加载，如果不指定的话，一半交App(System)加载。接到任务后，System检查自己的库里是否已经有这个类，发现没有以后委托给Extension，Extension进行同样的检查，发现还是没有就继续往上委托，最顶层的Boots发现自己的库里也没有，于是根据它的路径(Java核心类库，如java.lang)去尝试加载，没找到这个MyClass类，于是只好往下委托个Extension,Extension到自己的路径（JAVA_HOME/jre/lib/ext）找，还是没有找到，继续往下，此时System加载器到classpath路径寻找，找到了，于是加载到Java虚拟机。</p><p>现在假设我们将这个类放到JAVA_HOME/jre/lib/ext这个路径中去（相当于交给Extension加载器加载），按照同样的规则，最后由Extension加载器加载MyClass类，看到了吧，统一各类被两次加载JVM，但是每次都是由不同的ClassLoader完成。</p></blockquote><ul><li><p>可加性限制</p><blockquote><p>下层的加载器能够看到上层加载器中的类，反之则不行，也就是说委托只能从下到上。</p></blockquote></li><li><p>不允许卸载类</p><blockquote><p>类加载器可以加载一个类，但是它不能卸载一个类。但是类加载器可以被删除或者被创建。</p></blockquote></li></ul><p><strong>当类加载器完毕之后，JVM继续按照如下图完成其他工作：</strong></p><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E7%B1%BB%E5%8A%A0%E8%BD%BD%E7%9A%84%E8%BF%87%E7%A8%8B.png" srcset="/img/loading.gif" class=""><p>框图中各个步骤简单介绍如下：</p><blockquote><ul><li>Loading：文章前面介绍的类加载，将文件系统中的Class文件载入到JVM内存（运行数据区域）。</li><li>Verifying：检查载入的类文件是否符合JAVA规范和虚拟机规范。</li><li>Preparing：为这个类分配所需要的内存，确定这个类的属性、方法等所需要的数据结构。</li><li>Resolving：将常量池中的符号引用都改变为直接引用。</li><li>Initialing：初始化类的局部变量，为静态域赋值，同时执行静态初始化块。</li></ul></blockquote><p>那么，ClassLoader在加载类的时候，究竟做了些什么工作呢？首先必须要介绍一下<strong>运行时数据区域</strong>。</p><h2 id="运行时数据区域"><a href="#运行时数据区域" class="headerlink" title="运行时数据区域"></a>运行时数据区域</h2><blockquote><p><strong>Runtime Data Areas：</strong></p><p>当运行一个JVM实例时，系统将分配给它一块内存区域（这块内存区域的大小可以进行设置），这一内存区域由JVM自己来管理。从这一块内存中分出一块用来存储一些运行数据，例如创建的对象，传递给方法的参数，局部变量，返回值等等。分出来的这一块就称为运行数据区域。运行数据区域可以划分为6大块：<strong>Java栈、程序计数寄存器（PC寄存器）、本地方法栈（Native Method Stack）、Java堆、方法区域、运行常量池（Runtime Constant Pool）</strong>。运行常量池本应该属于方法区，但是由于其重要性，JVM规范将其独立出来说明。其中，前面3个区域（PC寄存器、Java栈、本地方法栈）是每个线程独自拥有的，后三者则是整个JVM实例中的所有线程共有的。这六大块如下图所示：</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E8%BF%90%E8%A1%8C%E6%97%B6%E6%95%B0%E6%8D%AE%E5%8C%BA.png" srcset="/img/loading.gif" class=""><blockquote><ul><li>PC计数器：</li></ul><p>每一个线程都拥有一个PC计数器，当线程启动时，PC计数器被创建，这个计数器存放当前正在被执行的字节码指令（JVM指令）的地址。</p><ul><li>Java栈：</li></ul><p>同样的，Java栈也是每个线程单独拥有，线程启动时创建。这个栈中存放着一系列的栈帧（Stack Frame），JVM只能进行压入（Push）和弹出（Pop）栈帧这两种操作。每当调用一个方法时，JVM就往栈里压入一个栈帧，方法结束返回时弹出栈帧。如果方法执行时出现异常，可以调用printStackTrace等方法来查看栈的情况，栈的示意图如下：</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E6%A0%88%E7%9A%84%E7%A4%BA%E6%84%8F%E5%9B%BE.png" srcset="/img/loading.gif" class=""><blockquote><p>现在我们来详细看看每一个栈帧中都放着什么东西。从示意图很容易看出，每个栈帧包含三个部分：本地变量数组，操作数栈，方法所属类的常量池引用。</p><ol><li>局部（本地）变量数组：</li></ol><p>局部（本地）变量数组中，从0开始按顺序存放方法所属对象的引用、传递给方法的参数、局部变量。举个例子：</p><p><code>public void doSomething( int a, double b, Object o){</code></p><p>​    …</p><p><code>}</code></p><p>这个方法的栈帧中的局部变量存储的内容分别是：</p><p><code>0：this</code> </p><p><code>1：a</code></p><p><code>2,3：b</code></p><p><code>4：o</code></p><p>看仔细了，其中double类型的b需要两个连续的索引。取值的时候，取出的是2这个索引中的值。如果是静态方法，则数组第0个不存放this引用，而是直接存储传递的参数。</p><ol start="2"><li>操作数栈:</li></ol><p>操作数栈中存放方法执行时的一些中间变量，JVM在执行方法时压入或者弹出这些变量。其实，操作数栈是方法真正工作的地方，执行方法时，局部变量数组与操作数栈根据方法定义进行数据交换。例如，执行以下代码是，操作数栈的情况如下：</p><p><code>int a = 100;</code>  </p><p><code>int b = 98;</code>  </p><p><code>int c = a + b;</code> </p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E6%93%8D%E4%BD%9C%E6%95%B0%E6%A0%88.jpg" srcset="/img/loading.gif" class=""><blockquote><p>　　注意在这个图中，操作数栈的底部是在上边，所以先压入的100位于上方。可以看出，操作数栈其实是一个数据临时存储区，存放一些中间变量，方法    结束了，操作数栈也就没有了。</p><ol start="3"><li>栈帧中的数据引用：</li></ol><p>除了局部变量数组和操作数栈之外，栈帧还需要一个常量池的引用。当JVM执行到需要常量池的数据时，就是通过这个引用来访问常量池的。栈帧中的数据还要负责处理方法的返回和异常。如果通过return返回，则将该方法从java栈中弹出。如果方法有返回值，则将返回值压入到调用该方法的方法操作数栈中。另外，数据区中还保存着该方法可能的异常表的引用。下面举例子来说明：</p><ol><li><code>class Example3C{</code>  </li><li>​    <code>public static void addAndPrint(){</code>  </li><li>​        <code>double result = addTwoTypes(1,88.88);</code>  </li><li>​        <code>System.out.println(result);</code>  </li><li>​    <code>}</code>  </li><li>​    <code>public static double addTwoTypes(int i, double d){</code>  </li><li>​    <code>return i+d;</code>  </li><li>​    <code>}</code>  </li><li></li><li><code>}</code>  </li></ol><p>执行上述代码时，java栈如下图所示：</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E4%BB%A3%E7%A0%81%E6%BC%94%E7%A4%BA.jpg" srcset="/img/loading.gif" class=""><blockquote><p>​    一样需要注意的是，栈的底部在上方，先压入addAndPrint方法的栈帧，再压入addTwoTypes方法的栈          帧。上面最右边的文字说明有错误，应该是addTwoTypes的执行结果存放在addAndPrint的操作数栈。</p><ul><li>本地方法栈</li></ul><p>当程序通过JNI（Java Native Interface）调用本地方法（如C或者C++代码）时，就根据本地方法的语言类型建立相应的栈。</p><ul><li>方法区域</li></ul><p>方法区域是一个JVM实例中的所有线程共享的，当启动一个JVM实例时，方法区域被创建。它用于存放常量池、有关域和方法的信息、静态变量、类和方法的字节码。不同的JVM实现方式在实现方法区域的时候会有所区别。Oracle的Hotspot称之为永久区域（Permanent Area）或者永久代（Permanent Generation）。</p><ul><li>运行时常量池：</li></ul><p>这个区域存放类和接口的常量，除此之外，它还存放方法和域的所有引用。当一个方法或者域被引用的时候，JVM就通过运行常量池中的这些引用来查找方法和域在内存中的实际地址。</p><ul><li>堆（Heap）</li></ul><p>堆中存放的是程序创建的对象或者实例。这个区域对JVM的性能影响很大。垃圾回收机制处理的正是这一块内存区域。所以，类加载器加载其实就是根据编译后的Class文件，将java字节码载入JVM内存，并完成对运行数据处于的初始化工作，供执行引擎执行。</p></blockquote><h2 id="执行引擎"><a href="#执行引擎" class="headerlink" title="执行引擎"></a>执行引擎</h2><blockquote><p>类加载器将字节码载入内存之后，执行引擎以Java字节码指令为单元，读取Java字节码。问题是，现在的java字节码机器是读不懂的，因此还必须想办法将字节码转化成平台相关的机器码。这个过程可以由解释器来执行，也可以用即时编译器（JIT Compiler）来完成。</p></blockquote><img src="/2017/05/08/Java-%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86/%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E.jpg" srcset="/img/loading.gif" class="">]]></content>
+    
+    
+    <categories>
+      
+      <category>Java</category>
+      
+      <category>Jvm</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Java</tag>
+      
+    </tags>
     
   </entry>
   

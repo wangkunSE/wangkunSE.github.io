@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.jpg">
+  <link rel="icon" type="image/png" href="/img/favicon.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>Java实现二叉树的三种非递归遍历 ~ Soul</title>
+
+  <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"  >
+<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css"  >
+<link rel="stylesheet" href="/lib/mdbootstrap/css/mdb.min.css"  >
+<link rel="stylesheet" href="/lib/github-markdown/github-markdown.min.css"  >
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"  >
+
+<link rel="stylesheet" href="/css/main.css"  >
+
+
+  <link rel="stylesheet" href="/lib/fancybox/jquery.fancybox.min.css"  >
+
+
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>铁锤的Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">Archives</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">Categories</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">Tags</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">About</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+</nav>
+
+    <div class="view intro-2" id="background"
+         style="background: url('/img/post.jpg')no-repeat center center;
+           background-size: cover;
+           background-attachment: fixed;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <br>
+              
+                <p class="mt-3">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>&nbsp;
+                  Saturday, November 11th 2017, 3:59 pm
+                </p>
+              
+
+              <p>
+                
+                  
+                  &nbsp;<i class="far fa-chart-bar"></i>
+                  <span class="post-count">
+                    782 字
+                  </span>&nbsp;
+                
+
+                
+                  
+                  &nbsp;<i class="far fa-clock"></i>
+                  <span class="post-count">
+                      3 分钟
+                  </span>&nbsp;
+                
+
+                
+                  <!-- 不蒜子统计文章PV -->
+                  
+                  &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;
+                  <span id="busuanzi_container_page_pv">
+                    <span id="busuanzi_value_page_pv"></span> 次
+                  </span>&nbsp;
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <h2 id="Java-实现二叉树的三种非递归遍历"><a href="#Java-实现二叉树的三种非递归遍历" class="headerlink" title="Java 实现二叉树的三种非递归遍历"></a>Java 实现二叉树的三种非递归遍历</h2><h3 id="1-思路"><a href="#1-思路" class="headerlink" title="1.思路"></a>1.思路</h3><blockquote>
+<p>其实思路就是递归的思路，无非就是加入了栈这个数据结构。</p>
+<p>具体来看代码吧，个人觉得还算简洁。</p>
+</blockquote>
+<h3 id="2-实现"><a href="#2-实现" class="headerlink" title="2.实现"></a>2.实现</h3><h4 id="首先是结点数据结构的设置："><a href="#首先是结点数据结构的设置：" class="headerlink" title="首先是结点数据结构的设置："></a>首先是结点数据结构的设置：</h4><pre><code class="java">/**
+ * @author WK
+ */
+public class SearchBinaryTree {
+
+    //存放的结点标志
+    public String tag = &quot;&quot;;
+    //是否被便利的标志
+    public boolean flag = false;
+    //左孩子
+    public SearchBinaryTree leftChild = null;
+    //右孩子
+    public SearchBinaryTree rightChild = null;
+  //省略了getter，setter以及构造函数
+}</code></pre>
+<h4 id="前序遍历"><a href="#前序遍历" class="headerlink" title="- 前序遍历"></a>- 前序遍历</h4><pre><code class="java">/**
+     *
+     * @param T 传入的树的根结点
+     */
+    public static void priorOrderNonRecursive(SearchBinaryTree T) {
+        //构造stack
+        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();
+        SearchBinaryTree p = T;
+
+        //保证所有节点被遍历过
+        while (p != null || (!binaryTrees.empty())) {
+
+            //未被遍历则输出tag，入栈
+            if (p.flag == false) {
+                System.out.println(p.tag);
+                p.flag = true;
+                binaryTrees.push(p);
+            }
+            //左孩子不为空且左孩子未被遍历过（防止重复入栈）
+            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {
+                p = p.leftChild;
+                continue;
+            }
+            //右孩子不为空且右孩子未被遍历过（防止重复入栈）
+            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {
+                p = p.rightChild;
+                continue;
+            }
+
+            //如果左右孩子都为空则需要出栈。
+            if (!binaryTrees.empty())
+                p = binaryTrees.pop();
+            else
+                p = null;
+
+        }
+
+    }</code></pre>
+<h4 id="中序遍历"><a href="#中序遍历" class="headerlink" title="- 中序遍历"></a>- 中序遍历</h4><pre><code class="java"> /**
+     * 中序遍历和前序的区别就在于遍历的位置，也就是输出tag的位置，其他完全类似
+     * @param root 传入的树的根结点
+     */
+    public static void infixOrderNonRecursive(SearchBinaryTree root) {
+        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();
+        SearchBinaryTree p = root;
+        while (p != null || (!binaryTrees.empty())) {
+
+            if (p.flag == false)
+                binaryTrees.push(p);
+            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {
+                p = p.leftChild;
+                continue;
+            }
+
+            if (p.flag == false) {
+                System.out.println(p.tag);
+                p.flag = true;
+
+            }
+            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {
+                p = p.rightChild;
+                continue;
+            }
+
+            if (!binaryTrees.empty())
+                p = binaryTrees.pop();
+            else
+                p = null;
+
+        }
+    }</code></pre>
+<h4 id="后序遍历"><a href="#后序遍历" class="headerlink" title="- 后序遍历"></a>- 后序遍历</h4><pre><code class="java">/**
+     *可以发现其实后序遍历的代码与前两个也类似，只是遍历位置不同，由此可见非循环遍历其实也并不难，掌握其中一个其他的也就掌握了
+     * @param root
+     */
+    public static void postOrderNonRecursive(SearchBinaryTree root) {
+        Stack&lt;SearchBinaryTree&gt; binaryTrees = new Stack&lt;&gt;();
+        SearchBinaryTree p = root;
+        while (p != null || (!binaryTrees.empty())) {
+
+            if (p.flag == false)
+                binaryTrees.push(p);
+            if (p.leftChild != null &amp;&amp; p.leftChild.flag == false) {
+                p = p.leftChild;
+                continue;
+            }
+
+
+            if (p.rightChild != null &amp;&amp; p.rightChild.flag == false) {
+                p = p.rightChild;
+                continue;
+            }
+
+            if (p.flag == false) {
+                System.out.println(p.tag);
+                p.flag = true;
+
+            }
+            if (!binaryTrees.empty())
+                p = binaryTrees.pop();
+            else
+                p = null;
+
+        }
+    }</code></pre>
+<h3 id="3-测试"><a href="#3-测试" class="headerlink" title="3.测试"></a>3.测试</h3><p> 以这棵树为例：</p>
+<img src="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/1.png" srcset="/img/loading.gif" class="">
+
+<p>初始化代码：</p>
+<pre><code class="java">private static SearchBinaryTree initTree() {
+        SearchBinaryTree A = new SearchBinaryTree(&quot;A&quot;);
+        SearchBinaryTree B = new SearchBinaryTree(&quot;B&quot;);
+        SearchBinaryTree C = new SearchBinaryTree(&quot;C&quot;);
+        SearchBinaryTree D = new SearchBinaryTree(&quot;D&quot;);
+        SearchBinaryTree E = new SearchBinaryTree(&quot;E&quot;);
+        SearchBinaryTree F = new SearchBinaryTree(&quot;F&quot;);
+        SearchBinaryTree G = new SearchBinaryTree(&quot;G&quot;);
+        A.leftChild = B;
+        A.rightChild = F;
+        B.leftChild = C;
+        B.rightChild = D;
+        D.leftChild = E;
+        F.leftChild = G;
+
+        return A;
+    }</code></pre>
+<p>测试：</p>
+<pre><code class="java">  SearchBinaryTree root = initTree();
+        System.out.println(&quot;--------前序遍历开始：&quot;);
+        priorOrderNonRecursive(root);
+        System.out.println(&quot;--------中序遍历开始：&quot;);
+        root = initTree();
+        infixOrderNonRecursive(root);
+        System.out.println(&quot;--------后序遍历开始：&quot;);
+        root = initTree();
+        postOrderNonRecursive(root);</code></pre>
+<p>结果：</p>
+<pre><code class="java">--------前序遍历开始：
+A
+B
+C
+D
+E
+F
+G
+--------中序遍历开始：
+C
+B
+E
+D
+A
+G
+F
+--------后序遍历开始：
+C
+E
+D
+B
+G
+F
+A</code></pre>
+<h3 id="3-总结"><a href="#3-总结" class="headerlink" title="3.总结"></a>3.总结</h3><blockquote>
+<p>实现之后发现静下心来思考的话这个问题并不难，说明对其他事物来讲也应该这样，静心下来去做。</p>
+</blockquote>
+
+            <hr>
+          </div>
+          <br>
+          <div>
+            <p>
+            
+              <span>
+                <i class="iconfont icon-inbox"></i>
+                
+                  <a class="hover-with-bg" href="/categories/Java">Java</a>
+                  &nbsp;
+                
+                  <a class="hover-with-bg" href="/categories/%E7%BC%96%E7%A8%8B">编程</a>
+                  &nbsp;
+                
+              </span>&nbsp;&nbsp;
+            
+            
+              <span>
+                <i class="iconfont icon-tag"></i>
+                
+                  <a class="hover-with-bg" href="/tags/%E7%AE%97%E6%B3%95">算法</a>
+                
+              </span>
+            
+            </p>
+            
+              <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      
+  <div id="toc">
+    <p class="h4"><i class="far fa-list-alt"></i>&nbsp;TOC</p>
+    <div id="tocbot"></div>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- custom -->
+
+
+<!-- Comments -->
+<div class="col-lg-7 mx-auto nopadding-md">
+  <div class="container comments mx-auto" id="comments">
+    
+  </div>
+</div>
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+    <i class="iconfont icon-love"></i>
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    <br>
+
+    
+  
+    <!-- 不蒜子统计PV -->
+    
+    &nbsp;<span id="busuanzi_container_site_pv">总访问量 
+          <span id="busuanzi_value_site_pv"></span> 次</span>&nbsp;
+  
+  
+    <!-- 不蒜子统计UV -->
+    
+    &nbsp;<span id="busuanzi_container_site_uv">总访客数 
+            <span id="busuanzi_value_site_uv"></span> 人</span>&nbsp;
+  
+  <br>
+
+
+
+    
+
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="/lib/jquery/jquery.min.js" ></script>
+<script src="/lib/popper/popper.min.js" ></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js" ></script>
+<script src="/lib/mdbootstrap/js/mdb.min.js" ></script>
+<script src="/js/main.js" ></script>
+
+
+  <script src="/js/lazyload.js" ></script>
+
+
+
+  
+    <script src="/lib/tocbot/tocbot.min.js" ></script>
+  
+  <script src="/js/post.js" ></script>
+
+
+
+  <script src="/lib/smooth-scroll/smooth-scroll.min.js" ></script>
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+<!-- Plugins -->
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+  <script src="/lib/prettify/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script src="/lib/typed/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Java实现二叉树的三种非递归遍历&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script src="/lib/anchor/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script src="/lib/fancybox/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>

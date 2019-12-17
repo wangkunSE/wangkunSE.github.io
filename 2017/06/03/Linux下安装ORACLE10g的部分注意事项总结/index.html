@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.jpg">
+  <link rel="icon" type="image/png" href="/img/favicon.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>Linux下安装ORACLE10g的部分注意事项总结 ~ Soul</title>
+
+  <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"  >
+<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css"  >
+<link rel="stylesheet" href="/lib/mdbootstrap/css/mdb.min.css"  >
+<link rel="stylesheet" href="/lib/github-markdown/github-markdown.min.css"  >
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"  >
+
+<link rel="stylesheet" href="/css/main.css"  >
+
+
+  <link rel="stylesheet" href="/lib/fancybox/jquery.fancybox.min.css"  >
+
+
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>铁锤的Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">Archives</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">Categories</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">Tags</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">About</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+</nav>
+
+    <div class="view intro-2" id="background"
+         style="background: url('/img/post.jpg')no-repeat center center;
+           background-size: cover;
+           background-attachment: fixed;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <br>
+              
+                <p class="mt-3">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>&nbsp;
+                  Saturday, June 3rd 2017, 3:15 pm
+                </p>
+              
+
+              <p>
+                
+                  
+                  &nbsp;<i class="far fa-chart-bar"></i>
+                  <span class="post-count">
+                    1.1k 字
+                  </span>&nbsp;
+                
+
+                
+                  
+                  &nbsp;<i class="far fa-clock"></i>
+                  <span class="post-count">
+                      5 分钟
+                  </span>&nbsp;
+                
+
+                
+                  <!-- 不蒜子统计文章PV -->
+                  
+                  &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;
+                  <span id="busuanzi_container_page_pv">
+                    <span id="busuanzi_value_page_pv"></span> 次
+                  </span>&nbsp;
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <h1 id="Linux下安装ORACLE10g的注意事项总结"><a href="#Linux下安装ORACLE10g的注意事项总结" class="headerlink" title="Linux下安装ORACLE10g的注意事项总结"></a>Linux下安装ORACLE10g的注意事项总结</h1><h2 id="1-配置网络"><a href="#1-配置网络" class="headerlink" title="1. 配置网络"></a>1. 配置网络</h2><p>*<em>vi /etc/sysconfig/network-scripts/ifcfg-eth0 *</em></p>
+<blockquote>
+<p>DEVICE=eth0<br>TYPE=Ethernet<br>UUID=eecaa6f0-7a48-4807-8d64-c0b7d490f8b2<br>ONBOOT=yes<br>NM_CONTROLLED=yes<br>BOOTPROTO=none<br><u>IPADDR=192.168.152.136</u><br><u>NETMASK=255.255.255.0</u><br><u>GATEWAY=192.168.152.2</u><br><u>HWADDR=00:0C:29:A9:44:BC</u><br>PREFIX=24<br>DEFROUTE=yes<br>IPV4_FAILURE_FATAL=yes<br>IPV6INIT=no<br>NAME=”System eth0”<br>LAST_CONNECT=1495547591<br><u>DNS1=192.168.152.2</u></p>
+</blockquote>
+<p><strong>下划线部分以自己的机子为准，若能ping通ip地址而ping不同域名，可以加上最后一行的DNS，地址为网关地址</strong></p>
+<h2 id="2-安装必要软件"><a href="#2-安装必要软件" class="headerlink" title="2. 安装必要软件"></a>2. 安装必要软件</h2><blockquote>
+<p>libXp-1.0.0-8.1.el5.i386.rpm<br>binutils-2.17.50.0.6-12.el5.i386.rpm<br>compat-db-4.2.52-5.1.i386.rpm<br>compat-libstdc++-296-2.96-138.i386.rpm<br>control-center-2.16.0-16.el5.i386.rpm<br>gcc-4.1.2-46.el5.i386.rpm<br>gcc-c++-4.1.2-46.el5.i386.rpm<br>glibc-2.5-42.i386.rpm<br>glibc-common-2.5-42.i386.rpm<br>libstdc++-4.1.2-46.el5.i386.rpm<br>libstdc++-devel-4.1.2-46.el5.i386.rpm<br>make-3.81-3.el5.i386.rpm<br>pdksh-5.2.14-36.el5.i386.rpm<br>sysstat-7.0.2-3.el5.i386.rpm<br>setarch-2.0-1.1.i386.rpm</p>
+</blockquote>
+<p><strong>需要注意的是64位系统需要将32位软件也安装上，不然后面会报错。</strong></p>
+<h2 id="3-配置java环境"><a href="#3-配置java环境" class="headerlink" title="3.配置java环境"></a>3.配置java环境</h2><blockquote>
+<p>这一步不多说了，可以设置一个全局的环境变量</p>
+</blockquote>
+<p><strong>vi /etc/profile  在最底下加入</strong></p>
+<blockquote>
+<p>export JAVA_HOME=/home/app/jdk<br>export CLASSPATH=.:$JAVA_HOME/lib:$CLASSPATH<br>export PATH=$PATH:$JAVA_HOME/bin:$JAVA_HOME/jre/bin</p>
+</blockquote>
+<h2 id="4-设置必要的用户以及文件"><a href="#4-设置必要的用户以及文件" class="headerlink" title="4.设置必要的用户以及文件"></a>4.设置必要的用户以及文件</h2><blockquote>
+<ul>
+<li>创建用户和组</li>
+</ul>
+<p>[root@oracle ~]# groupadd dba<br>[root@oracle ~]# groupadd oinstall<br>[root@oracle ~]# groupadd oper<br>[root@oracle ~]# useradd -g oinstall -G dba,oper oracle</p>
+<ul>
+<li>添加文件</li>
+</ul>
+<p>[root@oracle ~]# vim /etc/sysctl.conf<br>kernel.shmall = 2097152<br>kernel.shmmax = 2147483648<br>kernel.shmmni = 4096<br>kernel.sem = 250 32000 100 128<br>fs.file-max = 65536<br>net.ipv4.ip_local_port_range = 1024 65000<br>net.core.rmem_default = 1048576<br>net.core.rmem_max = 1048576<br>net.core.wmem_default = 262144<br>net.core.wmem_max = 262144<br>[root@oracle ~]# vim /etc/security/limits.conf<br>oracle              soft    nproc   2047<br>oracle              hard    nproc   16384<br>oracle              soft    nofile  1024<br>oracle              hard    nofile  65536<br>[root@oracle ~]# vim /etc/pam.d/login<br>session    required     /lib/security/pam_limits.so<br>session    required     pam_limits.so<br>[root@oracle ~]# vi /etc/profile</p>
+<pre><code class="shell">if [ $USER = &quot;oracle&quot; ]; then
+    if [ $SHELL = &quot;/bin/ksh&quot; ]; then
+         ulimit -p 16384
+         ulimit -n 65536
+   else
+         ulimit -u 16384 -n 65536
+   fi
+fi</code></pre>
+<ul>
+<li>新建文件，修改权限</li>
+</ul>
+<p>[root@oracle ~]# mkdir /u01<br>[root@oracle ~]# mkdir -pv /u01/app/oracle<br>mkdir: created directory <code>/u01/app&#39;
+mkdir: created directory</code>/u01/app/oracle’<br>[root@oracle ~]# chown -R oracle:oinstall /u01/app/oracle/<br>[root@oracle ~]# chmod -R 775 /u01/app/oracle/<br>[root@oracle ~]# mkdir /u01/flash_recovery_area<br>[root@oracle ~]# chown oracle:oinstall /u01/flash_recovery_area/<br>[root@oracle ~]# chmod 755 /u01/flash_recovery_area/</p>
+</blockquote>
+<h2 id="5-安装oracle"><a href="#5-安装oracle" class="headerlink" title="5.安装oracle"></a>5.安装oracle</h2><ol>
+<li><h4 id="添加以下几行"><a href="#添加以下几行" class="headerlink" title="添加以下几行"></a>添加以下几行</h4><blockquote>
+<p>[root@oracle ~]# su - oracle<br>[oracle@oracle ~]$ vim .bash_profile<br>export ORACLE_BASE=/u01/app/oracle<br>export ORACLE_HOME=/u01/app/oracle/product/10.2.0<br>export ORACLE_SID=xjzhujunjie<br>[oracle@oracle ~]$ . .bash_profile<br>[oracle@oracle ~]$ env | grep ORA<br>ORACLE_SID=soul<br>ORACLE_BASE=/u01/app/oracle<br>ORACLE_HOME=/u01/app/oracle/product/10.2.0</p>
+<p><strong>其中的ORACLE_SID可以写你自己的，但是要记住，后面要用</strong></p>
+</blockquote>
+</li>
+<li><h4 id="找到runInstaller进行安装，要在图形化界面下才能成功"><a href="#找到runInstaller进行安装，要在图形化界面下才能成功" class="headerlink" title="找到runInstaller进行安装，要在图形化界面下才能成功"></a>找到runInstaller进行安装，要在图形化界面下才能成功</h4><p>基本的安装过程不是很难，一路点过去就可以了。在准备的时候可以不要它的oral数据库，后面自己建库。</p>
+<blockquote>
+<p><strong>过程中可能会出现一些问题，多看log进行解决</strong></p>
+<p>大部分都是缺包，用yum把需要的包都打上就没问题了</p>
+<p><code>yum install libXp.i686 libXp-devel.i686 libXt.i686 libXt-devel.i686 libXtst.i686 libXtst-devel.i686 make.x86_64 gcc.x86_64 libaio.x86_64 glibc-devel.i686 libgcc.i686</code><br><code>glibc-devel.x86_64 compat-libstdc++-33 -y</code><br><code>yum install glibc* gcc* make* compat-db* libstdc* libXp* libXtst* compat-libstdc++* -y</code> </p>
+<p>*<em>Error in invoking target ‘collector’ of makefile ‘/u01/app/oracle/product/10.2.0/sysman/lib/ins_emdb.mk’. *</em></p>
+<p>上面这个问题特殊的说一下。出现这个问题可以按continue。然后有两种解决方式：</p>
+<p>1.修改bash_porfile 添加LD_LIBRARY_PATH=$ORACLE_HOME/lib</p>
+<p>2.将/u01/app/oracle/product/10.2.0/bin下的oracle改成oracle.bin</p>
+<p>并新建一个oracle在其中添加以下内容：</p>
+<p><code>export DISABLE_HUGETLBFS=1</code><br><code>exec $ORACLE_HOME/bin/oracle.bin$@</code></p>
+<p><code>EOF</code></p>
+<p>两个方式我都用了，后面启动没有出现问题。</p>
+</blockquote>
+</li>
+<li><h4 id="建立监听器–netca"><a href="#建立监听器–netca" class="headerlink" title="建立监听器–netca"></a>建立监听器–netca</h4><blockquote>
+<p>在图形化界面下使用netca命令，按步骤添加就好，协议选择tcp。</p>
+</blockquote>
+</li>
+<li><h4 id="查看监听器–lsnrctl-status"><a href="#查看监听器–lsnrctl-status" class="headerlink" title="查看监听器–lsnrctl status"></a>查看监听器–lsnrctl status</h4><blockquote>
+<p>The command completed successfully</p>
+<p>如果有上面这句话就说明监听器启动成功了，如果没成功，用<strong>lsnrctl start</strong> 开启，停用为<strong>lsnrctl stop</strong>命令</p>
+</blockquote>
+</li>
+<li><h4 id="创建数据库–dbcp"><a href="#创建数据库–dbcp" class="headerlink" title="创建数据库–dbcp"></a>创建数据库–dbcp</h4><blockquote>
+<p>一路点过去就行，注意SID属性选择之前你在配置文件中写的那个。最后注意将<strong>scott hr</strong>两个账户解锁。</p>
+</blockquote>
+</li>
+<li><h4 id="启动数据库实例–sqlplus"><a href="#启动数据库实例–sqlplus" class="headerlink" title="启动数据库实例–sqlplus"></a>启动数据库实例–sqlplus</h4><blockquote>
+<p>第一次账号为<strong>sys as sysdba</strong>密码为空</p>
+<p>进去后挂载数据库<strong>startup</strong></p>
+<p>至此就完成数据库的安装了。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="6-远程访问的问题"><a href="#6-远程访问的问题" class="headerlink" title="6.远程访问的问题"></a>6.远程访问的问题</h2><blockquote>
+<p>因为我是在虚拟机中安装，本地环境为windows，所以特殊说明一下。</p>
+<p>首先要安装sqlplus工具包并加入path中，然后在cmd中输入</p>
+<p><code>sqlplus scott/tiger@oracle10:1521/soul</code></p>
+<p>其中的oracle10是我设置的虚拟机域名。</p>
+<p>可能会存在一些问题，<strong>ORA-12514</strong>等。</p>
+<p>解决办法：</p>
+<p>在$ORACLE_HOME/network/admin/listener.ora中更改</p>
+<pre><code class="shell">SID_LIST_LISTENER =  
+(SID_LIST =  
+(SID_DESC =  
+ (SID_NAME = PLSExtProc)  
+ (ORACLE_HOME = /u01/app/oratt/product/10.2.0/dbhome_1)  
+ (PROGRAM = extproc)  
+)  
+(SID_DESC =  
+ (SID_NAME = webdb)  
+ (ORACLE_HOME = /u01/app/oratt/product/10.2.0/dbhome_1)  
+)  
+)
+LISTENER =  
+(DESCRIPTION_LIST =  
+(DESCRIPTION =  
+(ADDRESS = (PROTOCOL = TCP)(HOST = serv1)(PORT = 1844))  
+(ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC0))  
+    )  
+)  </code></pre>
+</blockquote>
+
+            <hr>
+          </div>
+          <br>
+          <div>
+            <p>
+            
+              <span>
+                <i class="iconfont icon-inbox"></i>
+                
+                  <a class="hover-with-bg" href="/categories/RDBMS">RDBMS</a>
+                  &nbsp;
+                
+                  <a class="hover-with-bg" href="/categories/oracle">oracle</a>
+                  &nbsp;
+                
+              </span>&nbsp;&nbsp;
+            
+            
+              <span>
+                <i class="iconfont icon-tag"></i>
+                
+                  <a class="hover-with-bg" href="/tags/linux">linux</a>
+                
+                  <a class="hover-with-bg" href="/tags/oracle">oracle</a>
+                
+              </span>
+            
+            </p>
+            
+              <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      
+  <div id="toc">
+    <p class="h4"><i class="far fa-list-alt"></i>&nbsp;TOC</p>
+    <div id="tocbot"></div>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- custom -->
+
+
+<!-- Comments -->
+<div class="col-lg-7 mx-auto nopadding-md">
+  <div class="container comments mx-auto" id="comments">
+    
+  </div>
+</div>
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+    <i class="iconfont icon-love"></i>
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    <br>
+
+    
+  
+    <!-- 不蒜子统计PV -->
+    
+    &nbsp;<span id="busuanzi_container_site_pv">总访问量 
+          <span id="busuanzi_value_site_pv"></span> 次</span>&nbsp;
+  
+  
+    <!-- 不蒜子统计UV -->
+    
+    &nbsp;<span id="busuanzi_container_site_uv">总访客数 
+            <span id="busuanzi_value_site_uv"></span> 人</span>&nbsp;
+  
+  <br>
+
+
+
+    
+
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="/lib/jquery/jquery.min.js" ></script>
+<script src="/lib/popper/popper.min.js" ></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js" ></script>
+<script src="/lib/mdbootstrap/js/mdb.min.js" ></script>
+<script src="/js/main.js" ></script>
+
+
+  <script src="/js/lazyload.js" ></script>
+
+
+
+  
+    <script src="/lib/tocbot/tocbot.min.js" ></script>
+  
+  <script src="/js/post.js" ></script>
+
+
+
+  <script src="/lib/smooth-scroll/smooth-scroll.min.js" ></script>
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+<!-- Plugins -->
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+  <script src="/lib/prettify/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script src="/lib/typed/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Linux下安装ORACLE10g的部分注意事项总结&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script src="/lib/anchor/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script src="/lib/fancybox/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>

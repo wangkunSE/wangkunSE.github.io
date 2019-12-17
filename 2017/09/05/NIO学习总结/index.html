@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.jpg">
+  <link rel="icon" type="image/png" href="/img/favicon.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>NIO学习总结 ~ Soul</title>
+
+  <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"  >
+<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css"  >
+<link rel="stylesheet" href="/lib/mdbootstrap/css/mdb.min.css"  >
+<link rel="stylesheet" href="/lib/github-markdown/github-markdown.min.css"  >
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"  >
+
+<link rel="stylesheet" href="/css/main.css"  >
+
+
+  <link rel="stylesheet" href="/lib/fancybox/jquery.fancybox.min.css"  >
+
+
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>铁锤的Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">Archives</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">Categories</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">Tags</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">About</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+</nav>
+
+    <div class="view intro-2" id="background"
+         style="background: url('/img/post.jpg')no-repeat center center;
+           background-size: cover;
+           background-attachment: fixed;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <br>
+              
+                <p class="mt-3">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>&nbsp;
+                  Tuesday, September 5th 2017, 3:21 pm
+                </p>
+              
+
+              <p>
+                
+                  
+                  &nbsp;<i class="far fa-chart-bar"></i>
+                  <span class="post-count">
+                    1.7k 字
+                  </span>&nbsp;
+                
+
+                
+                  
+                  &nbsp;<i class="far fa-clock"></i>
+                  <span class="post-count">
+                      6 分钟
+                  </span>&nbsp;
+                
+
+                
+                  <!-- 不蒜子统计文章PV -->
+                  
+                  &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;
+                  <span id="busuanzi_container_page_pv">
+                    <span id="busuanzi_value_page_pv"></span> 次
+                  </span>&nbsp;
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <h1 id="NIO-学习总结"><a href="#NIO-学习总结" class="headerlink" title="NIO 学习总结"></a>NIO 学习总结</h1><h2 id="1-学习感悟"><a href="#1-学习感悟" class="headerlink" title="1.学习感悟"></a>1.学习感悟</h2><p>&emsp;&emsp;Java NIO是自jdk1.4以来就有的一个包。里面提供了大量的与普通IO不同的API。主要的不同点就在于N，有两种解释，一种是new，一种是nonblocking。学习完了之后我觉得两种说法都对，因为这部分API和典型的IO思想上完全不一样，而不一样之处中很重要的一点就是nonblocking这个特性。</p>
+<p>&emsp;&emsp;整体的学习是从构建非阻塞型Socket通信开始的，之前是一直在学习Socket的知识，因为在项目中用到了而且对于自己来说是难点，所以特地学习了一下，收获也非常多，不过Socket部分另起一篇文章写。</p>
+<p>&emsp;&emsp;NIO之前就明白很重要，但是一开始看Java核心技术的介绍并没有看进去，以为很难，学完之后发现并不然，重要的是要找到一个好的资源。我对NIO的学习大部分都是通过一个外国小哥的博客，链接在这里（tutorials.jenkov.com）。文章是14年就发表在网站上的，感觉自己要跟上这个时代真的是要做很多努力。博客中技术十分全面，Java的各种核心包都有教程，虽是英文，但是并不难懂，且有图有代码结合说明十分的便于理解。</p>
+<p>&emsp;&emsp;目前基本明白了NIO的思想以及各种API的调用，但是缺乏实战经验，所以理解可能很片面，还需要不断的加深理解。毕竟这个行业是要不断学习的嘛。</p>
+<h2 id="2-学习内容"><a href="#2-学习内容" class="headerlink" title="2.学习内容"></a>2.学习内容</h2><h3 id="1-三大组件"><a href="#1-三大组件" class="headerlink" title="1. 三大组件"></a>1. 三大组件</h3><ul>
+<li>Buffer</li>
+</ul>
+<p>&emsp;&emsp;Buffer是什么呢？在我看来Buffer其实就是一个放数据的容器，换言之就是一个数组。可以向其中写数据，当然也可以向其中读数据。那么它内部是怎么控制的呢？</p>
+<p>&emsp;&emsp;这其中涉及它的很重要的四个属性，<strong>mask</strong>、<strong>capacity</strong>、<strong>position</strong>、<strong>limit</strong>。其中mask就像它的字面意思，它用于用户做标记，通过合适的方法可以找到该标记然后对标记后的数据做处理。capacity是整个数组的长度，在创建Buffer实例时就已经确定了，是不变的。下面就是两个很重要的属性，关于怎么读写Buffer中的数据。position很好理解就是下一个要操作的数据位置，这个操作包括读写。而limit就是所能操作数据的界限。这四个属性有这样一种关系mask&lt;=position&lt;=limit&lt;=capacity。</p>
+<p>&emsp;&emsp;Buffer中有两个有意思的方法特别说一下，其中一个是flip()，另一个是compact()。flip()的实现代码非常简单如下所示：</p>
+<pre><code class="java">public final Buffer flip() {
+    limit = position;
+     position = 0;
+     mark = -1;
+     return this;
+ }</code></pre>
+<p> 这是什么意思呢，其实非常简单，调用这个方法就是意味着你要从Buffer中往外读取已经存在于Buffer中的数据了。</p>
+<p>&emsp;&emsp;与之相对的就是clear()与compat()方法就是整理出合适的空间可以向Buffer中写数据。</p>
+<ul>
+<li><p>Channel</p>
+<p>&emsp;&emsp;什么是Channel呢，与典型的IO中的Stream有些像，但是不一样，他也有很多种形式，比如处理文件的FileChannel和通信的SocketChannel等等。但是向其中读写数据的介质就是上面说到的Buffer。 数据的传送不像Stream一样是一个类似水管的形态，而更像矿车的轨道，Buffer就是矿车。</p>
+<p> &emsp;&emsp;我自己对Channel的理解也不是很深刻，更深的理解只能等以后多实践才能得出吧。</p>
+</li>
+<li><p>Selector</p>
+<p>&emsp;&emsp;说了这么半天，从一开头就说到nonblocking，但是还一直没介绍是啥呢。nonblocking就和Selector有关，Selector是一个nonblocking的Channel管理器，它的select方法告诉程序员哪些他们感兴趣的Channel可以用了。而兴趣可以在最开始注册的时候注册进去。</p>
+<p>&emsp;&emsp;FileChannel不支持非阻塞型模式，所以以下所说的Channel都是SocketChannel。</p>
+<p>&emsp;&emsp;这种方式的好处就是即使单线程也可以处理多个Channel，不像传统IO需要为每一个连接分配一个线程。在很多连接不是很活跃的情况下，极大的浪费了系统的资源。这里借鉴两个大佬的图。见下两图：</p>
+<img src="/2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/nio-vs-io-3.png" srcset="/img/loading.gif" class="">
+
+</li>
+</ul>
+<p>上图为非阻塞形式</p>
+<p> ​</p>
+ <img src="/2017/09/05/NIO%E5%AD%A6%E4%B9%A0%E6%80%BB%E7%BB%93/nio-vs-io-4.png" srcset="/img/loading.gif" class="">
+
+<p>上图为阻塞形式</p>
+<p>&emsp;&emsp;而不阻塞的好处就在于没有数据可读写的时候可以做一些其他的事情，比如记录服务器状态（还没有想到更好的可干的事儿）。而select方法干的事儿和传统IO的阻塞读写形式有一个很好的比喻，就是说朋友和你约好了要来你家，但是不知道具体什么时候来，正常我们会怎么做呢，是不是定时去门口看看朋友有没有来，如果没来的话就回到客厅做点儿别的事儿，非阻塞型IO就是这么做的，传统IO的话就会一直站在家门口等到朋友来了才和朋友一起进门。由此可见当然是非阻塞型IO好咯。</p>
+<p>&emsp;&emsp;但也并不是说阻塞型IO一无是处，阻塞型IO的服务器实现起来非常简单，数据处理起来也非常容易。在并发量不是很大的情况下，阻塞型IO实现的服务器就够用了。</p>
+<h3 id="2-为什么需要NIO"><a href="#2-为什么需要NIO" class="headerlink" title="2.为什么需要NIO"></a>2.为什么需要NIO</h3><p>&emsp;&emsp;因为线程是一个非常宝贵且费资源的资源，大佬的文章中写到要是有1,000,000个连接连接到服务器，且为每一个连接分配一个线程的话大概需要1TB的内存。所以说并发量很大的时候传统的阻塞型服务器是顶不住的，只有使用NIO，虽然编写NIO的服务器是很难的一件事，但是其突破了性能障碍。</p>
+<h3 id="3-什么时候用NIO"><a href="#3-什么时候用NIO" class="headerlink" title="3.什么时候用NIO"></a>3.什么时候用NIO</h3><p>&emsp;&emsp;这里引用一下大佬的原文：</p>
+<blockquote>
+<p>NIO allows you to manage multiple channels (network connections or files) using only a single (or few) threads, but the cost is that parsing the data might be somewhat more complicated than when reading data from a blocking stream.</p>
+<p>If you need to manage thousands of open connections simultanously, which each only send a little data, for instance a chat server, implementing the server in NIO is probably an advantage. Similarly, if you need to keep a lot of open connections to other computers, e.g. in a P2P network, using a single thread to manage all of your outbound connections might be an advantage. </p>
+</blockquote>
+<p>&emsp;&emsp;大意就是当需要构建一个并发量大切每次传输数据少的情境下，例如聊天服务器，P2P网络等等，需要用到NIO来构建服务器通讯。</p>
+
+            <hr>
+          </div>
+          <br>
+          <div>
+            <p>
+            
+              <span>
+                <i class="iconfont icon-inbox"></i>
+                
+                  <a class="hover-with-bg" href="/categories/Java">Java</a>
+                  &nbsp;
+                
+              </span>&nbsp;&nbsp;
+            
+            
+              <span>
+                <i class="iconfont icon-tag"></i>
+                
+                  <a class="hover-with-bg" href="/tags/Java">Java</a>
+                
+                  <a class="hover-with-bg" href="/tags/NIO">NIO</a>
+                
+              </span>
+            
+            </p>
+            
+              <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      
+  <div id="toc">
+    <p class="h4"><i class="far fa-list-alt"></i>&nbsp;TOC</p>
+    <div id="tocbot"></div>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- custom -->
+
+
+<!-- Comments -->
+<div class="col-lg-7 mx-auto nopadding-md">
+  <div class="container comments mx-auto" id="comments">
+    
+  </div>
+</div>
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+    <i class="iconfont icon-love"></i>
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    <br>
+
+    
+  
+    <!-- 不蒜子统计PV -->
+    
+    &nbsp;<span id="busuanzi_container_site_pv">总访问量 
+          <span id="busuanzi_value_site_pv"></span> 次</span>&nbsp;
+  
+  
+    <!-- 不蒜子统计UV -->
+    
+    &nbsp;<span id="busuanzi_container_site_uv">总访客数 
+            <span id="busuanzi_value_site_uv"></span> 人</span>&nbsp;
+  
+  <br>
+
+
+
+    
+
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="/lib/jquery/jquery.min.js" ></script>
+<script src="/lib/popper/popper.min.js" ></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js" ></script>
+<script src="/lib/mdbootstrap/js/mdb.min.js" ></script>
+<script src="/js/main.js" ></script>
+
+
+  <script src="/js/lazyload.js" ></script>
+
+
+
+  
+    <script src="/lib/tocbot/tocbot.min.js" ></script>
+  
+  <script src="/js/post.js" ></script>
+
+
+
+  <script src="/lib/smooth-scroll/smooth-scroll.min.js" ></script>
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+<!-- Plugins -->
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+  <script src="/lib/prettify/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script src="/lib/typed/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "NIO学习总结&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script src="/lib/anchor/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script src="/lib/fancybox/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>

@@ -42,7 +42,7 @@
     <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
   <div class="container">
     <a class="navbar-brand"
-       href="/">&nbsp;<strong>大锤的Blog</strong>&nbsp;</a>
+       href="/">&nbsp;<strong>铁锤的Blog</strong>&nbsp;</a>
 
     <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
             data-target="#navbarSupportedContent"
@@ -136,68 +136,47 @@
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/12/11/learnHexo/">
-        <p class="h4 index-header">learnHexo</p>
+      <a href="/2018/02/02/synchronized%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
+        <p class="h4 index-header">synchronized理解与实践</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">文章相关命令新文章System.out.println(&quot;hello world&quot;);
+          <div class="index-text mb-1">
+作为Java使用者，对于synchronized肯定不陌生，它是多线程中重要的一个机制，能够保证多线程程序在共享数据时的正确性。但是最近遇到一个问题，久久没有想明白，查阅了很多博客和资料最终终于想明白了，决定写记录下来。
 
-1231
+如果想了解synchronized的机制以及原理可以参考：
+Java 之 synchronized 详解
+起因    private static void synchronizedDemo() {
+        Task task = new Task();
+        for (int i = 0; i &lt; 10; i++) {
+            new Thread(task).start();
+        }
+    }
 
-12312312
-
-
-
-
-
-alert(&#39;Hello World!&#39;);
-
-
-
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque hendrerit lacus ut purus iaculis feugiat. Sed nec tempor elit, quis aliquam neque. Curabitur sed diam eget dolor fermentum semper at eu lorem.
-
-
-
-
-System.out.println(&quot;hello world&quot;);
-
-1231
-
-12312312
-    /**
-    */
-引用图片{% assert_img slug [title] %}
-asdasdasdasd
-asdasdas
-hexo
-
-
-
-
-asdasdasdasdasdas
-
-</div>
+    private static class Task implements Runnable {
+        private static final String MY_LOCK_DATE = &quot;date_lock&quot;;
+        private Integer value = </div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-11&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-02-02&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/hexo">hexo</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/Java">Java</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/hexo">hexo</a>&nbsp;
+            <a href="/tags/Thread">Thread</a>&nbsp;
           
         
       </div>
@@ -208,105 +187,39 @@ asdasdasdasdasdas
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/12/10/test3/">
-        <p class="h4 index-header">test3</p>
+      <a href="/2018/01/31/ThreadLocal%E7%90%86%E8%A7%A3%E4%B8%8E%E5%AE%9E%E8%B7%B5/">
+        <p class="h4 index-header">ThreadLocal理解与实践</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1"></div>
+          <div class="index-text mb-1">​        首先贴出源码的对于该类的注释，大意讲的是这个类提供了线程封闭的变量。所谓线程封闭指的是其他线程不可以访问这个变量，每一个线程对应该变量的一个副本。当ThreadLocal被声明成private static时，一般用来将一个属性与当前线程联系起来（比如当前的线程ID，用户ID）。
+/**
+ * This class provides thread-local variables.  These variables differ from
+ * their normal counterparts in that each thread that accesses one (via its
+ * {@code get} or {@code set} method) has its own, independently initialized
+ * copy of the variable.  {@code ThreadLocal} instances are typically private
+ * static fields in classes that wish t</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-10&nbsp;&nbsp;
-        
-        
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/12/10/test2/">
-        <p class="h4 index-header">test2</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1"></div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-10&nbsp;&nbsp;
-        
-        
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/12/10/test/">
-        <p class="h4 index-header">test</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">MySQL必知必会1.检索数据1.1 distinct
-##用于检索出单一的行值
-select distinct vend_id from products.
-
-##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。
-select distinct vend_id,vend_name from products.
-
-mysql&gt; select * from test;
-+----+------+-------+
-| id | name | photo |
-+----+------+-------+
-|  1 | tony | photo |
-|  1 | tom  | photo |
-|  2 | tony | photo |
-|  2 | tom  | photo |
-|  2 | tom  | photo |
-+----+------+-------+
-5 rows in set
-
-mysql&gt; select distinct id,name from test;
-+----+------+
-| id | name |
-+----+------+</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-10&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-01-31&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
           
-            <a href="/categories/test">test</a>&nbsp;
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
           
-            <a href="/categories/test1">test1</a>&nbsp;
+            <a href="/categories/Java">Java</a>&nbsp;
           &nbsp;
         
         
           <i class="iconfont icon-tag"></i>
           
-            <a href="/tags/test">test</a>&nbsp;
+            <a href="/tags/Java">Java</a>&nbsp;
           
         
       </div>
@@ -317,51 +230,399 @@ mysql&gt; select distinct id,name from test;
     
     
     <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/12/03/MySQL%E5%BF%85%E7%9F%A5%E5%BF%85%E4%BC%9A/">
-        <p class="h4 index-header">MySQL必知必会</p>
+      <a href="/2018/01/02/2017%E6%80%BB%E7%BB%93/">
+        <p class="h4 index-header">2017总结</p>
         
         
           
         
         <div class="index-excerpt" >
-          <div class="index-text mb-1">MySQL必知必会[TOC]
-1.检索数据1.1 distinct
-##用于检索出单一的行值
-select distinct vend_id from products.
-
-##distinct 不止作用于其后置字段，它会查出所有列组合情况下单一的列。
-select distinct vend_id,vend_name from products.
-
-mysql&gt; select * from test;
-+----+------+-------+
-| id | name | photo |
-+----+------+-------+
-|  1 | tony | photo |
-|  1 | tom  | photo |
-|  2 | tony | photo |
-|  2 | tom  | photo |
-|  2 | tom  | photo |
-+----+------+-------+
-5 rows in set
-
-mysql&gt; select distinct id,name from test;
-+----+------+
-| id | name |
-+----+-</div>
+          <div class="index-text mb-1">&emsp;&emsp;时光匆匆，一转眼一年又过去了。很多事情都像是昨天刚刚发生的一样，越长大就越感觉到时间流逝之快远远超过预料。从前老师给布置任务让做年终个人总结，但当时从来都是敷衍，现在才感觉到这不失为一种记录时间的方法，所以就用这篇流水账记录一下我的2017。
+学业&emsp;&emsp;今年到头来虽然也感觉自己不会的知识很多，但是比起一年前的自己还是很有进步的。当然也有更多不足之处，需要在新的一年里努力加油的。
+&emsp;&emsp;细算一下进步体现在以下几个方面。首先是专业知识的理解加深，包括对整个计算机的理解，对工作语言Java本身的理解，对所应用到的一些知识的理解也都进了一步，不过这都是在结合别人建议之后进行加深的，这也是以后的方向，毕竟一个剑客也要对自己的剑了如指掌，才能在交战中取得胜利，才能够格参透更高深的剑意。其次是专业知识的广度也有所增长，了解到了很多新的专业方向，但是了解都很泛，明年一定要选其中的几个深入理解，只有看得招数多了，才能悟出自己的招数，就似独孤九剑，所谓无招胜有招不过就是临敌经验，以及对抓重点能力的锻炼。再次是对专业知识外的书籍的阅读，知晓了王阳明</div>
         </div>
       </a>
 
       <div>
         
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-12-03&nbsp;&nbsp;
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-01-02&nbsp;&nbsp;
         
         
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E5%85%B6%E4%BB%96">其他</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E6%97%A5%E5%B8%B8">日常</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/12/02/Maven%E7%9A%84filtering%E5%92%8Cprofile%E6%A0%87%E7%AD%BE%E4%BD%BF%E7%94%A8/">
+        <p class="h4 index-header">Maven的filtering和profile标签使用</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">使用Maven 将项目分版前言
+每个项目通常都会用不同的配置文件对应不同的版本，例如开发版和上线版本的配置通常会是不同的。此时就会产生一个问题，当项目需要从开发版切换到上线版时，总是会避免不了更改很多配置项，或者切换配置文件，但是不管哪一种都不方便配置。使用Maven就可以很方便的帮助我们应对这种问题，本文就简单介绍一下使用方法。
+
+resources属性
+这个属性就是指定构建项目时需要将哪些配置文件打包，其本身包含很多子标签，这里就不一一介绍了，只介绍相关的。其中include就是指定需要包含在最终项目中的资源。
+
+ &lt;resources&gt;
+            &lt;resource&gt;
+                &lt;directory&gt;src/main/java&lt;/directory&gt;
+                &lt;includes&gt;
+                    &lt;include&gt;**/*.xml&lt;/include&gt;
+                &lt;/includes&gt</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-12-02&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Maven">Maven</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/11/20/%E5%AE%9E%E4%B9%A0%E9%9D%A2%E8%AF%95%E8%AE%B0%E5%BD%95/">
+        <p class="h4 index-header">实习面试记录</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">spring相关
+1.springmvc 工作流程
+2.springmvc mapping种类
+3.spirng 工作原理
+4.Aop 概念以及spring aop实现的方式
+5.spring 启动过程
+
+集合框架
+1.hashmap原理
+2.concurrentHashMap和hashtable，hashmap的区别
+
+多线程
+1.原子类
+2.wait和sleep的区别
+3.某线程获得锁后能否反复进入被synchronized加锁的代码或方法
+4.countdownLaunch的实现原理
+5.多线程的学习方法：没有困难制造困难。
+
+jvm相关
+1.jvm编译时做了哪些优化（我说我挺懂jvm的，直接给我抛出了这个问题，当时就感觉自己嘴怎么这么贱。。）
+2.堆内存如何分配的（当时答得不好，他提示说新生代和老年代是不一样的，面试完才想起来这不就是垃圾回收算法的知识嘛。。还是不熟，死记课本不行啊。。）
+
+数据结构
+1.B树，B*树，能否根据所给数组形成B树（当时都忘了B树是啥样的了，只记得可以做索引。。平时一定要来回翻看，不然就会感觉到书到用时方恨少了。。）
+2.红黑树原理，作用
+3.堆排序</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-20&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/">
+        <p class="h4 index-header">Java实现二叉树的三种非递归遍历</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">Java 实现二叉树的三种非递归遍历1.思路
+其实思路就是递归的思路，无非就是加入了栈这个数据结构。
+具体来看代码吧，个人觉得还算简洁。
+
+2.实现首先是结点数据结构的设置：/**
+ * @author WK
+ */
+public class SearchBinaryTree {
+
+    //存放的结点标志
+    public String tag = &quot;&quot;;
+    //是否被便利的标志
+    public boolean flag = false;
+    //左孩子
+    public SearchBinaryTree leftChild = null;
+    //右孩子
+    public SearchBinaryTree rightChild = null;
+  //省略了getter，setter以及构造函数
+}
+- 前序遍历/**
+     *
+     * @param T 传入的树的根结点
+     */
+    public static void priorOrderNonRecursive(SearchBinaryTree T) </div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-11&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Java">Java</a>&nbsp;
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/">
+        <p class="h4 index-header">Vmare克隆虚拟机</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">克隆虚拟机​    VMware虚拟机安装系统虽然方便，但是搭集群时如果每个结点都重新安装的话也是很耗时的。幸好VMware有个克隆功能，用起来非常方便，非常爽。下面就给出简单的克隆教程。前提是你已经有一个安装好系统且配置好环境的虚拟机。
+
+
+这里我就用图上的nginx虚拟机做演示，我安装的是centos7。
+1、右键nginx虚拟机–》快照–》拍摄快照
+
+2、点击拍摄快照，快照拍摄成功。名称可自填
+
+3、再右键nginx虚拟机–》管理–》克隆
+
+4、下一步5、选择现有快照–》下一步
+
+6、选择创建完整克隆–》下一步
+
+7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。
+
+8、至此我们完成了克隆虚拟机的任务
+
+9、配置网络
+
+​    什么都没设置网络居然是好的，但是回头看原虚拟机，发现原虚拟机访问不了网络了，果然有问题。
+
+
+①、删除/etc/sysconfig/network-scripts/ifcfg-ens33 的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。
+
+②、进入/etc/</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-04&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/vmare">vmare</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/">
+        <p class="h4 index-header">编译安装nginx的坑</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">编译安装nginx的坑报错信息make -f objs/Makefile
+make[1]: Entering directory `/data/source/nginx&#39;
+cd /usr/local/ufo/lib/pcre \
+&amp;&amp; if [ -f Makefile ]; then make distclean; fi \
+&amp;&amp; CC=&quot;gcc&quot; CFLAGS=&quot;-O2 -fomit-frame-pointer -pipe &quot; \
+./configure --disable-shared
+/bin/sh: ./configure: No such file or directory
+make[1]: *** [/usr/local/services/lib/pcre/Makefile] Error 127
+make[1]: Leaving directory `/data/source/nginx-0.7.61&#39;
+make: *** [build] Error 2
+
+分析
+一开始一点儿头绪都没有，</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-03&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nginx">nginx</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/10/28/%E6%88%91%E4%BB%AC%E4%BB%A8%E8%AF%BB%E5%90%8E%E6%84%9F/">
+        <p class="h4 index-header">我们仨读后感</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">&emsp;&emsp;自从读完《围城》，似乎对读书就爱了起来。其实《围城》中多处的引经据典我都看不懂，但是依然觉得这本书写得是真好。因为从前那么不爱读书的我竟能不知不觉的看下去，直到看完才惊觉已然看完了。因此当然就对钱老产生了极大的兴趣，为什么作者这么厉害，看围城前对钱老的了解只是《寂静的钱钟书》那篇文章。后来慢慢了解到钱老经历之丰富，学识之渊博。真的是敬仰二字都不足以表达出我的感受。
+&emsp;&emsp;读完《我们仨》才明白为什么围城中的序所写的钱老写书时给杨先生看，两人边看边笑。因为《围城》就是钱老回国后自己的故事啊，不同的是钱老有货真价实的学历与知识储备而且有他爱的圆圆。所以其实我很好奇《我们仨》中没写到的故事，就是钱老怎么和杨先生在一起，又有没有唐晓芙这个人呢？哈哈，就这两本书而言都给我同一种感觉，那就是读着不累，故事又很抓人，然而又不缺乏深度。我想这就是高级知识分子笔下的文章吧。
+&emsp;&emsp;《我们仨》真的是一个非常温馨的故事，一家人不论什么时候总是彼此牵挂，在一起便无限欢喜，一家人在一起平平淡淡但又充满趣味。其中很有感触的一幕就是，钱老躺在船的床上，杨先生</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-10-28&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E4%B9%A6%E7%B1%8D">书籍</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E6%96%87%E5%AD%A6">文学</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/10/23/%E5%A4%A7%E8%AF%9D%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E8%AF%BB%E5%90%8E%E6%84%9F/">
+        <p class="h4 index-header">大话设计模式读后感</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">&emsp;&emsp;算来从读这本书开始应该有一个多月了，刚开始读得时候真的是感觉像开启了新世界的大门，感觉太厉害了，全书都是一个个的小故事，故事中包含一个设计模式，真的让人感觉面向对象是一种思维，一门哲学，全书读起来十分抓人，个人感觉《HeadFirst设计模式》还要好。因为平时还有其他工作所以读完这本书花了一个月的时间，包括写书中的示例代码。虽然读完了这本书，但是感觉就如囫囵吞枣，很多东西都没理解，印象非常深刻的模式寥寥可数，还需要在实际的学习工作中深入理解。每个模式都非常的厉害，它们的存在让我感觉到写代码不是简单的复制粘贴，而是一门艺术。
+&emsp;&emsp;看了设计模式之后感觉自己以前的代码真的是丑陋无比，简直就如建房子只会堆砖抹水泥一样。也终于体会到了一点儿工程师和码农的区别，体会到了一些什么才是真正的面向对象编程。并不是说用一门面向对象的语言就可以写出面向对象的代码。面向对象编程使代码耦合度的降低，因此软件的扩展性，复用性得到了极大的增强。
+&emsp;&emsp;之前写代码真的是对设计几乎都没有如何想，觉得功能实现了就行了嘛，在适当地抽取一下复用的代码就算是对自己代</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-10-23&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E4%B9%A6%E7%B1%8D">书籍</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F">设计模式</a>&nbsp;
+          
         
       </div>
     </div>
   </div>
 
 
+
+  <nav aria-label="index posts navigation">
+    <span class="pagination pg-blue justify-content-center mt-5" id="pagination">
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/">2</a><a class="extend next" rel="next" href="/page/2/"><i class="fas fa-angle-double-right"></i></a>
+    </span>
+  </nav>
+  
+  <script>
+    for (ele of document.getElementById("pagination").getElementsByClassName("page-number")) {
+      ele.href += '#board';
+    }
+  </script>
 
 
 
@@ -484,7 +745,7 @@ mysql&gt; select distinct id,name from test;
     var typed = new Typed('#subtitle', {
       strings: [
         '  ',
-        "For Liberity&nbsp;",
+        "奥利给&nbsp;",
       ],
       cursorChar: "_",
       typeSpeed: 70,
