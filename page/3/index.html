@@ -136,6 +136,88 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/25/Nginx%20location%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/">
+        <p class="h4 index-header">Nginx location匹配规则</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">语法规则
+location [=|~|~*|^~] /uri/ { … }
+
+
+
+
+模式
+含义
+
+
+
+location = /uri
+= 表示精确匹配，只有完全匹配上才能生效
+
+
+location ^~ /uri
+^~ 开头对URL路径进行前缀匹配，并且在正则之前。
+
+
+location ~ pattern
+开头表示区分大小写的正则匹配
+
+
+location ~* pattern
+开头表示不区分大小写的正则匹配
+
+
+location /uri
+不带任何修饰符，也表示前缀匹配，但是在正则匹配之后
+
+
+location /
+通用匹配，任何未匹配到其它location的请求都会匹配到，相当于switch中的default
+
+
+
+首先精确匹配 =
+其次前缀匹配 ^~
+其次是按文件中顺序的正则匹配
+然后匹配不带任何修饰的前缀匹配。
+最后是交给 / 通用匹配
+当有匹配成功时候，停止匹配，按当前匹配规则处理请求
+
+遇到的问题
+想要在非根目录下部署静态文件，但是一直显示404。 配置如下
+location ^~ /admin {
+      root  /a/n/admin;
+      index </div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-25&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/nginx">nginx</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2019/09/24/%E8%87%AA%E5%B7%B1%E6%90%AD%E5%BB%BAgit%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%B9%B6%E5%85%8D%E5%AF%86/">
         <p class="h4 index-header">Git配置SSH免密码登录</p>
         
@@ -609,64 +691,6 @@ https的通信主要是两段加密的过程，客户端和服务端的通信要
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/http">http</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/08/14/equals()%E4%B8%8EhashCode()%E5%85%B3%E8%81%94%E6%80%BB%E7%BB%93/">
-        <p class="h4 index-header">equals()与hashCode()关联总结</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">1. equals()1.1含义
-默认代表两个对象的引用是否相等，等同于 ==。但是一般的覆盖行为是为了使两个对象逻辑相等。
-Point point1 = new Point(0,0);
-Point point2 = new Point(0,0);
-point1.equals(point2);
-
-//我们希望这个结果是相等的，因为他们在同一点上，尽管他们的对象引用不同。
-
-1.2 性质
-自反性 ：非null情况下x.equals(x)永远返回true。
-对称性 :  x.equals(y) 和 y.equals(x)的值相同
-传递性：x.equals(y) 为true  y.equals(z) 为true 那么 z.equals(x) 为true
-一致性：对于一个信息未变的对象调用equals()方法返回的结果一致。
-
-2. hashCode()2.1含义
-用于散列集合的使用。
-
-2.2 约定
-
-在应用程序的执行期间，只要equals()操作所用到的信息未发生变化，那么hashCode()的值应当一致。
-如果两个对象是equals()的，那么他们的hashCode()方法值一定相同。
-</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-08-14&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/Java">Java</a>&nbsp;
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/Java">Java</a>&nbsp;
           
         
       </div>

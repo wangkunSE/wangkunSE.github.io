@@ -136,6 +136,64 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/08/14/equals()%E4%B8%8EhashCode()%E5%85%B3%E8%81%94%E6%80%BB%E7%BB%93/">
+        <p class="h4 index-header">equals()与hashCode()关联总结</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">1. equals()1.1含义
+默认代表两个对象的引用是否相等，等同于 ==。但是一般的覆盖行为是为了使两个对象逻辑相等。
+Point point1 = new Point(0,0);
+Point point2 = new Point(0,0);
+point1.equals(point2);
+
+//我们希望这个结果是相等的，因为他们在同一点上，尽管他们的对象引用不同。
+
+1.2 性质
+自反性 ：非null情况下x.equals(x)永远返回true。
+对称性 :  x.equals(y) 和 y.equals(x)的值相同
+传递性：x.equals(y) 为true  y.equals(z) 为true 那么 z.equals(x) 为true
+一致性：对于一个信息未变的对象调用equals()方法返回的结果一致。
+
+2. hashCode()2.1含义
+用于散列集合的使用。
+
+2.2 约定
+
+在应用程序的执行期间，只要equals()操作所用到的信息未发生变化，那么hashCode()的值应当一致。
+如果两个对象是equals()的，那么他们的hashCode()方法值一定相同。
+</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-08-14&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Java">Java</a>&nbsp;
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Java">Java</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/08/10/LeetCode%20Median%20of%20Two%20Sorted%20Arrays/">
         <p class="h4 index-header">LeetCode-Median of Two Sorted Arrays</p>
         
@@ -647,70 +705,6 @@ ConcurrentHashMap提供了和hashTable同样的线程安全性，但是实现细
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/Java">Java</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/07/24/LeetCode%20N-Queens/">
-        <p class="h4 index-header">LeetCode-N Queens</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">LeetCode: N-Queens题目:
-输入一个数字n，输出一个n*n大小的棋盘能放下n个皇后的所有情况的集合。
-
-例子：
-Input: 4
-Output: [
- [&quot;.Q..&quot;,  // Solution 1
-  &quot;...Q&quot;,
-  &quot;Q...&quot;,
-  &quot;..Q.&quot;],
-
- [&quot;..Q.&quot;,  // Solution 2
-  &quot;Q...&quot;,
-  &quot;...Q&quot;,
-  &quot;.Q..&quot;]
-]
-解释：对于4皇后来说有以上两种独特的解法
-
-思路:
-不难想象解这个题需要回溯法，每一行只可能有一个Queen，所以通过行来找，每一行放置一个Q即结束。我的解法思路和之前解数独问题的解法一致。
-
-代码:
-虽然代码思路差不多，但是有很多细节也比较麻烦，比如判断这个地方能否放置Queen。
-
-class Solution {
-   public List&lt;List&lt;String&gt;&gt; solveNQueens(int n) {</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-24&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          
-            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>

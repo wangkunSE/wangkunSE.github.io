@@ -136,6 +136,70 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/07/24/LeetCode%20N-Queens/">
+        <p class="h4 index-header">LeetCode-N Queens</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: N-Queens题目:
+输入一个数字n，输出一个n*n大小的棋盘能放下n个皇后的所有情况的集合。
+
+例子：
+Input: 4
+Output: [
+ [&quot;.Q..&quot;,  // Solution 1
+  &quot;...Q&quot;,
+  &quot;Q...&quot;,
+  &quot;..Q.&quot;],
+
+ [&quot;..Q.&quot;,  // Solution 2
+  &quot;Q...&quot;,
+  &quot;...Q&quot;,
+  &quot;.Q..&quot;]
+]
+解释：对于4皇后来说有以上两种独特的解法
+
+思路:
+不难想象解这个题需要回溯法，每一行只可能有一个Queen，所以通过行来找，每一行放置一个Q即结束。我的解法思路和之前解数独问题的解法一致。
+
+代码:
+虽然代码思路差不多，但是有很多细节也比较麻烦，比如判断这个地方能否放置Queen。
+
+class Solution {
+   public List&lt;List&lt;String&gt;&gt; solveNQueens(int n) {</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-24&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/07/24/LeetCode%20Merge%20Intervals/">
         <p class="h4 index-header">LeetCode-Merge Intervals</p>
         
@@ -658,61 +722,6 @@ Output: [24,12,8,6]
         for(int i = 0; i &lt; length; i++){
             if(nums[i] != 0){
    </div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-17&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          
-            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/07/17/LeetCode%20Jump%20Game%20II/">
-        <p class="h4 index-header">LeetCode-Jump Game II</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">LeetCode : Jump Game II题目：
-给出一个只含正数的数组，一开始你就在数组的第一个索引上，每个元素代表你能跳的最大步数，你的目标是用最小的跳数跳到数组末尾。保证不会存在不能跳到数组末尾的情况（不保证的话可以判断一下就是JUMP GAME I）。
-
-例子：
-
-思路:
-显然这是一个贪心算法，从后往前看，每次获取到最靠前的索引值，然后用这个索引值进行迭代就可以解题。但是我这么做时间复杂度是O（n^2），并没有发挥贪心的特性。
-
-解法一：class Solution {
-    public int jump(int[] nums) {
-            if(nums== null || nums.length &lt; 2){
-                return 0;
-            }
-            int count = 0;
-            int length = nums.length;
-            int lastPos = length -1;
-            int minIndex = le</div>
         </div>
       </a>
 

@@ -136,6 +136,66 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2017/11/04/Vmare%E5%85%8B%E9%9A%86%E8%99%9A%E6%8B%9F%E6%9C%BA/">
+        <p class="h4 index-header">Vmare克隆虚拟机</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">克隆虚拟机​    VMware虚拟机安装系统虽然方便，但是搭集群时如果每个结点都重新安装的话也是很耗时的。幸好VMware有个克隆功能，用起来非常方便，非常爽。下面就给出简单的克隆教程。前提是你已经有一个安装好系统且配置好环境的虚拟机。
+
+
+这里我就用图上的nginx虚拟机做演示，我安装的是centos7。
+1、右键nginx虚拟机–》快照–》拍摄快照
+
+2、点击拍摄快照，快照拍摄成功。名称可自填
+
+3、再右键nginx虚拟机–》管理–》克隆
+
+4、下一步5、选择现有快照–》下一步
+
+6、选择创建完整克隆–》下一步
+
+7、输入虚拟机名称，安装地址，点击完成，等待克隆完成。
+
+8、至此我们完成了克隆虚拟机的任务
+
+9、配置网络
+
+​    什么都没设置网络居然是好的，但是回头看原虚拟机，发现原虚拟机访问不了网络了，果然有问题。
+
+
+①、删除/etc/sysconfig/network-scripts/ifcfg-ens33 的UUID这一行，因为每张网卡的mac地址是不一样的，所以UUID也是不一样的。如果有HWADDR或MACADDR这个选项也得把这一行给去了。
+
+②、进入/etc/</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-04&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/vmare">vmare</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2017/11/03/%E7%BC%96%E8%AF%91%E5%AE%89%E8%A3%85nginx%E7%9A%84%E5%9D%91/">
         <p class="h4 index-header">编译安装nginx的坑</p>
         
