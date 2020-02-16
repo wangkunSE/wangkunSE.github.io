@@ -136,6 +136,65 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/07/17/LeetCode%20Product%20Except%20Self/">
+        <p class="h4 index-header">LeetCode-Product of Array Except Self</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode：Product of Array Except Self题目：
+给一个长度大于1的数组，返回一个数组使得output[i] 等于nums中元素除了自身（nums[i]）的乘积。要O(n)的复杂度。
+
+例子:
+Input:  [1,2,3,4]
+Output: [24,12,8,6]
+
+思路：
+算出一个总的乘积，当前位置就是总的乘积除以当前的值。
+
+代码：class Solution {
+    public int[] productExceptSelf(int[] nums) {
+        if( nums == null || nums.length &lt; 2){
+            return nums;
+        }
+        int length = nums.length;
+        long total = 1L;
+        int zeroCount = 0;
+        for(int i = 0; i &lt; length; i++){
+            if(nums[i] != 0){
+   </div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-17&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/07/17/LeetCode%20Jump%20Game%20II/">
         <p class="h4 index-header">LeetCode-Jump Game II</p>
         
@@ -587,64 +646,6 @@ jvm相关
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2017/11/11/Java%E5%AE%9E%E7%8E%B0%E4%BA%8C%E5%8F%89%E6%A0%91%E7%9A%84%E4%B8%89%E7%A7%8D%E9%9D%9E%E9%80%92%E5%BD%92%E9%81%8D%E5%8E%86/">
-        <p class="h4 index-header">Java实现二叉树的三种非递归遍历</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">Java 实现二叉树的三种非递归遍历1.思路
-其实思路就是递归的思路，无非就是加入了栈这个数据结构。
-具体来看代码吧，个人觉得还算简洁。
-
-2.实现首先是结点数据结构的设置：/**
- * @author WK
- */
-public class SearchBinaryTree {
-
-    //存放的结点标志
-    public String tag = &quot;&quot;;
-    //是否被便利的标志
-    public boolean flag = false;
-    //左孩子
-    public SearchBinaryTree leftChild = null;
-    //右孩子
-    public SearchBinaryTree rightChild = null;
-  //省略了getter，setter以及构造函数
-}
-- 前序遍历/**
-     *
-     * @param T 传入的树的根结点
-     */
-    public static void priorOrderNonRecursive(SearchBinaryTree T) </div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2017-11-11&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
           
         
       </div>

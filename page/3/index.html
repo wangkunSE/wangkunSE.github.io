@@ -136,6 +136,63 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2019/09/26/LeetCode%20Letter%20Case%20P/">
+        <p class="h4 index-header">LeetCode-Letter Case P</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">LeetCode: Letter Case P题目:
+给定一个字符串S，将字符串中的每个字母不包含数字分别变成大写和小写的方式，返回一个可能出现的字符串集合。
+
+例子：
+Examples:
+Input: S = &quot;a1b2&quot;
+Output: [&quot;a1b2&quot;, &quot;a1B2&quot;, &quot;A1b2&quot;, &quot;A1B2&quot;]
+
+Input: S = &quot;3z4&quot;
+Output: [&quot;3z4&quot;, &quot;3Z4&quot;]
+
+Input: S = &quot;12345&quot;
+Output: [&quot;12345&quot;]
+
+思路:
+这个题是在Subset那个题之后做的，做起来就很随便了，思路和那个一样，就是判断出是不是字母，如果是字母先把当前的字母变成小写走一遍，然后把当前字母变成大写走一遍。
+
+代码：class Solution {
+public List&lt;String&gt; letterCasePermutation(String sou</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2019-09-26&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
+          
+            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2019/09/25/Nginx%20location%E5%8C%B9%E9%85%8D%E8%A7%84%E5%88%99/">
         <p class="h4 index-header">Nginx location匹配规则</p>
         
@@ -647,50 +704,6 @@ Hashtable是加了对象锁保证线程安全，那么加了对象锁一定线�
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/%E9%9D%A2%E8%AF%95">面试</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/08/16/Https%E5%8E%9F%E7%90%86/">
-        <p class="h4 index-header">Https原理</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">Https 原理https://www.cnblogs.com/zhangshitong/p/6478721.html
-https://www.jianshu.com/p/55e402bcbc18
-概括
-https的通信主要是两段加密的过程，客户端和服务端的通信要保证安全则需要使用密钥对传输内容进行加密。因为非对称加密算法的效率低所以采取对称加密算法。
-
-问题提出1. 那么就出现了第一个问题:数据密钥怎么给客户端？肯定是要加密的，那么用什么方法，对称加密算法吗，那么问题就来了，解密数据密钥的密钥怎么传给客户端？再设计一层嘛？所以行不通。那么就用非对称加密，服务端用私钥加密数据密钥，而客户端用自己的服务端发给他的公钥进行解密拿出数据密钥。
-2. 那么如果有个中间人是不是整个计划也就泡汤了？怎么防止这种情况?就是怎么保证我拿到的公钥是我想访问的服务器的公钥？把公钥放到一个第三方权威机构，也就是CA中心。CA中心给服务器颁发权威证书，也就是CA中心把服务端需要获取数据密钥的公钥用自己的公钥加密后的东西(很绕。。)。CA中心的公钥就在操作系统或浏览器中可查。
-3. 那么即便证书是合法的也不能证</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-08-16&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%BD%91%E7%BB%9C">网络</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/http">http</a>&nbsp;
           
         
       </div>

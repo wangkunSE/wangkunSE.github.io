@@ -136,6 +136,55 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/07/31/ConcurrentHashMap%E5%AD%A6%E4%B9%A0/">
+        <p class="h4 index-header">ConcurrentHashMap学习</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">ConcurrentHashMap学习官方文档：
+ConcurrentHashMap提供了和hashTable同样的线程安全性，但是实现细节却完全不一样。取值操作是不加锁的，而且也不提供方法锁住整个表。
+因为get操作不加锁，所以很多更新操作可能会同时发生。取回的值意味着最近完成的结果。对于并集操作，例如 {@code putAll} 和{@code clear}, 并发取值意味着紧紧一部分Node的插入和删除操作。同时，一次只允许一个线程做iterator操作。
+
+重要方法:get:
+可以看到get操作是不经过加锁的。
+
+ /**
+     * Returns the value to which the specified key is mapped,
+     * or {@code null} if this map contains no mapping for the key.
+     *
+     * &lt;p&gt;More formally, if this map contains a mapping from a key
+     * {@code k} to</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-31&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Java">Java</a>&nbsp;
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Java">Java</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/07/24/LeetCode%20N-Queens/">
         <p class="h4 index-header">LeetCode-N Queens</p>
         
@@ -669,65 +718,6 @@ Output: [1,2,3,4,8,12,11,10,9,5,6,7]
       <div>
         
           <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-18&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          
-            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/07/17/LeetCode%20Product%20Except%20Self/">
-        <p class="h4 index-header">LeetCode-Product of Array Except Self</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">LeetCode：Product of Array Except Self题目：
-给一个长度大于1的数组，返回一个数组使得output[i] 等于nums中元素除了自身（nums[i]）的乘积。要O(n)的复杂度。
-
-例子:
-Input:  [1,2,3,4]
-Output: [24,12,8,6]
-
-思路：
-算出一个总的乘积，当前位置就是总的乘积除以当前的值。
-
-代码：class Solution {
-    public int[] productExceptSelf(int[] nums) {
-        if( nums == null || nums.length &lt; 2){
-            return nums;
-        }
-        int length = nums.length;
-        long total = 1L;
-        int zeroCount = 0;
-        for(int i = 0; i &lt; length; i++){
-            if(nums[i] != 0){
-   </div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-17&nbsp;&nbsp;
         
         
           <i class="iconfont icon-inbox"></i>
