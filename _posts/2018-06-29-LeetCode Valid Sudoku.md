@@ -1,3 +1,16 @@
+---
+title: LeetCode-Valid Sudoku
+date: 2018-06-29 16:37:05
+categories:
+- [编程]
+- [Java]
+tags:
+- Leetcode
+- 算法
+---
+
+
+
 ## LeetCode : Valid Sudoku
 
 #### 题目:

@@ -1,4 +1,4 @@
-## `equals()`与`hashCode()`关联总结
+## equals()与hashCode()关联总结
 
 ### 1. equals()
 

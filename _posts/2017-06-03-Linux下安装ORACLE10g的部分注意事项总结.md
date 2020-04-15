@@ -140,7 +140,7 @@
    > `glibc-devel.x86_64 compat-libstdc++-33 -y`
    > `yum install glibc* gcc* make* compat-db* libstdc* libXp* libXtst* compat-libstdc++* -y` 
    >
-   > ​
+   > 
    >
    > **Error in invoking target 'collector' of makefile '/u01/app/oracle/product/10.2.0/sysman/lib/ins_emdb.mk'. **
    >

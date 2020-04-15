@@ -2,7 +2,7 @@
 
 > 作为Java使用者，对于synchronized肯定不陌生，它是多线程中重要的一个机制，能够保证多线程程序在共享数据时的正确性。但是最近遇到一个问题，久久没有想明白，查阅了很多博客和资料最终终于想明白了，决定写下来给大家参考。
 
-**如果想了解synchronized的机制以及原理的话给大家推荐一个博客：**
+**如果想了解synchronized的机制以及原理可以参考：**
 
 [Java 之 synchronized 详解](https://juejin.im/post/594a24defe88c2006aa01f1c)
 
