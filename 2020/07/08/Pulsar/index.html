@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/favicon.jpg">
+  <link rel="icon" type="image/png" href="/img/favicon.jpg">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="description" content="">
+  <meta name="author" content="John Doe">
+  <meta name="keywords" content="">
+  <title>Pulsar 文档翻译 ~ Soul</title>
+
+  <link rel="stylesheet" href="/lib/font-awesome/css/all.min.css"  >
+<link rel="stylesheet" href="/lib/bootstrap/css/bootstrap.min.css"  >
+<link rel="stylesheet" href="/lib/mdbootstrap/css/mdb.min.css"  >
+<link rel="stylesheet" href="/lib/github-markdown/github-markdown.min.css"  >
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1067060_qzomjdt8bmp.css">
+
+
+
+  <link rel="stylesheet" href="/lib/prettify/tomorrow-night-eighties.min.css"  >
+
+<link rel="stylesheet" href="/css/main.css"  >
+
+
+  <link rel="stylesheet" href="/lib/fancybox/jquery.fancybox.min.css"  >
+
+
+<meta name="generator" content="Hexo 4.1.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand"
+       href="/">&nbsp;<strong>铁锤的Blog</strong>&nbsp;</a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/archives/">Archives</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/categories/">Categories</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/tags/">Tags</a>
+          </li>
+        
+          
+          
+          <li class="nav-item">
+            <a class="nav-link" href="/about/">About</a>
+          </li>
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" data-toggle="modal" data-target="#modalSearch">&nbsp;&nbsp;<i
+                class="iconfont icon-search"></i>&nbsp;&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+
+</nav>
+
+    <div class="view intro-2" id="background"
+         style="background: url('/img/post.jpg')no-repeat center center;
+           background-size: cover;
+           background-attachment: fixed;">
+      <div class="full-bg-img">
+        <div class="mask rgba-black-light flex-center">
+          <div class="container text-center white-text fadeInUp">
+            <span class="h2" id="subtitle">
+              
+            </span>
+
+            
+              <br>
+              
+                <p class="mt-3">
+                  <i class="fas fa-calendar-alt" aria-hidden="true"></i>&nbsp;
+                  Wednesday, July 8th 2020, 6:05 pm
+                </p>
+              
+
+              <p>
+                
+                  
+                  &nbsp;<i class="far fa-chart-bar"></i>
+                  <span class="post-count">
+                    6.6k 字
+                  </span>&nbsp;
+                
+
+                
+                  
+                  &nbsp;<i class="far fa-clock"></i>
+                  <span class="post-count">
+                      26 分钟
+                  </span>&nbsp;
+                
+
+                
+                  <!-- 不蒜子统计文章PV -->
+                  
+                  &nbsp;<i class="far fa-eye" aria-hidden="true"></i>&nbsp;
+                  <span id="busuanzi_container_page_pv">
+                    <span id="busuanzi_value_page_pv"></span> 次
+                  </span>&nbsp;
+                
+              </p>
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-md">
+      <div class="py-5 z-depth-3" id="board">
+        <div class="post-content mx-auto" id="post">
+          <div class="markdown-body">
+            <h2 id="一、简介"><a href="#一、简介" class="headerlink" title="一、简介"></a>一、简介</h2><blockquote>
+<p>Pulsar 是一个多用户，高性能的服务间消息通信的解决方案。最早是雅虎开发的，目前已经变成了 Apache 顶级项目。</p>
+<p>Pulsar 的关键特性：</p>
+<ul>
+<li>单个 Pulsar 实例原生支持多个集群，并且支持对在集群中的消息有跨地区备份。</li>
+<li>非常非常低的发布和端到端的延迟。</li>
+<li>无缝扩展到百万级别的 topics。</li>
+<li>方便上手的客户端 API（Java，Go，Python，C++）</li>
+<li>对于 topics 拥有多种订阅模式。</li>
+<li>通过 Apache BookKeeper 保证消息分发和存储。</li>
+<li>拥有一个轻量级的无服务的计算框架来提供流式数据处理。</li>
+<li>拥有一个基于无服务计算框架的连接框架可以非常方便的将数据从 Pulsar 输入和输出。</li>
+<li>Tiered Storage 将热点数据转移到冷数据区。</li>
+</ul>
+</blockquote>
+<h2 id="二、消息"><a href="#二、消息" class="headerlink" title="二、消息"></a>二、消息</h2><h3 id="2-1-messaging-concepts"><a href="#2-1-messaging-concepts" class="headerlink" title="2.1 messaging concepts"></a>2.1 messaging concepts</h3><blockquote>
+<p>Pulsar 是基于发布-订阅模式的。一旦订阅被创建了，所有的消息就会被 Pulsar 保存，即使消费者失联。只有消息被消费者确认这些消息已经处理完毕了，这些消息才会被丢弃。</p>
+</blockquote>
+<h4 id="2-1-1-消息"><a href="#2-1-1-消息" class="headerlink" title="2.1.1 消息"></a>2.1.1 消息</h4><blockquote>
+<p>消息是 Pulsar 中的最基本单元。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">Component</th>
+<th align="left">Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Value / data payload</td>
+<td align="left">The data carried by the message. All Pulsar messages carry raw bytes, although message data can also conform to data <a href="https://pulsar.apache.org/docs/en/schema-get-started" target="_blank" rel="noopener">schemas</a> 序列化与反序列化.</td>
+</tr>
+<tr>
+<td align="left">Key</td>
+<td align="left">Messages can optionally be tagged with keys, which can be useful for things like <a href="https://pulsar.apache.org/docs/en/concepts-topic-compaction" target="_blank" rel="noopener">topic compaction</a>.</td>
+</tr>
+<tr>
+<td align="left">Properties</td>
+<td align="left">An optional key/value map of user-defined properties.</td>
+</tr>
+<tr>
+<td align="left">Producer name</td>
+<td align="left">The name of the producer that produced the message (producers are automatically given default names, but you can apply your own explicitly as well).</td>
+</tr>
+<tr>
+<td align="left">Sequence ID</td>
+<td align="left">Each Pulsar message belongs to an ordered sequence on its topic. A message’s sequence ID is its ordering in that sequence.</td>
+</tr>
+<tr>
+<td align="left">Publish time</td>
+<td align="left">The timestamp of when the message was published (automatically applied by the producer).</td>
+</tr>
+<tr>
+<td align="left">Event time</td>
+<td align="left">An optional timestamp that applications can attach to the message representing when something happened, for example, when the message was processed. The event time of a message is 0 if none is explicitly set.</td>
+</tr>
+<tr>
+<td align="left">TypedMessageBuilder</td>
+<td align="left"><code>TypedMessageBuilder</code> is used to construct a message. You can set message properties like the message key, message value with <code>TypedMessageBuilder</code>. When you set <code>TypedMessageBuilder</code>, the best practice is to set the key as a string. If you set the key as other types, for example, an AVRO object, the key is sent as bytes, and it is difficult to get the AVRO object back on the consumer.</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-生产者"><a href="#2-2-生产者" class="headerlink" title="2.2 生产者"></a>2.2 生产者</h3><blockquote>
+<p>一个生产者是一段将关联了 topic 的消息发布到 Pulsar broker 做处理的程序。</p>
+</blockquote>
+<h4 id="2-2-1-发送模式"><a href="#2-2-1-发送模式" class="headerlink" title="2.2.1 发送模式"></a>2.2.1 发送模式</h4><table>
+<thead>
+<tr>
+<th align="left">Mode</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Sync send</td>
+<td align="left">The producer will wait for acknowledgement from the broker after sending each message. If acknowledgment isn’t received then the producer will consider the send operation a failure.</td>
+</tr>
+<tr>
+<td align="left">Async send</td>
+<td align="left">The producer will put the message in a blocking queue and return immediately. The client library will then send the message to the broker in the background. If the queue is full (max size <a href="https://pulsar.apache.org/docs/en/reference-configuration#broker" target="_blank" rel="noopener">configurable</a>), the producer could be blocked or fail immediately when calling the API, depending on arguments passed to the producer.</td>
+</tr>
+</tbody></table>
+<h4 id="2-2-2-压缩"><a href="#2-2-2-压缩" class="headerlink" title="2.2.2 压缩"></a>2.2.2 压缩</h4><blockquote>
+<p>消息可以压缩以节省带宽，有以下几种方式来来压缩消息：</p>
+<ul>
+<li><a href="https://github.com/lz4/lz4" target="_blank" rel="noopener">LZ4</a></li>
+<li><a href="https://zlib.net/" target="_blank" rel="noopener">ZLIB</a></li>
+<li><a href="https://facebook.github.io/zstd/" target="_blank" rel="noopener">ZSTD</a></li>
+<li><a href="https://google.github.io/snappy/" target="_blank" rel="noopener">SNAPPY</a></li>
+</ul>
+</blockquote>
+<h4 id="2-2-3-Batching"><a href="#2-2-3-Batching" class="headerlink" title="2.2.3 Batching"></a>2.2.3 Batching</h4><blockquote>
+<p>当 batching 被打开了，生产者可以一个请求中发送多条消息。batch size 依赖于消息的最大大小和最大发送延迟。因此，backlog 的 size 代表了所有 batches 的大小而不是消息的总大小。</p>
+<p>在 Pulsar 中，batches 被当成一个单独的集合而不是单个的消息。在这个条件下，消费者通常会把一个 batch 拆分成单独的消息。然而，延迟消息通常发送的是单个消息即使 batching 被打开了。</p>
+<p>只有在 batch 中的所有消息都被消费者确认消费了，消费者才会回复 batch 被消费的消息。这也就意味着 batch 中的任何一个消息失败了，所有在 batch 中的消息就会重发，即使其中一部分消息已经确认过了。</p>
+<p>为了解决这个问题，在 2.6.0 版本中加入了 batch index 的概念， broker 保存 batch index 确认状态避免消息被重复发送，当所有在 batch 中的消息被确认消费了，这个 batch 就会被删除。</p>
+<p>默认 batch index 确认是关闭的，可以使用 batchIndexAcknowledgeEnable 这个参数打开。但是打开这个通知会带来更多的内存消耗，所以要小心这个操作。</p>
+</blockquote>
+<h3 id="2-3消费者"><a href="#2-3消费者" class="headerlink" title="2.3消费者"></a>2.3消费者</h3><blockquote>
+<p>一个消费者是订阅了一个 topic 并不断接受该 topic 消息的程序。</p>
+</blockquote>
+<h4 id="2-3-1-接受模式"><a href="#2-3-1-接受模式" class="headerlink" title="2.3.1 接受模式"></a>2.3.1 接受模式</h4><table>
+<thead>
+<tr>
+<th align="left">Mode</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Sync receive</td>
+<td align="left">A sync receive will be blocked until a message is available.</td>
+</tr>
+<tr>
+<td align="left">Async receive</td>
+<td align="left">An async receive will return immediately with a future value—a <a href="http://www.baeldung.com/java-completablefuture" target="_blank" rel="noopener"><code>CompletableFuture</code></a> in Java, for example—that completes once a new message is available.</td>
+</tr>
+</tbody></table>
+<h4 id="2-3-2-监听器"><a href="#2-3-2-监听器" class="headerlink" title="2.3.2 监听器"></a>2.3.2 监听器</h4><blockquote>
+<p>客户端库中为消费者提供了监听器的实现。例如 Java 客户端提供了 <a href="https://pulsar.incubator.apache.org/api/client/2.6.0-SNAPSHOT/org/apache/pulsar/client/api/MessageListener" target="_blank" rel="noopener">MesssageListener</a> 接口，在这个接口中当有消息接受到就会调用<code>received</code>方法。</p>
+</blockquote>
+<h4 id="2-3-3-消息确认"><a href="#2-3-3-消息确认" class="headerlink" title="2.3.3 消息确认"></a>2.3.3 消息确认</h4><blockquote>
+<p>当一个消费者成功的消费了一个消息，这个消费者就会发送一个确认通知请求给 broker。这个消息会被永久保存在 broker，只有所有的订阅都回复了确认通知。如果想要在确认通知后也存储消息，则需要配置 <a href="https://pulsar.apache.org/docs/en/concepts-messaging#message-retention-and-expiry" target="_blank" rel="noopener">消息保存策略</a>。</p>
+<p>消息可以被一个一个的确认，也可以积累到一起进行确认。积累确认时只需要确认最后一个它收到的消息就可以。在消息流中的消息直到（包括）确认的消息都不会重新发送给那个消费者。</p>
+<p>消息确认通知有两种方式：</p>
+<ul>
+<li>单独确认。每一个消息单独确认。</li>
+<li>积累确认。确认最后一个消息。（积累确认不能应用在共享订阅模式[shared subscription mode，因为该模式中多个消费者访问了同一个订阅）</li>
+</ul>
+</blockquote>
+<h4 id="2-3-4-未确认通知"><a href="#2-3-4-未确认通知" class="headerlink" title="2.3.4 未确认通知"></a>2.3.4 未确认通知</h4><blockquote>
+<p>当一个消费者在一个时刻没有成功地消费一个消息并且想重新消费消息时，这个消费者可以发送一个 negative acknowledgement 给 broker，然后 broker 会重新发送这个消息。</p>
+<p>同样的未确认通知也可以一个一个发和累积发。在排他和容错订阅模式下，消费者只发送最后一个消息的未确认通知，在共享模式中，可以单独地发送未确认消息。</p>
+<p>在 batch 模式中，所有消费者将会重新收到 batch 只要发送了未确认通知。</p>
+</blockquote>
+<h4 id="2-3-5-确认通知超时"><a href="#2-3-5-确认通知超时" class="headerlink" title="2.3.5 确认通知超时"></a>2.3.5 确认通知超时</h4><blockquote>
+<p>当想在消息未消费成功时自动触发 broker 重发消息，可以使用未确认消息时重发机制。客户端会在<code>acktimeout</code>时间区间内追踪未确认的消息，然后重新发送未确认消息请求给 broker。</p>
+<p>如果 batching 被打开了，其他在同一个 batch 中的消息也会被重新发送。</p>
+<p>倾向于使用未确认通知而不是依靠超时机制，未确认通知更准确，而且避免了因为消息处理时间过长而导致的非合法重发。</p>
+</blockquote>
+<h4 id="2-3-6-Dead-letter-topic"><a href="#2-3-6-Dead-letter-topic" class="headerlink" title="2.3.6 Dead letter topic"></a>2.3.6 Dead letter topic</h4><blockquote>
+<p>Dead letter topic 可以使消费者在不能成功消费一些消息的时候继续消费新消息。在这个机制中，消费失败的消息会被存在一个单独的 topic 中，这个 topic 就被称作 dead letter topic。</p>
+</blockquote>
+<p>示例：</p>
+<pre><code class="java">Consumer&lt;byte[]&gt; consumer = pulsarClient.newConsumer(Schema.BYTES)
+              .topic(topic)
+              .subscriptionName(&quot;my-subscription&quot;)
+              .subscriptionType(SubscriptionType.Shared)
+              .deadLetterPolicy(DeadLetterPolicy.builder()
+                    .maxRedeliverCount(maxRedeliveryCount)
+                    .build())
+              .subscribe();
+
+// 默认 dead letter topic 格式
+&lt;topicname&gt;-&lt;subscriptionname&gt;-DLQ
+
+//如果想要为 dead letter topic 指定名称 使用如下方式
+  Consumer&lt;byte[]&gt; consumer = pulsarClient.newConsumer(Schema.BYTES)
+              .topic(topic)
+              .subscriptionName(&quot;my-subscription&quot;)
+              .subscriptionType(SubscriptionType.Shared)
+              .deadLetterPolicy(DeadLetterPolicy.builder()
+                    .maxRedeliverCount(maxRedeliveryCount)
+                    .deadLetterTopic(&quot;your-topic-name&quot;)
+                    .build())
+              .subscribe();</code></pre>
+<blockquote>
+<p>当前只有共享订阅模式支持 dead letter topic。</p>
+</blockquote>
+<h4 id="2-3-7-Retry-letter-topic"><a href="#2-3-7-Retry-letter-topic" class="headerlink" title="2.3.7 Retry letter topic"></a>2.3.7 Retry letter topic</h4><blockquote>
+<p>在很多线上业务系统中，消息需要被重复消费因为业务逻辑遇到了异常。通常，用户希望能够配置重复消费失败消息的延迟时间。在这个用例中，可以配置生产者同时向业务 topic 和 retry letter topic 发送消息，并且可以在消费者开启自动重试消息。</p>
+<p>自动重试默认是关闭的，可以设置 <code>enableRetry</code> 为 <code>true</code>打开自动重试机制。</p>
+</blockquote>
+<pre><code class="java">Consumer&lt;byte[]&gt; consumer = pulsarClient.newConsumer(Schema.BYTES)
+                .topic(topic)
+                .subscriptionName(&quot;my-subscription&quot;)
+                .subscriptionType(SubscriptionType.Shared)
+                .enableRetry(true)
+                .receiverQueueSize(100)
+                .deadLetterPolicy(DeadLetterPolicy.builder()
+                        .maxRedeliverCount(maxRedeliveryCount)
+                        .retryLetterTopic(&quot;persistent://my-property/my-ns/my-subscription-custom-Retry&quot;)
+                        .build())
+                .subscriptionInitialPosition(SubscriptionInitialPosition.Earliest)
+                .subscribe();</code></pre>
+<h3 id="2-4-Topics"><a href="#2-4-Topics" class="headerlink" title="2.4 Topics"></a>2.4 Topics</h3><blockquote>
+<p>topic 在订阅系统中就是从生产者到消费者传递消息的通道。在 Pulsar 中 topic 的名称有一个良好定义的结构</p>
+</blockquote>
+<pre><code class="java">{persistent|non-persistent}://tenant/namespace/topic</code></pre>
+<table>
+<thead>
+<tr>
+<th align="left">Topic name component</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>persistent</code> / <code>non-persistent</code></td>
+<td align="left">This identifies the type of topic. Pulsar supports two kind of topics: <a href="https://pulsar.apache.org/docs/en/concepts-architecture-overview#persistent-storage" target="_blank" rel="noopener">persistent</a> and <a href="https://pulsar.apache.org/docs/en/concepts-messaging/#non-persistent-topics" target="_blank" rel="noopener">non-persistent</a> (persistent is the default, so if you don’t specify a type the topic will be persistent). With persistent topics, all messages are durably <a href="https://pulsar.apache.org/docs/en/concepts-architecture-overview#persistent-storage" target="_blank" rel="noopener">persisted</a> on disk (that means on multiple disks unless the broker is standalone), whereas data for <a href="https://pulsar.apache.org/docs/en/concepts-messaging/#non-persistent-topics" target="_blank" rel="noopener">non-persistent</a> topics isn’t persisted to storage disks.</td>
+</tr>
+<tr>
+<td align="left"><code>tenant</code></td>
+<td align="left">The topic’s tenant within the instance. Tenants are essential to multi-tenancy in Pulsar and can be spread across clusters.</td>
+</tr>
+<tr>
+<td align="left"><code>namespace</code></td>
+<td align="left">The administrative unit of the topic, which acts as a grouping mechanism for related topics. Most topic configuration is performed at the <a href="https://pulsar.apache.org/docs/en/concepts-messaging/#namespaces" target="_blank" rel="noopener">namespace</a> level. Each tenant can have multiple namespaces.</td>
+</tr>
+<tr>
+<td align="left"><code>topic</code></td>
+<td align="left">The final part of the name. Topic names are freeform and have no special meaning in a Pulsar instance.</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>不用明确地在 Pulsar 中创建一个 topic。当消费者尝试消费一个不存在的 topic 时，Pulsar 会自动地创建一这个 topic。如果 tenant 和 namespace 没有指定，这个 topic 就会被声称在默认的 tenant 和 namespace 下。 </p>
+</blockquote>
+<h3 id="2-5-Namespaces"><a href="#2-5-Namespaces" class="headerlink" title="2.5 Namespaces"></a>2.5 Namespaces</h3><blockquote>
+<p>命名空间是在租户下的逻辑命名法，一个租户可以创建多个命名空间。比如一个租户可以为两个不同的应用创建完全不同的命名空间。</p>
+</blockquote>
+<h3 id="2-6-Subscriptions"><a href="#2-6-Subscriptions" class="headerlink" title="2.6 Subscriptions"></a>2.6 Subscriptions</h3><blockquote>
+<p>订阅是一个命名配置规则，这个规则决定了消息怎么推送到消费者。目前在 Pulsar 中有四种消费模式：独占，共享，容错和 key 共享。如下图所示：</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-subscription-modes.png" srcset="/img/loading.gif" alt="Subscription modes"></p>
+<blockquote>
+<p>组合订阅是非常方便的。</p>
+<ul>
+<li>如果想在消费者中达到传统的发布订阅模式，可以为每一个消费者起一个唯一的订阅名称。</li>
+<li>如果想在多个消费者间使用消息队列模式，可以让多个消费者拥有同一个订阅名称（共享，容错，key_shared）。</li>
+<li>如果想同时组合使用，可以让一部分消费者使用独占模式，其他选择另外的模式。</li>
+</ul>
+</blockquote>
+<h4 id="2-6-1-独占-Exclusive"><a href="#2-6-1-独占-Exclusive" class="headerlink" title="2.6.1 独占 Exclusive"></a>2.6.1 独占 Exclusive</h4><blockquote>
+<p>在独占模式中，只有一个消费者允许添加到一个订阅中。如果超过一个消费者尝试使用同一个订阅订阅一个主题，这个消费者会报错。默认情况下开启的是独占模式。如下图所示，只有 Consumer A-0 允许消费这个订阅。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-exclusive-subscriptions.png" srcset="/img/loading.gif" alt="Exclusive subscriptions"></p>
+<h4 id="2-6-2-容错-FailOver"><a href="#2-6-2-容错-FailOver" class="headerlink" title="2.6.2 容错 FailOver"></a>2.6.2 容错 FailOver</h4><blockquote>
+<p>在容错模式中，多个消费者可以绑定到同一个订阅中。在该模式中， broker 会基于优先级和消费者名称的字母排序选择一个主消费者。一开始只有主消费者会收到消息，当主消费者失联后，消息会被按顺序发送到下一个消费者。</p>
+<p>对于 partitioned topics 而言，broker 分配 partioned topics 给拥有最高优先级的消费者。如果多个消费者都是最高优先级，则 broker 公平的分配 topics 给这些消费者。</p>
+<p>如下图所示，Consumer B-0 是主消费者，如果 Consumer B-0 挂了，则 Consumer B-1会变成下一个消费者。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-failover-subscriptions.png" srcset="/img/loading.gif" alt="Failover subscriptions"></p>
+<h4 id="2-6-3-共享模式-Shared"><a href="#2-6-3-共享模式-Shared" class="headerlink" title="2.6.3 共享模式 Shared"></a>2.6.3 共享模式 Shared</h4><blockquote>
+<p>在共享或轮转模式中，多个消费者可以绑定到同一个订阅。消息被轮流发送到这些 Consumer 中，并且每一个消息只会发送给一个消费者。当一个消费者失联，所有未被确认的消息将会被重新安排发送到剩下的消费者中。</p>
+<p>当使用共享模式时，需要注意以下几点：</p>
+<ul>
+<li>消息是无序的</li>
+<li>不能使用累积确认策略</li>
+</ul>
+<p>如下图所示，Consumer C-1、Consumer C-2、Consumer C-3 都可以绑定到这个订阅。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-shared-subscriptions.png" srcset="/img/loading.gif" alt="Shared subscriptions"></p>
+<h4 id="2-6-4-Key-Shared"><a href="#2-6-4-Key-Shared" class="headerlink" title="2.6.4 Key_Shared"></a>2.6.4 Key_Shared</h4><blockquote>
+<p>在 key_shared 模式中，多个消费者可以绑定到同一个订阅中。消息在多个消费者间进行分发，拥有同一个key 或者同种顺序的 key 的消息会被发送到同一个消费者。不管消息被重发了多少次，他总是被重发到同一个消费者。当一个消费者加入或者离开订阅，会导致当前的消费者接受到的消息发生变化。</p>
+<p>当使用 Key_Shared 模式时，需要注意以下几点：</p>
+<ul>
+<li>需要为消息指定一个 key 或者有序的 key</li>
+<li>在 key_shared 模式中不能使用累积确认</li>
+</ul>
+<p>可以在 broker.config 模式中屏蔽掉 key_shared 订阅。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-key-shared-subscriptions.png" srcset="/img/loading.gif" alt="Key_Shared subscriptions"></p>
+<h3 id="2-7-多主题订阅-Multi-topic-subscriptions"><a href="#2-7-多主题订阅-Multi-topic-subscriptions" class="headerlink" title="2.7 多主题订阅 Multi-topic subscriptions"></a>2.7 多主题订阅 Multi-topic subscriptions</h3><blockquote>
+<p>Pulsar 中的消费者可以同时订阅不同的主题，可以用如下两种方式定义一个主题列表</p>
+<ul>
+<li>依靠正则表达式，比如 <code>persistent://public/default/finance-.*</code> (所有主题必须拥有相同的命名空间)</li>
+<li>明确定义一个列表。</li>
+</ul>
+<p>当订阅了多个主题后， Pulsar 客户端会自动调用 Pulsar API 去发现匹配的主题并订阅它们。当某些主题当前不存在时，消费者会在它们被创建时自动订阅。</p>
+<p>要注意的是多个主题间的消息不保证顺序。</p>
+<p>如下是多主题订阅的 Java 版本的示例。</p>
+</blockquote>
+<pre><code class="java">import java.util.regex.Pattern;
+
+import org.apache.pulsar.client.api.Consumer;
+import org.apache.pulsar.client.api.PulsarClient;
+
+PulsarClient pulsarClient = // Instantiate Pulsar client object
+
+// Subscribe to all topics in a namespace
+Pattern allTopicsInNamespace = Pattern.compile(&quot;persistent://public/default/.*&quot;);
+Consumer&lt;byte[]&gt; allTopicsConsumer = pulsarClient.newConsumer()
+                .topicsPattern(allTopicsInNamespace)
+                .subscriptionName(&quot;subscription-1&quot;)
+                .subscribe();
+
+// Subscribe to a subsets of topics in a namespace, based on regex
+Pattern someTopicsInNamespace = Pattern.compile(&quot;persistent://public/default/foo.*&quot;);
+Consumer&lt;byte[]&gt; someTopicsConsumer = pulsarClient.newConsumer()
+                .topicsPattern(someTopicsInNamespace)
+                .subscriptionName(&quot;subscription-1&quot;)
+                .subscribe();</code></pre>
+<h3 id="2-8-Partitioned-topics"><a href="#2-8-Partitioned-topics" class="headerlink" title="2.8 Partitioned topics"></a>2.8 Partitioned topics</h3><blockquote>
+<p>一般的主题只能由一个 broker 服务，限制了这个主题的最大流量。分片主题是一种特殊的主题可以被多个 broker 处理。</p>
+<p>在这个场景中，一个分片主题其实是由 N 个内部主题实现的，N 是分片数量。当推送消息到一个分片主题时，每一个消息是被路由到其中一个 broker 中的。跨 broker 的分片分布是有 Pulsar 自动处理的。</p>
+<p>如下图所示。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/partitioning.png" srcset="/img/loading.gif" alt="img"></p>
+<blockquote>
+<p>当前的 Topic1 主题有四个分片(P0~P4)。因为分片数多于 broker 数，所以有两个 broker 拥有两个分片，其中一个拥有一个分片。</p>
+<p>消息被广播给了两个消费者。路由模式（routing mode）决定了每个消息应该发布到哪个分片，订阅模式(subscription mode)决定了消息进入哪个消费者。</p>
+<p>路由和订阅模式通常是可以分开决定的。通常来讲，流量问题应当考虑分片路由，应用语义应当考虑订阅模式。</p>
+<p>订阅模式不受分片与否的影响，分片只决定了消息被生产者发布和消费者处理确认消息之间发生了什么。</p>
+<p>分片主题需要通过 <a href="https://pulsar.apache.org/docs/en/admin-api-overview" target="_blank" rel="noopener">admin API</a> 明确创建。分片数量可以在创建主题时决定。</p>
+</blockquote>
+<h4 id="2-8-1-路由模式-Routing-modes"><a href="#2-8-1-路由模式-Routing-modes" class="headerlink" title="2.8.1 路由模式 (Routing modes)"></a>2.8.1 路由模式 (Routing modes)</h4><blockquote>
+<p>当推送到分片主题时，必须指定一个路由模式。路由模式决定了每个消息应当发布到哪个分片。有以下三种路由模式</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">Mode</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>RoundRobinPartition</code></td>
+<td align="left">If no key is provided, the producer will publish messages across all partitions in round-robin fashion to achieve maximum throughput. Please note that round-robin is not done per individual message but rather it’s set to the same boundary of batching delay, to ensure batching is effective. While if a key is specified on the message, the partitioned producer will hash the key and assign message to a particular partition. This is the default mode.</td>
+</tr>
+<tr>
+<td align="left"><code>SinglePartition</code></td>
+<td align="left">If no key is provided, the producer will randomly pick one single partition and publish all the messages into that partition. While if a key is specified on the message, the partitioned producer will hash the key and assign message to a particular partition.</td>
+</tr>
+<tr>
+<td align="left"><code>CustomPartition</code></td>
+<td align="left">Use custom message router implementation that will be called to determine the partition for a particular message. User can create a custom routing mode by using the <a href="https://pulsar.apache.org/docs/en/client-libraries-java" target="_blank" rel="noopener">Java client</a> and implementing the <a href="https://pulsar.incubator.apache.org/api/client/2.6.0-SNAPSHOT/org/apache/pulsar/client/api/MessageRouter" target="_blank" rel="noopener">MessageRouter</a> interface.</td>
+</tr>
+</tbody></table>
+<h4 id="2-8-2-顺序保证"><a href="#2-8-2-顺序保证" class="headerlink" title="2.8.2 顺序保证"></a>2.8.2 顺序保证</h4><blockquote>
+<p>消息的顺序取决于 MessageRoutingMode 和 Message Key。通常，用户希望每一个 key 的分片是有序的。</p>
+<p>如果一个消息中存在一个 key ，当使用 RoundRobinPartition 和 SinglePartition 模式时，在 ProducerBuilder 中可以指定 HashingScheme 来决定这个消息被路由到哪个分片。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">Ordering guarantee</th>
+<th align="left">Description</th>
+<th align="left">Routing Mode and Key</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Per-key-partition</td>
+<td align="left">All the messages with the same key will be in order and be placed in same partition.</td>
+<td align="left">Use either <code>SinglePartition</code> or <code>RoundRobinPartition</code> mode, and Key is provided by each message.</td>
+</tr>
+<tr>
+<td align="left">Per-producer</td>
+<td align="left">All the messages from the same producer will be in order.</td>
+<td align="left">Use <code>SinglePartition</code> mode, and no Key is provided for each message.</td>
+</tr>
+</tbody></table>
+<h4 id="2-8-3-Hashing-scheme"><a href="#2-8-3-Hashing-scheme" class="headerlink" title="2.8.3 Hashing scheme"></a>2.8.3 Hashing scheme</h4><blockquote>
+<p>Hashing Scheme 是一个在具体消息选择分片时的代表了标准哈希方法的可用集合。</p>
+<p>有两种类型的哈希方法是可用的：<code>JavaStringHash</code> 和<code>Murmur3_32Hash</code>。要注意的是 <code>JavaStringHash</code>在从多种语言的生产者中获取消息不能够生效，这种情况下，推荐使用<code>Murmur3_32Hash</code>方式。</p>
+</blockquote>
+<h3 id="2-9-非持久化-topics"><a href="#2-9-非持久化-topics" class="headerlink" title="2.9 非持久化 topics"></a>2.9 非持久化 topics</h3><blockquote>
+<p>通常，Pulsar 会将为确认的消息存在多个 Bookeeper 存储节点 bookies 上。持久化的消息数据可以在 broker 重启或者订阅失败时保存下来。</p>
+<p>同时，Pulsar 支持非持久化消息，只存在内存中，没有持久化到硬盘里。这种模式下，消息会丢失。</p>
+<p>可以用如下方式生命非持久化数据。</p>
+<pre><code class="java">non-persistent://tenant/namespace/topic</code></pre>
+<p>在非持久化主题中， broker 会立刻发送消息到所有的订阅，而不经过将他们持久化到 Bookeeper 上。当订阅者失联了，broker 不能够推送那些即时消息，并且订阅者再也不会受到那些消息了。非持久化主题在某些情况下会比持久化主题快一些，但是丢失了 Pulsar 部分优势。</p>
+</blockquote>
+<h4 id="2-9-1-性能-Performance"><a href="#2-9-1-性能-Performance" class="headerlink" title="2.9.1 性能 Performance"></a>2.9.1 性能 Performance</h4><blockquote>
+<p>性能上通常会快于持久化的主题。</p>
+</blockquote>
+<h4 id="2-9-2-客户端-API"><a href="#2-9-2-客户端-API" class="headerlink" title="2.9.2 客户端 API"></a>2.9.2 客户端 API</h4><blockquote>
+<p>与持久化主题唯一不同的点在于主题名称必须以 <code>non-persistent</code>开头。</p>
+<p>以下为示例：</p>
+</blockquote>
+<pre><code class="java">PulsarClient client = PulsarClient.builder()
+        .serviceUrl(&quot;pulsar://localhost:6650&quot;)
+        .build();
+String npTopic = &quot;non-persistent://public/default/my-topic&quot;;
+String subscriptionName = &quot;my-subscription-name&quot;;
+
+Consumer&lt;byte[]&gt; consumer = client.newConsumer()
+        .topic(npTopic)
+        .subscriptionName(subscriptionName)
+        .subscribe();
+
+Producer&lt;byte[]&gt; producer = client.newProducer()
+                .topic(npTopic)
+                .create();</code></pre>
+<h3 id="2-10-消息保存和过期"><a href="#2-10-消息保存和过期" class="headerlink" title="2.10 消息保存和过期"></a>2.10 消息保存和过期</h3><blockquote>
+<p>通常在 Pulsar 消息 broker 中</p>
+<ul>
+<li>会立刻删除被确认过的消息</li>
+<li>持久化存储未被确认的消息。</li>
+</ul>
+<p>Pulsar 有两个 feature，保证了可以重写以上行为：</p>
+<ul>
+<li>消息 <code>retention</code> 保证存储消息即使已经被消费者确认了</li>
+<li>消息<code>expiry</code>保证了你可以为未被确认的消息设置 TTL</li>
+</ul>
+<p>所有的 <code>retention</code> 和<code>expiry</code>策略都被保存在命名空间级。</p>
+<p>概念如下图所示。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/retention-expiry.png" srcset="/img/loading.gif" alt="Message retention and expiry"></p>
+<h3 id="2-11-消息去重存储"><a href="#2-11-消息去重存储" class="headerlink" title="2.11 消息去重存储"></a>2.11 消息去重存储</h3><blockquote>
+<p>当一个消息被存储不止一次时会发生消息重复。去重是 Pulsar 的一个可选 feature 防止了不必要的消息重复，即使这个消息被接受到不止一次。下图比较了两种模式：</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/message-deduplication.png" srcset="/img/loading.gif" alt="Pulsar message deduplication"></p>
+<blockquote>
+<p>需要注意的是，该设置是在命名空间级别进行处理。</p>
+</blockquote>
+<h4 id="2-11-1-生产者幂等"><a href="#2-11-1-生产者幂等" class="headerlink" title="2.11.1 生产者幂等"></a>2.11.1 生产者幂等</h4><blockquote>
+<p>另一种可用的消息去重途径是保证每条消息被生产一次。这个途径通常被称作生产者幂等，这种方式需要客户端保证。在 Pulsar 中，可以在 broker 层实现消息去重。只需要进行设置就可以了。<a href="https://pulsar.apache.org/docs/en/cookbooks-deduplication" target="_blank" rel="noopener">Managing message deduplication</a> </p>
+</blockquote>
+<h3 id="2-12-延迟消息发送"><a href="#2-12-延迟消息发送" class="headerlink" title="2.12 延迟消息发送"></a>2.12 延迟消息发送</h3><blockquote>
+<p>延迟消息发送保证了你可以不用立刻消费一个消息。在这个机制下，消息存储于 Bookeeper 中，在消息发布到 broker 后，DelayedDeliveryTracker 在内存中保留了时间索引，它会被推送到客户端直到达到延迟的推送时间。延迟消息只在共享订阅模式下能够很好的工作，在独占和容错模式下，消息会被立刻发送。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/message_delay.png" srcset="/img/loading.gif" alt="Delayed Message Delivery"></p>
+<blockquote>
+<p>消息会被无检查的存储在 broker 中，当一个消费者消费消息时，如果这个消息被设置了延迟消费，这个消息就会被添加到 DelayedDeliveryTracker。订阅会从 DelayedDeliveryTracker 中检查到时间的消息。</p>
+</blockquote>
+<h4 id="2-12-1-Broker"><a href="#2-12-1-Broker" class="headerlink" title="2.12.1 Broker"></a>2.12.1 Broker</h4><blockquote>
+<p>延迟消息默认是开启的，可以通过如下配置进行更改。</p>
+</blockquote>
+<pre><code class="shell"># Whether to enable the delayed delivery for messages.
+# If disabled, messages are immediately delivered and there is no tracking overhead.
+delayedDeliveryEnabled=true
+
+# Control the ticking time for the retry of delayed message delivery,
+# affecting the accuracy of the delivery time compared to the scheduled time.
+# Default is 1 second.
+delayedDeliveryTickTimeMillis=1000</code></pre>
+<h4 id="2-12-2-Producer"><a href="#2-12-2-Producer" class="headerlink" title="2.12.2 Producer"></a>2.12.2 Producer</h4><blockquote>
+<p>下面的示例是如何开启延迟消息。</p>
+</blockquote>
+<pre><code class="java">// message to be delivered at the configured delay interval
+producer.newMessage().deliverAfter(3L, TimeUnit.Minute).value(&quot;Hello Pulsar!&quot;).send();</code></pre>
+<h2 id="三、架构"><a href="#三、架构" class="headerlink" title="三、架构"></a>三、架构</h2><blockquote>
+<p>在最高层级，一个 Pulsar 实例有一个或多个 Pulsar 集群组成。实例中的集群可以互相备份数据。</p>
+<p>在一个 Pulsar 集群中：</p>
+<ul>
+<li>一个或多个 broker 为从生产者产生的消息做负载均衡，转发这些消息给消费者，与 Pulsar 配置中心通信以处理多种协作任务，将消息存储到 Bookeeper 的实例中，依靠为集群指定的 Zookeeper 来处理确切任务。</li>
+<li>一个由多个 bookie 组成的 Bookeeper 集群处理消息的持久化存储。</li>
+<li>一个全局的 Zookeeper 来处理多个 Pulsar 集群间的协作任务。</li>
+</ul>
+<p>下图展示了一个 Pulsar 集群。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-system-architecture.png" srcset="/img/loading.gif" alt="Pulsar architecture diagram"></p>
+<h3 id="3-1-Brokers"><a href="#3-1-Brokers" class="headerlink" title="3.1 Brokers"></a>3.1 Brokers</h3><blockquote>
+<p>Pulsar broker 是一个无状态的基础组件，它是为了另两个组件：</p>
+<ul>
+<li>一个为了管理任务和生产者消费者间的 topic 查找的开放 REST API 的 http 服务</li>
+<li>转发器，由异步 TCP 服务实现，用来传输所有数据。</li>
+</ul>
+<p>broker 只有在 managed ledger 缓存的容量小于 backlog 时，才会从 Bookeeper 中读取 entries，否则为了性能考虑会优先读取缓存。</p>
+<p>最后，为了跨地域备份的全局主题，broker 管理备份组件 tail 本地的 entries 发布区域通过 Java client 重新发送到远程区域。</p>
+</blockquote>
+<h3 id="3-2-Clusters"><a href="#3-2-Clusters" class="headerlink" title="3.2 Clusters"></a>3.2 Clusters</h3><blockquote>
+<p>一个 Pulsar 实例可以有一个或多个 Pulsar 集群组成。集群由以下内容组成：</p>
+<ul>
+<li>一个或多个 brokers</li>
+<li>一个 Zookeeper 用来管理集群级别的配置和协作</li>
+<li>bookies 集合用来持久化消息。</li>
+</ul>
+</blockquote>
+<h3 id="3-3-元数据存储"><a href="#3-3-元数据存储" class="headerlink" title="3.3 元数据存储"></a>3.3 元数据存储</h3><blockquote>
+<p>Pulsar 用 Zookeeper 来协作通信、存储元数据和集群配置。在一个 Pulsar 实例中：</p>
+<ul>
+<li>租户信息，命名空间，还有其他实体需要全局一致地存储在配置存储中。</li>
+<li>每一个 cluster 有它自己本地的 Zookeeper 来存储指定的集群配置和协作信息，比如元数据，broker 负载报告，Bookeeper ledger 的元数据。</li>
+</ul>
+</blockquote>
+<h3 id="3-4-Persistent-storage"><a href="#3-4-Persistent-storage" class="headerlink" title="3.4 Persistent storage"></a>3.4 Persistent storage</h3><blockquote>
+<p>Pulsar 为应用提供了消息发送的保证。如果一个消息顺利到达了 Pulsar broker，他将被发送到他指定的目标。</p>
+</blockquote>
+<h4 id="3-4-1-Apache-Bookeeper"><a href="#3-4-1-Apache-Bookeeper" class="headerlink" title="3.4.1 Apache Bookeeper"></a>3.4.1 Apache Bookeeper</h4><blockquote>
+<p>Pulsar 用了 Apache Bookeeper 来持久化消息存储。 Bookeeper 是一个分布式的 WAL 系统，提供了如下优势：</p>
+<ul>
+<li>它使 Pulsar 可以使用很多独立的日志，称作 ledgers。主题随时可以创建多个 ledgers</li>
+<li>它非常方便地提供了数据的顺序存储</li>
+<li>它保证了在不同系统失败的情况下 ledgers 的读一致性</li>
+<li>它提供了跨 bookies 的 I/O 分布公平</li>
+<li>在容量和流量上支持水平扩展。容量可以在增加更多 bookies 时立刻增加。</li>
+<li>bookies 是为千万级的 ledgers 并发读写设计的。使用多个磁盘，bookies 可以将堵操作独立出来以降低写操作的延迟影响。</li>
+</ul>
+<p>同时，对于消息数据，游标也持久化存储到了 Bookeeper 中。游标是消费者的订阅位置。Bookeeper 确保了 Pulsar 可以存储消费者的消费位置。因此，Pulsar 支持了持久化存储。</p>
+<p>bookies 和 brokers 的交互如下图所示</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/broker-bookie.png" srcset="/img/loading.gif" alt="Brokers and bookies"></p>
+<h4 id="3-4-2-Ledgers"><a href="#3-4-2-Ledgers" class="headerlink" title="3.4.2 Ledgers"></a>3.4.2 Ledgers</h4><blockquote>
+<p>一个 ledgers 追加写的数据结构，由一个单独的 writer 分配给多个 Bookeeper 的存储节点。Ledger entries 在多个 bookies 间被复制了多个副本，Ledgers 本身拥有很简单的语义：</p>
+<ul>
+<li>一个Pulsar broker 可以创建一个 ledger ，并且往其中追加 entries，和关闭这个 ledger。</li>
+<li>当一个 ledger 被关闭了，不管是主动的还是因为 writer 崩溃了，这个 ledger 只能以只读模式再次打开。</li>
+<li>最终，当 ledger 中的 entries 不被需要了，整个 ledger 可以从系统中被删除。</li>
+</ul>
+</blockquote>
+<h5 id="3-4-2-1-Ledger-读一致性"><a href="#3-4-2-1-Ledger-读一致性" class="headerlink" title="3.4.2.1 Ledger 读一致性"></a>3.4.2.1 Ledger 读一致性</h5><blockquote>
+<p>Bookeeper 的主要优势在于它保证了 ledgers 的读一致性。而且这个 ledger 只能被一个进程写，这个进程可以非常高效地追加 entries，不用考虑一致性。在失败后，ledger 会经过一个恢复流程，它会终结 ledger 的状态，并且确认那个 entry 是最后一次提交的。在那之后，这个 ledger 的所有 readers 被保证了能够获得同一份内容。</p>
+</blockquote>
+<h5 id="3-4-2-2-管理-ledgers"><a href="#3-4-2-2-管理-ledgers" class="headerlink" title="3.4.2.2 管理 ledgers"></a>3.4.2.2 管理 ledgers</h5><blockquote>
+<p>Bookeeper ledgers 提供了一份日志的抽象，因此开发了一个叫做 managed ledger 库代表了单个主题的存储层。一个 managed ledger 代表了一个消息流的抽象，单个写过程追加内容到流的结尾，和多个消费该消息流的指针。</p>
+<p>在内部，一个 manager ledger 使用多个 ledgers 保存数据。有两个原因为什么使用多个 ledgers：</p>
+<ul>
+<li>在失败后，一个 ledger 不能够继续写，只能创建一个新的 ledger。</li>
+<li>一个 ledger 可以在这个消息的所有游标都被消费后被删除。</li>
+</ul>
+</blockquote>
+<h4 id="3-4-3-Journal-storage"><a href="#3-4-3-Journal-storage" class="headerlink" title="3.4.3 Journal storage"></a>3.4.3 Journal storage</h4><blockquote>
+<p>在 Bookeeper 中，journal files 包含了 Bookeeper 的事务日志。在对一个 ledger 进行更新操作前，boodie 需要确保此次更新操作的描述被持久化到事务日志中。一个新的 journal 文件会在 bookie 启动时，或者老的文件达到最大值时被创建。</p>
+</blockquote>
+<h3 id="3-5-Pulsar-proxy"><a href="#3-5-Pulsar-proxy" class="headerlink" title="3.5 Pulsar proxy"></a>3.5 Pulsar proxy</h3><blockquote>
+<p>在不能直接使用 Pulsar 客户端和 Pulsar cluster 交互的时候。考虑使用 Pulsar Proxy。比如客户端不能直接访问 broker 的地址，例如：将Pulsar 运行在一个云环境中，或者 Kubernetes 中。</p>
+</blockquote>
+<h3 id="3-6-服务发现"><a href="#3-6-服务发现" class="headerlink" title="3.6 服务发现"></a>3.6 服务发现</h3><blockquote>
+<p>连接到 Pulsar brokers 的客户端需要能够通过一个 URL 连接到整个 Pulsar 实例。Pulsar 提供了一个内置的服务发现机制，你可以使用 <a href="https://pulsar.apache.org/docs/en/deploy-bare-metal#service-discovery-setup" target="_blank" rel="noopener">Deploying a Pulsar instance</a> 构建。</p>
+<p>下图展示了 Pulsar 的服务发现。</p>
+</blockquote>
+<p><img src="https://pulsar.apache.org/docs/assets/pulsar-service-discovery.png" srcset="/img/loading.gif" alt="alt-text"></p>
+<p>图中，Pulsar 集群是通过一个单一的 DNS 名称暴露出来的。客户端可以通过如下方式访问：</p>
+<pre><code class="python">from pulsar import Client
+
+client = Client(&#39;pulsar://pulsar-cluster.acme.com:6650&#39;)</code></pre>
+
+            <hr>
+          </div>
+          <br>
+          <div>
+            <p>
+            
+              <span>
+                <i class="iconfont icon-inbox"></i>
+                
+                  <a class="hover-with-bg" href="/categories/pulsar">pulsar</a>
+                  &nbsp;
+                
+              </span>&nbsp;&nbsp;
+            
+            
+              <span>
+                <i class="iconfont icon-tag"></i>
+                
+                  <a class="hover-with-bg" href="/tags/%E5%B7%A5%E5%85%B7">工具</a>
+                
+              </span>
+            
+            </p>
+            
+              <p class="note note-warning">本博客所有文章除特别声明外，均采用 <a href="https://zh.wikipedia.org/wiki/Wikipedia:CC_BY-SA_3.0%E5%8D%8F%E8%AE%AE%E6%96%87%E6%9C%AC" target="_blank" rel="nofollow noopener noopener">CC BY-SA 3.0协议</a> 。转载请注明出处！</p>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="d-none d-lg-block col-lg-2 toc-container">
+      
+  <div id="toc">
+    <p class="h4"><i class="far fa-list-alt"></i>&nbsp;TOC</p>
+    <div id="tocbot"></div>
+  </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- custom -->
+
+
+<!-- Comments -->
+<div class="col-lg-7 mx-auto nopadding-md">
+  <div class="container comments mx-auto" id="comments">
+    
+  </div>
+</div>
+
+    
+  </main>
+
+  
+    <a class="z-depth-1" id="scroll-top-button" href="#" role="button">
+      <i class="fa fa-chevron-up scroll-top-arrow" aria-hidden="true"></i>
+    </a>
+  
+
+  
+    <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+  
+
+  <footer class="mt-5">
+  <div class="text-center py-3">
+    <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><b>Hexo</b></a>
+    <i class="iconfont icon-love"></i>
+    <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"> <b>Fluid</b></a>
+    <br>
+
+    
+  
+    <!-- 不蒜子统计PV -->
+    
+    &nbsp;<span id="busuanzi_container_site_pv">总访问量 
+          <span id="busuanzi_value_site_pv"></span> 次</span>&nbsp;
+  
+  
+    <!-- 不蒜子统计UV -->
+    
+    &nbsp;<span id="busuanzi_container_site_uv">总访客数 
+            <span id="busuanzi_value_site_uv"></span> 人</span>&nbsp;
+  
+  <br>
+
+
+
+    
+
+  </div>
+</footer>
+
+<!-- SCRIPTS -->
+<script src="/lib/jquery/jquery.min.js" ></script>
+<script src="/lib/popper/popper.min.js" ></script>
+<script src="/lib/bootstrap/js/bootstrap.min.js" ></script>
+<script src="/lib/mdbootstrap/js/mdb.min.js" ></script>
+<script src="/js/main.js" ></script>
+
+
+  <script src="/js/lazyload.js" ></script>
+
+
+
+  
+    <script src="/lib/tocbot/tocbot.min.js" ></script>
+  
+  <script src="/js/post.js" ></script>
+
+
+
+  <script src="/lib/smooth-scroll/smooth-scroll.min.js" ></script>
+
+
+
+  <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" ></script>
+
+
+<!-- Plugins -->
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+
+
+  <script src="/lib/prettify/prettify.min.js" ></script>
+  <script>
+    $(document).ready(function () {
+      $('pre').addClass('prettyprint  linenums');
+      prettyPrint();
+    })
+  </script>
+
+
+
+  <script src="/lib/typed/typed.min.js" ></script>
+  <script>
+    var typed = new Typed('#subtitle', {
+      strings: [
+        '  ',
+        "Pulsar 文档翻译&nbsp;",
+      ],
+      cursorChar: "_",
+      typeSpeed: 70,
+      loop: false,
+    });
+    typed.stop();
+    $(document).ready(function () {
+      $(".typed-cursor").addClass("h2");
+      typed.start();
+    });
+  </script>
+
+
+
+  <script src="/lib/anchor/anchor.min.js" ></script>
+  <script>
+    anchors.options = {
+      placement: "right",
+      visible: "false",
+      
+    };
+    var el = "h1,h2,h3,h4,h5,h6".split(",");
+    var res = [];
+    for (item of el) {
+      res.push(".markdown-body > " + item)
+    }
+    anchors.add(res.join(", "))
+  </script>
+
+
+
+  <script src="/js/local-search.js" ></script>
+  <script>
+    var path = "/local-search.xml";
+    var inputArea = document.querySelector("#local-search-input");
+    inputArea.onclick = function () {
+      getSearchFile(path);
+      this.onclick = null
+    }
+  </script>
+
+
+
+  <script src="/lib/fancybox/jquery.fancybox.min.js" ></script>
+  <script>
+    $("#post img:not(.no-zoom img, img[no-zoom])").each(
+      function () {
+        var element = document.createElement("a");
+        $(element).attr("data-fancybox", "images");
+        $(element).attr("href", $(this).attr("src"));
+        $(this).wrap(element);
+      }
+    );
+  </script>
+
+
+
+
+
+
+
+</body>
+</html>

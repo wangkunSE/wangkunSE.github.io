@@ -136,6 +136,85 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2018/08/01/JVM%E6%80%BB%E7%BB%93/">
+        <p class="h4 index-header">JVM总结</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">JVM总结1.类加载机制1.1类加载时机:
+加载–&gt; 验证–&gt;准备–&gt;解析—&gt;初始化–&gt;使用—&gt;卸载
+
+初始化的触发时机（主动引用）：
+
+new一个新对象，或者调用这个类的静态方法或静态参数时。
+对类进行反射调用时
+初始化一个类，发现其父类还没有初始化时
+当虚拟机启动时，用户指定了一个主类，发现其主类还没有进行初始化时。
+
+
+1.2类的加载过程：1.2.1加载所完成的事情
+
+
+通过一个类的全限定名来获取定义此类的二进制字节流。
+将这个字节流转化为方法区的运行时数据结构
+在内存中生成一个代表这个类的java.lang.Class对象。
+
+
+1.2.2验证验证内容
+
+
+文件格式验证（流—&gt;方法区的数据结构）
+元数据验证
+字节码验证
+符号引用验证
+
+
+1.2.3准备
+为类变量分配内存并设置类变量初始值的阶段。
+
+1.2.4解析
+将符号引用替换为直接引用的过程。
+
+1.2.5初始化
+执行构造器的过程
+
+2.可达性分析算法
+当一个对象到GC Roots没有任何引用链相连时，就是从GC Roots不可到达这个对象时，这个对象时不可达的。
+
+在Java中，可</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2018-08-01&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/Java">Java</a>&nbsp;
+          
+            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
+          
+            <a href="/categories/Jvm">Jvm</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/Jvm">Jvm</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2018/07/31/ConcurrentHashMap%E5%AD%A6%E4%B9%A0/">
         <p class="h4 index-header">ConcurrentHashMap学习</p>
         
@@ -644,74 +723,6 @@ Output:
         int index = 1;
 
         while( rowBegin &lt;= rowEnd &amp;&amp</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2018-07-18&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          
-            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2018/07/18/LeetCode%20Spiral%20Matrix%20/">
-        <p class="h4 index-header">LeetCode-Spiral Matrix</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">LeetCode: Spiral Matrix题目：
-顺时针打印矩阵
-
-例子：
-Example 1:
-Input:
-[
- [ 1, 2, 3 ],
- [ 4, 5, 6 ],
- [ 7, 8, 9 ]
-]
-Output: [1,2,3,6,9,8,7,4,5]
-
-Example 2:
-Input:
-[
-  [1, 2, 3, 4],
-  [5, 6, 7, 8],
-  [9,10,11,12]
-]
-Output: [1,2,3,4,8,12,11,10,9,5,6,7]
-
-思路：
-就是从左至右，从上至下，从右至左，从下至上进行打印矩阵即可，但是这里要注意只剩1行和1列的处理
-
-代码:class Solution {
-    public List&lt;Integer&gt; spiralOrder(int[][] matrix) {
-        List&lt;Integer&gt; result = new ArrayList&lt;&gt;();
-        if(matrix == null || matrix.length == 0){
-            ret</div>
         </div>
       </a>
 

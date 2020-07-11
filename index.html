@@ -136,6 +136,65 @@
     
     
     <div class="col-12 col-md-8 m-auto">
+      <a href="/2020/07/08/Pulsar/">
+        <p class="h4 index-header">Pulsar 文档翻译</p>
+        
+        
+          
+        
+        <div class="index-excerpt" >
+          <div class="index-text mb-1">一、简介
+Pulsar 是一个多用户，高性能的服务间消息通信的解决方案。最早是雅虎开发的，目前已经变成了 Apache 顶级项目。
+Pulsar 的关键特性：
+
+单个 Pulsar 实例原生支持多个集群，并且支持对在集群中的消息有跨地区备份。
+非常非常低的发布和端到端的延迟。
+无缝扩展到百万级别的 topics。
+方便上手的客户端 API（Java，Go，Python，C++）
+对于 topics 拥有多种订阅模式。
+通过 Apache BookKeeper 保证消息分发和存储。
+拥有一个轻量级的无服务的计算框架来提供流式数据处理。
+拥有一个基于无服务计算框架的连接框架可以非常方便的将数据从 Pulsar 输入和输出。
+Tiered Storage 将热点数据转移到冷数据区。
+
+
+二、消息2.1 messaging concepts
+Pulsar 是基于发布-订阅模式的。一旦订阅被创建了，所有的消息就会被 Pulsar 保存，即使消费者失联。只有消息被消费者确认这些消息已经处理完毕了，这些消息才会被丢弃。
+
+2.1.1 消息
+消息是 Pulsar 中的最基本单元。
+
+
+
+
+Compon</div>
+        </div>
+      </a>
+
+      <div>
+        
+          <i class="iconfont icon-riqi2"></i>&nbsp;2020-07-08&nbsp;&nbsp;
+        
+        
+          <i class="iconfont icon-inbox"></i>
+          
+            <a href="/categories/pulsar">pulsar</a>&nbsp;
+          &nbsp;
+        
+        
+          <i class="iconfont icon-tag"></i>
+          
+            <a href="/tags/%E5%B7%A5%E5%85%B7">工具</a>&nbsp;
+          
+        
+      </div>
+    </div>
+  </div>
+
+  <div class="row mb-4 mx-auto">
+    
+    
+    <div class="col-12 col-md-8 m-auto">
       <a href="/2020/02/16/%E7%A9%B7%E7%88%B8%E7%88%B8%E5%AF%8C%E7%88%B8%E7%88%B8/">
         <p class="h4 index-header">穷爸爸富爸爸</p>
         
@@ -615,61 +674,6 @@ G1 中的重要概念Region
           <i class="iconfont icon-tag"></i>
           
             <a href="/tags/Jvm">Jvm</a>&nbsp;
-          
-        
-      </div>
-    </div>
-  </div>
-
-  <div class="row mb-4 mx-auto">
-    
-    
-    <div class="col-12 col-md-8 m-auto">
-      <a href="/2019/10/23/LeetCode%20211%20Add%20and%20Search%20Word%20-%20Data%20structure%20design/">
-        <p class="h4 index-header">LeetCode-Add and Search Word - Data structure design</p>
-        
-        
-          
-        
-        <div class="index-excerpt" >
-          <div class="index-text mb-1">LeetCode: Add and Search Word - Data structure design题目:
-设计一个数据结构实现下面两个操作：
-void addWord(word)
-bool search(word)
-search(word)方法可以查找出添加的单词，并且单词中的（’.’）字符代表任意存在的字母。
-
-例子：
-addWord(&quot;bad&quot;)
-addWord(&quot;dad&quot;)
-  addWord(&quot;mad&quot;)
-  search(&quot;pad&quot;) -&gt; false
-  search(&quot;bad&quot;) -&gt; true
-  search(&quot;.ad&quot;) -&gt; true
-search(&quot;b..&quot;) -&gt; true
-
-思路:
-这个题是一个设计数据结构的题，和trieNode那个题是类似的，需要一个这样的结构来根据字母树来查找单词。但是这里多了一个任意字符’.’，刚开始我改变了存储结构，按层来存储，这样看来就像一个单链表，但是这样其实</div>
-        </div>
-      </a>
-
-      <div>
-        
-          <i class="iconfont icon-riqi2"></i>&nbsp;2019-10-23&nbsp;&nbsp;
-        
-        
-          <i class="iconfont icon-inbox"></i>
-          
-            <a href="/categories/%E7%BC%96%E7%A8%8B">编程</a>&nbsp;
-          
-            <a href="/categories/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          &nbsp;
-        
-        
-          <i class="iconfont icon-tag"></i>
-          
-            <a href="/tags/%E7%AE%97%E6%B3%95">算法</a>&nbsp;
-          
-            <a href="/tags/Leetcode">Leetcode</a>&nbsp;
           
         
       </div>
